@@ -4,7 +4,7 @@
   "description": "Mock unit test data generation",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test"
+    "test": "karma start"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,17 @@
   "bugs": {
     "url": "https://github.com/tyler-technologies/data-generators/issues"
   },
-  "homepage": "https://github.com/tyler-technologies/data-generators#readme"
+  "homepage": "https://github.com/tyler-technologies/data-generators#readme",
+  "devDependencies": {
+    "@types/jasmine": "^3.8.2",
+    "@types/uuid": "^8.3.1",
+    "jasmine-core": "^3.8.0",
+    "karma": "^6.3.4",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-jasmine": "^4.0.1",
+    "karma-jasmine-html-reporter": "^1.7.0",
+    "karma-typescript": "^5.5.1",
+    "typescript": "^4.3.5",
+    "uuid": "^8.3.2"
+  }
 }
