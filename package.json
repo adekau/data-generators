@@ -1,6 +1,6 @@
 {
-  "name": "data-generators",
-  "version": "1.0.0",
+  "name": "@nwps/data-generators",
+  "version": "1.0.0-rc.0",
   "description": "Mock unit test data generation",
   "main": "index.js",
   "scripts": {
