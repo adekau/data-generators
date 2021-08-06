@@ -3,7 +3,7 @@ export { createGenerator } from './data-generator';
 export { many } from './many';
 export { enumValueGenerator } from './enum';
 export { numberGenerator, integerGenerator, charGenerator, stringGenerator, booleanGenerator } from './primitives';
-export { struct } from './struct';
+export { struct, structWithOverrides } from './struct';
 export { tuple } from './tuple';
 export { uuidGenerator } from './uuid';
 export { optional } from './optional';

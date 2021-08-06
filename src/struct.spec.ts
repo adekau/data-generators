@@ -1,6 +1,7 @@
+import { constant } from './constant';
 import { enumValueGenerator } from './enum';
 import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from './primitives';
-import { struct } from './struct';
+import { struct, structWithOverrides } from './struct';
 
 enum EyeColor {
     Blue = 'blue',
@@ -39,5 +40,37 @@ describe('Data Generators: Struct', () => {
         expect(result.lastName.length).toBe(8);
         expect(result.middleInitial).toBeInstanceOf(String);
         expect(result.middleInitial.length).toBe(1);
+    });
+
+    describe('structWithOverrides', () => {
+        const gen = structWithOverrides({
+            num: numberGenerator(5, 10),
+            str: stringGenerator()
+        });
+        it('should allow overriding struct generators', () => {
+            expect(
+                gen({
+                    num: constant(16)
+                }).create()
+            ).toEqual({
+                num: 16,
+                str: jasmine.any(String)
+            });
+
+            expect(
+                gen({ num: integerGenerator(20, 30), str: charGenerator })
+                    .createMany(4)
+                    .every(({ num, str }) => num >= 20 && num <= 30 && str.length === 1)
+            ).toBeTrue();
+        });
+
+        it('should default to struct with no provided overrides', () => {
+            expect(gen().create().str.length).toBe(10);
+            expect(
+                gen()
+                    .createMany(4)
+                    .every(({ num, str }) => num >= 5 && num <= 10 && str.length === 10)
+            ).toBeTrue();
+        });
     });
 });
