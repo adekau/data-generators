@@ -1,7 +1,10 @@
 import { constant } from './constant';
+import { DataGenerator } from './data-generator.interface';
 import { enumValueGenerator } from './enum';
-import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from './primitives';
+import { booleanGenerator, charGenerator, integerGenerator, numberGenerator, stringGenerator } from './primitives';
+import { constantSequence } from './sequence';
 import { struct, structWithOverrides } from './struct';
+import { uuidGenerator } from './uuid-generator';
 
 enum EyeColor {
     Blue = 'blue',
@@ -71,6 +74,25 @@ describe('Data Generators: Struct', () => {
                     .createMany(4)
                     .every(({ num, str }) => num >= 5 && num <= 10 && str.length === 10)
             ).toBeTrue();
+        });
+
+        it('allows mapping', () => {
+            const gen2 = structWithOverrides({
+                id: uuidGenerator,
+                value: stringGenerator(6),
+                enabled: booleanGenerator()
+            }, (dg) => dg.map((v) => `${v.id}|${v.enabled}|${v.value}`));
+
+            const results = gen2({
+                id: constant('hello'),
+                value: constant('test'),
+                enabled: constantSequence(true, false) as DataGenerator<boolean>
+            }).createMany(2);
+
+            expect(results).toEqual([
+                'hello|true|test',
+                'hello|false|test'
+            ]);
         });
     });
 });

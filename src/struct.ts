@@ -25,8 +25,20 @@ export const struct = <T>(generators: { [K in keyof T]-?: DataGenerator<T[K]> })
         }, {} as { [K in keyof T]: T[K] });
     });
 
+
 /**
  * Same as {@link struct}, but allows optional overrides of each property's generator.
+ * @param generators an object of generators matching the interface
+ * @param manipulate expose the underlying struct DataGeneration to manipulate it with `map`, `flatMap`, etc.
  */
-export const structWithOverrides = <T>(generators: { [K in keyof T]-?: DataGenerator<T[K]> }) => (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }) =>
-    struct<T>(Object.assign({}, generators, generatorOverrides));
+export function structWithOverrides<T>(generators: { [K in keyof T]-?: DataGenerator<T[K]> }): (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }) => DataGenerator<T>;
+export function structWithOverrides<T, U>(generators: { [K in keyof T]-?: DataGenerator<T[K]> }, manipulate: (dg: DataGenerator<T>) => DataGenerator<U>): (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }) => DataGenerator<U>
+export function structWithOverrides(...args: any[]): (generatorOverrides?: Record<string, unknown>) => any {
+    return (generatorOverrides) => {
+        if (args.length === 1)
+            return struct(Object.assign({}, args[0], generatorOverrides));
+        else
+            return args[1](struct(Object.assign({}, args[0], generatorOverrides)));
+    }
+}
+

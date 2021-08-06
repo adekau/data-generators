@@ -1,4 +1,4 @@
-import { uuidGenerator } from './uuid';
+import { uuidGenerator } from './uuid-generator';
 
 describe('Data Generators: UUID', () => {
     it('should generate a UUID', () => {

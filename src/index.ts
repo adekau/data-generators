@@ -5,7 +5,7 @@ export { enumValueGenerator } from './enum';
 export { numberGenerator, integerGenerator, charGenerator, stringGenerator, booleanGenerator } from './primitives';
 export { struct, structWithOverrides } from './struct';
 export { tuple } from './tuple';
-export { uuidGenerator } from './uuid';
+export { uuidGenerator } from './uuid-generator';
 export { optional } from './optional';
 export { constant } from './constant';
 export { either } from './either';

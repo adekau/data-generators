@@ -30,4 +30,6 @@ export interface DataGenerator<T> {
      * @returns a new data generator created by `project`.
      */
     flatMap: <U>(project: (output: T) => DataGenerator<U>) => DataGenerator<U>;
+    
+    ap: <U>(projectGenerator: DataGenerator<(output: T) => U>) => DataGenerator<U>;
 }
