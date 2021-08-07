@@ -25,6 +25,12 @@ export const struct = <T>(generators: { [K in keyof T]: DataGenerator<T[K]> }): 
         }, {} as T);
     });
 
+/**
+ * Creates a generator that generates a potentially incomplete object adhering to a partial interface.
+ * 
+ * @param generators an object of optional generators matching the interface
+ * @returns a generator that creates a partial object using the provided generators
+ */
 export const partialStruct = <T>(generators: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<Partial<T>> =>
     createGenerator(() => {
         return Object.keys(generators).reduce((acc, key) => {
