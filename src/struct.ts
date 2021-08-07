@@ -15,30 +15,31 @@ import { DataGenerator } from './data-generator.interface';
  * }).create();
  * // Example Output: { isRequired: true, fieldId: 52, value: 'aVE3^x' }
  */
-export const struct = <T>(generators: { [K in keyof T]-?: DataGenerator<T[K]> }): DataGenerator<T> =>
+export const struct = <T>(generators: { [K in keyof T]: DataGenerator<T[K]> }): DataGenerator<T> =>
     createGenerator(() => {
         return Object.keys(generators).reduce((acc, key) => {
             return {
                 ...acc,
                 [key]: generators[key as keyof typeof generators].create()
             };
-        }, {} as { [K in keyof T]: T[K] });
+        }, {} as T);
     });
 
+export const partialStruct = <T>(generators: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<Partial<T>> =>
+    createGenerator(() => {
+        return Object.keys(generators).reduce((acc, key) => {
+            return {
+                ...acc,
+                [key]: generators[key as keyof typeof generators]?.create()
+            };
+        }, {})
+    })
 
 /**
- * Same as {@link struct}, but allows optional overrides of each property's generator.
- * @param generators an object of generators matching the interface
- * @param manipulate expose the underlying struct DataGeneration to manipulate it with `map`, `flatMap`, etc.
+ * Creates a function that returns a new DataGenerator with properties of the original DataGenerator being optionally overridden.
+ * 
+ * @param dataGenerator The object DataGenerator to provide overrides for.
+ * @returns a function that overrides the selected properties.
  */
-export function structWithOverrides<T>(generators: { [K in keyof T]-?: DataGenerator<T[K]> }): (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }) => DataGenerator<T>;
-export function structWithOverrides<T, U>(generators: { [K in keyof T]-?: DataGenerator<T[K]> }, manipulate: (dg: DataGenerator<T>) => DataGenerator<U>): (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }) => DataGenerator<U>
-export function structWithOverrides(...args: any[]): (generatorOverrides?: Record<string, unknown>) => any {
-    return (generatorOverrides) => {
-        if (args.length === 1)
-            return struct(Object.assign({}, args[0], generatorOverrides));
-        else
-            return args[1](struct(Object.assign({}, args[0], generatorOverrides)));
-    }
-}
-
+export const withOverrides = <T extends Record<string, unknown>>(dataGenerator: DataGenerator<T>) => (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<T> =>
+    dataGenerator.map((out) => Object.assign({}, out, partialStruct(generatorOverrides ?? {}).create()))
