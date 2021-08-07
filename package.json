@@ -2,10 +2,13 @@
   "name": "@nwps/data-generators",
   "version": "1.0.0-rc.1",
   "description": "Mock unit test data generation",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "karma start"
+    "test": "karma start",
+    "build": "tsc"
   },
+  "files": ["lib/**/*"],
+  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tyler-technologies/data-generators.git"
