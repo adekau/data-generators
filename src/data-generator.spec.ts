@@ -1,5 +1,5 @@
 import { createGenerator } from './data-generator';
-import { integerGenerator } from './primitives';
+import { booleanGenerator, integerGenerator, numberGenerator } from './primitives';
 
 describe('Data Generators: Data Generator', () => {
     it('should create a data generator', () => {
@@ -19,5 +19,17 @@ describe('Data Generators: Data Generator', () => {
         const newGen = integerGenerator(1, 5).ap(genFn);
 
         expect(newGen.create()).toBeGreaterThan(5);
+    });
+
+    it('should flatMap', () => {
+        const randomProbabilityGenerator = numberGenerator(0, 100);
+        const spy = jasmine.createSpy('booleanGenerator', booleanGenerator).and.callThrough();
+        const gen = randomProbabilityGenerator.flatMap(spy);
+
+        const results = gen.createMany(3);
+
+        expect(results.length).toBe(3);
+        expect(results.every((x) => typeof x === 'boolean'));
+        expect(spy).toHaveBeenCalledTimes(3);
     });
 });

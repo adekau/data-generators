@@ -6,6 +6,8 @@ export interface DataGenerator<T> {
      * Generate a single output
      *
      * @returns a single value of type `T`.
+     * @example
+     * charGenerator.create(); // 'T'
      */
     create: () => T;
 
@@ -14,6 +16,8 @@ export interface DataGenerator<T> {
      *
      * @param length the number of outputs to generate
      * @returns an array of length `length` of generated outputs
+     * @example
+     * integerGenerator(1, 10).createMany(4); // [3, 1, 9, 3]
      */
     createMany: (length: number) => T[];
 
@@ -21,6 +25,10 @@ export interface DataGenerator<T> {
      * @param project mapping function from a single output of {@link DataGenerator.create}
      * to a new value.
      * @returns a new {@link DataGenerator} that uses the projection function to generate output.
+     * @example
+     * const gen = integerGenerator(1, 10).map((n: number) => n * 10);
+     * gen.create(); // returns a number between 10 and 100
+
      */
     map: <U>(project: (output: T) => U) => DataGenerator<U>;
 
@@ -28,8 +36,20 @@ export interface DataGenerator<T> {
      * @param project mapping function from single output of {@link DataGenerator.create} to
      * a new {@link DataGenerator}.
      * @returns a new data generator created by `project`.
+     * @example
+     * const randomProbabilityGenerator = numberGenerator(0, 100);
+     * const gen = randomProbabilityGenerator.flatMap(booleanGenerator);
+     * gen.create(); // generates a boolean with a random probability of being true
      */
     flatMap: <U>(project: (output: T) => DataGenerator<U>) => DataGenerator<U>;
     
+    /**
+     * @param projectGenerator a data generator that generates the mapping function
+     * @returns a new data generator that applies the projection generator to the calling generator
+     * @example
+     * const mapper = createGenerator(() => (n: number) => n * 10);
+     * const gen = integerGenerator(1, 10).ap(mapper);
+     * gen.create(); // returns a number between 10 and 100
+     */
     ap: <U>(projectGenerator: DataGenerator<(output: T) => U>) => DataGenerator<U>;
 }

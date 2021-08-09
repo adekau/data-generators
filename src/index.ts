@@ -13,3 +13,4 @@ export { sequence, constantSequence } from './sequence';
 export { incrementGenerator } from './increment';
 export { dateGenerator, DateOverrideGenerators } from './date';
 export { defer } from './defer';
+export { functionGenerator } from './function';
