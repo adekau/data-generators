@@ -14,3 +14,4 @@ export { incrementGenerator } from './increment';
 export { dateGenerator, DateOverrideGenerators } from './date';
 export { defer } from './defer';
 export { functionGenerator, toFunctionGenerator } from './function';
+export { withDefault } from './default';
