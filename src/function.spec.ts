@@ -6,7 +6,7 @@ describe('Data Generators: Fucntion', () => {
 		const gen = functionGenerator(integerGenerator(1, 5));
 
 		const functions = gen.createMany(3);
-		expect(functions.every((fn) => typeof fn === 'function'));
-		expect(functions.every((fn) => fn() >= 1 && fn() <= 5));
+		expect(functions.every((fn) => typeof fn === 'function')).toBeTrue();
+		expect(functions.every((fn) => fn() >= 1 && fn() <= 5)).toBeTrue();
 	});
 });

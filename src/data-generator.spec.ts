@@ -29,7 +29,7 @@ describe('Data Generators: Data Generator', () => {
         const results = gen.createMany(3);
 
         expect(results.length).toBe(3);
-        expect(results.every((x) => typeof x === 'boolean'));
+        expect(results.every((x) => typeof x === 'boolean')).toBeTrue();
         expect(spy).toHaveBeenCalledTimes(3);
     });
 });

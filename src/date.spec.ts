@@ -18,7 +18,7 @@ describe('Data Generators: Date', () => {
 
         expect(dates.every((x) => x instanceof Date)).toBeTrue();
         expect(dates.every((x) => !isNaN(x.getTime()))).toBeTrue();
-        expect(dates.every((x) => x.getFullYear() < today.getFullYear()));
+        expect(dates.every((x) => x.getFullYear() < today.getFullYear())).toBeTrue();
     });
 
     it('should generate a date in the AM with minutes in the first half of the hour', () => {
