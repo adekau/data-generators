@@ -1,8 +1,10 @@
 import { createGenerator, dgAp, dgFlatMap, dgMap } from './data-generator';
 import { optional } from './optional';
 import { defer } from './defer';
-import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from './primitives';
+import { booleanGenerator, charGenerator, integerGenerator, numberGenerator, stringGenerator } from './primitives';
 import { many } from './many';
+import { withDefault } from './default';
+import { DataGenerator } from './data-generator.interface';
 
 describe('Data Generators: Data Generator', () => {
     it('should create a data generator', () => {
@@ -64,9 +66,19 @@ describe('Data Generators: Data Generator', () => {
                 dgMap((num) => num + 20),
                 dgFlatMap(stringGenerator),
                 optional(50),
-                many(4)
+                withDefault(charGenerator),
+                many(4),
+                optional(),
+                withDefault(charGenerator.pipe(many(3))),
+                dgMap((strs) => strs.map((str) => str.length)),
+                dgFlatMap(
+                    (nums): DataGenerator<string | number> =>
+                        nums.every((num) => num === 1) ? charGenerator : integerGenerator(1, 10)
+                )
             );
-            console.log(gen.createMany(5));
+            expect(
+                gen.createMany(5).every((x) => (typeof x === 'string' ? x.length === 1 : x >= 1 && x <= 10))
+            ).toBeTrue();
         });
     });
 });
