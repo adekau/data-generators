@@ -12,6 +12,10 @@ describe('Data Generators: Enum', () => {
         const result = enumValueGenerator(TestEnum).createMany(10);
 
         expect(result.length).toBe(10);
-        expect(result.every((x) => x === TestEnum.Blue || x === TestEnum.Green || x === TestEnum.Red || x === TestEnum.Invalid)).toBeTrue();
+        expect(
+            result.every(
+                (x) => x === TestEnum.Blue || x === TestEnum.Green || x === TestEnum.Red || x === TestEnum.Invalid
+            )
+        ).toBeTrue();
     });
 });

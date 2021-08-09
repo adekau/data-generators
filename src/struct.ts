@@ -27,7 +27,7 @@ export const struct = <T>(generators: { [K in keyof T]: DataGenerator<T[K]> }): 
 
 /**
  * Creates a generator that generates a potentially incomplete object adhering to a partial interface.
- * 
+ *
  * @param generators an object of optional generators matching the interface
  * @returns a generator that creates a partial object using the provided generators
  */
@@ -38,14 +38,16 @@ export const partialStruct = <T>(generators: { [K in keyof T]+?: DataGenerator<T
                 ...acc,
                 [key]: generators[key as keyof typeof generators]?.create()
             };
-        }, {})
-    })
+        }, {});
+    });
 
 /**
  * Creates a function that returns a new DataGenerator with properties of the original DataGenerator being optionally overridden.
- * 
+ *
  * @param dataGenerator The object DataGenerator to provide overrides for.
  * @returns a function that overrides the selected properties.
  */
-export const withOverrides = <T extends object>(dataGenerator: DataGenerator<T>) => (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<T> =>
-    dataGenerator.map((out) => Object.assign({}, out, partialStruct(generatorOverrides ?? {}).create()))
+export const withOverrides =
+    <T extends object>(dataGenerator: DataGenerator<T>) =>
+    (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<T> =>
+        dataGenerator.map((out) => Object.assign({}, out, partialStruct(generatorOverrides ?? {}).create()));

@@ -12,7 +12,9 @@ interface DateData {
     ms?: number;
 }
 
-export type DateOverrideGenerators = { [K in keyof DateData]+?: DataGenerator<DateData[K]> };
+export type DateOverrideGenerators = {
+    [K in keyof DateData]+?: DataGenerator<DateData[K]>;
+};
 
 const dateDataGenerator = (overrideGenerators?: DateOverrideGenerators): DataGenerator<DateData> =>
     struct<DateData>({
@@ -34,4 +36,6 @@ const dateDataGenerator = (overrideGenerators?: DateOverrideGenerators): DataGen
  * @returns a random date {@link DataGenerator}
  */
 export const dateGenerator = (overrideGenerators?: DateOverrideGenerators): DataGenerator<Date> =>
-    dateDataGenerator(overrideGenerators).map(({ year, month, date, hours, minutes, seconds, ms }) => new Date(year, month, date, hours, minutes, seconds, ms));
+    dateDataGenerator(overrideGenerators).map(
+        ({ year, month, date, hours, minutes, seconds, ms }) => new Date(year, month, date, hours, minutes, seconds, ms)
+    );

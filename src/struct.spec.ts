@@ -33,7 +33,11 @@ describe('Data Generators: Struct', () => {
         });
         const result = gen.create();
 
-        expect(result.eyeColor === EyeColor.Blue || result.eyeColor === EyeColor.Brown || result.eyeColor === EyeColor.Green).toBeTrue();
+        expect(
+            result.eyeColor === EyeColor.Blue ||
+                result.eyeColor === EyeColor.Brown ||
+                result.eyeColor === EyeColor.Green
+        ).toBeTrue();
         expect(Number.isInteger(result.height)).toBeTrue();
         expect(result.height >= 150 && result.height <= 200).toBeTrue();
         expect(result.weight).toBeInstanceOf(Number);
@@ -47,10 +51,12 @@ describe('Data Generators: Struct', () => {
     });
 
     describe('structWithOverrides', () => {
-        const gen = withOverrides(struct({
-            num: numberGenerator(5, 10),
-            str: stringGenerator()
-        }));
+        const gen = withOverrides(
+            struct({
+                num: numberGenerator(5, 10),
+                str: stringGenerator()
+            })
+        );
         it('should allow overriding struct generators', () => {
             expect(
                 gen({

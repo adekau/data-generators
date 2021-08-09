@@ -9,4 +9,5 @@ import { DataGenerator } from './data-generator.interface';
  * @param length the number of outputs to generate
  * @returns a new generator that generates an array of outputs from `baseGenerator`
  */
-export const many = <T>(baseGenerator: DataGenerator<T>, length: number): DataGenerator<T[]> => createGenerator(() => baseGenerator.createMany(length));
+export const many = <T>(baseGenerator: DataGenerator<T>, length: number): DataGenerator<T[]> =>
+    createGenerator(() => baseGenerator.createMany(length));
