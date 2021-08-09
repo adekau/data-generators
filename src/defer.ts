@@ -14,9 +14,7 @@ import { DataGenerator } from './data-generator.interface';
  * defer(withOverrides(struct({ num1: numberGenerator(), num2: numberGenerator() })), (dg) => dg.map(({ num1, num2 }) => num1 + num2));
  */
 export const defer =
-    <T, U, V extends any[]>(
-        dataGeneratorFn: (...args: V) => DataGenerator<T>,
-        deferredProject: (arg: DataGenerator<T>) => DataGenerator<U>
-    ): ((...args: V) => DataGenerator<U>) =>
+    <T, U, V extends any[]>(deferredProject: (arg: DataGenerator<T>) => DataGenerator<U>) =>
+    (dataGeneratorFn: (...args: V) => DataGenerator<T>) =>
     (...args: V) =>
         deferredProject(dataGeneratorFn(...args));

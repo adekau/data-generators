@@ -48,6 +48,7 @@ export const partialStruct = <T>(generators: { [K in keyof T]+?: DataGenerator<T
  * @returns a function that overrides the selected properties.
  */
 export const withOverrides =
+    () =>
     <T extends object>(dataGenerator: DataGenerator<T>) =>
     (generatorOverrides?: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<T> =>
         dataGenerator.map((out) => Object.assign({}, out, partialStruct(generatorOverrides ?? {}).create()));

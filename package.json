@@ -5,7 +5,8 @@
     "main": "lib/index.js",
     "scripts": {
         "test": "karma start",
-        "build": "tsc"
+        "prettier": "prettier --write .",
+        "build": "prettier --write . && tsc"
     },
     "files": [
         "lib/**/*"

@@ -6,10 +6,19 @@ import { either } from './either';
  * Creates a generator that modifies the input generator to have a chance of returning `undefined`.
  *
  * @param generator the base generator to generate a value from when not returning `undefined`
- * @param undefinedProbability the probability (between 0 and 100) of generating `undefined`
+ * @param undefinedProbability the probability (between 0 and 100) of generating `undefined` (default 15)
  * @returns either a value from `generator` or `undefined`.
  */
-export const optional = <T>(
-    generator: DataGenerator<T>,
-    undefinedProbability: number = 15
-): DataGenerator<T | undefined> => either(constant(undefined), generator, undefinedProbability);
+export function optional(
+    undefinedProbability?: number
+): <T>(generator: DataGenerator<T>) => DataGenerator<T | undefined>;
+export function optional<T>(generator: DataGenerator<T>, undefinedProbability?: number): DataGenerator<T | undefined>;
+export function optional(...args: any[]): any {
+    if (args.length === 0) {
+        return (generator: DataGenerator<any>) => either(constant(undefined), generator, 15);
+    }
+    if (args.length === 1 && (typeof args[0] === 'number' || typeof args[0] === 'undefined')) {
+        return (generator: DataGenerator<any>) => either(constant(undefined), generator, args[0] ?? 15);
+    }
+    return either(constant(undefined), args[0], args[1] ?? 15);
+}

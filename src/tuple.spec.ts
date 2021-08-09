@@ -21,7 +21,7 @@ describe('Data Generators: Tuple', () => {
             numberGenerator(5, 20),
             integerGenerator(2, 10),
             struct({ bool: booleanGenerator(), num: numberGenerator() }),
-            many(booleanGenerator(), 3)
+            booleanGenerator().pipe(many(3))
         );
         const data = gen.create();
 

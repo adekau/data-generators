@@ -51,12 +51,11 @@ describe('Data Generators: Struct', () => {
     });
 
     describe('structWithOverrides', () => {
-        const gen = withOverrides(
-            struct({
-                num: numberGenerator(5, 10),
-                str: stringGenerator()
-            })
-        );
+        const gen = struct({
+            num: numberGenerator(5, 10),
+            str: stringGenerator()
+        }).pipe(withOverrides());
+
         it('should allow overriding struct generators', () => {
             expect(
                 gen({

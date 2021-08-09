@@ -23,13 +23,26 @@ export const createGenerator = <T>(create: () => T): DataGenerator<T> => ({
     }
 });
 
+/**
+ * Pipeable version of {@link DataGenerator.map}.
+ */
 export const dgMap =
     <T, U>(project: (output: T) => U) =>
     (dg: DataGenerator<T>) =>
         dg.map(project);
 
-const gen = createGenerator(() => 5).pipe(
-    dgMap((o) => o.toString()),
-    dgMap((o) => o.concat('!')),
-    dgMap((o) => o.length)
-);
+/**
+ * Pipeable version of {@link DataGenerator.flatMap}
+ */
+export const dgFlatMap =
+    <T, U>(project: (output: T) => DataGenerator<U>) =>
+    (dg: DataGenerator<T>) =>
+        dg.flatMap(project);
+
+/**
+ * Pipeable version of {@link DataGenerator.ap}
+ */
+export const dgAp =
+    <T, U>(projectGenerator: DataGenerator<(output: T) => U>) =>
+    (dg: DataGenerator<T>) =>
+        dg.ap(projectGenerator);

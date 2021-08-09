@@ -8,3 +8,10 @@ import { DataGenerator } from './data-generator.interface';
  */
 export const functionGenerator = <T>(returnValueGenerator: DataGenerator<T>): DataGenerator<() => T> =>
     returnValueGenerator.map((out) => () => out);
+
+/**
+ * Pipe operator to convert a DataGenerator to a DataGenerator that generates a function returning the piped generator's output
+ *
+ * @returns a {@link functionGenerator}
+ */
+export const toFunctionGenerator = () => functionGenerator;

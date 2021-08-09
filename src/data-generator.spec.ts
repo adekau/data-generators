@@ -1,5 +1,8 @@
-import { createGenerator } from './data-generator';
-import { booleanGenerator, integerGenerator, numberGenerator } from './primitives';
+import { createGenerator, dgAp, dgFlatMap, dgMap } from './data-generator';
+import { optional } from './optional';
+import { defer } from './defer';
+import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from './primitives';
+import { many } from './many';
 
 describe('Data Generators: Data Generator', () => {
     it('should create a data generator', () => {
@@ -31,5 +34,39 @@ describe('Data Generators: Data Generator', () => {
         expect(results.length).toBe(3);
         expect(results.every((x) => typeof x === 'boolean')).toBeTrue();
         expect(spy).toHaveBeenCalledTimes(3);
+    });
+
+    describe('pipe', () => {
+        it('should pipe map', () => {
+            const gen = numberGenerator().pipe(dgMap((num) => num.toString()));
+
+            expect(gen.create()).toBeInstanceOf(String);
+        });
+
+        it('should pipe flatMap', () => {
+            const gen = integerGenerator(1, 10).pipe(dgFlatMap(stringGenerator));
+
+            const result = gen.createMany(5);
+            expect(result.every((s) => typeof s === 'string')).toBeTrue();
+            expect(result.every((s) => s.length <= 10 && s.length >= 1)).toBeTrue();
+        });
+
+        it('should pipe apply', () => {
+            const apgen = createGenerator(() => (num: number) => num > 5);
+            const gen = integerGenerator(1, 10).pipe(dgAp(apgen));
+
+            const result = gen.createMany(5);
+            expect(result.every((bool) => typeof bool === 'boolean')).toBeTrue();
+        });
+
+        it('should pipe 9 functions', () => {
+            const gen = integerGenerator(1, 5).pipe(
+                dgMap((num) => num + 20),
+                dgFlatMap(stringGenerator),
+                optional(50),
+                many(4)
+            );
+            console.log(gen.createMany(5));
+        });
     });
 });

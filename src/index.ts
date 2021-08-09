@@ -1,5 +1,5 @@
 export { DataGenerator } from './data-generator.interface';
-export { createGenerator } from './data-generator';
+export { createGenerator, dgMap, dgFlatMap, dgAp } from './data-generator';
 export { many } from './many';
 export { enumValueGenerator } from './enum';
 export { numberGenerator, integerGenerator, charGenerator, stringGenerator, booleanGenerator } from './primitives';
@@ -13,4 +13,4 @@ export { sequence, constantSequence } from './sequence';
 export { incrementGenerator } from './increment';
 export { dateGenerator, DateOverrideGenerators } from './date';
 export { defer } from './defer';
-export { functionGenerator } from './function';
+export { functionGenerator, toFunctionGenerator } from './function';

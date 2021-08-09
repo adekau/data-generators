@@ -1,4 +1,5 @@
 import { constant } from './constant';
+import { dgMap } from './data-generator';
 import { DataGenerator } from './data-generator.interface';
 import { defer } from './defer';
 import { booleanGenerator, integerGenerator, stringGenerator } from './primitives';
@@ -9,7 +10,7 @@ import { uuidGenerator } from './uuid-generator';
 describe('Data Generators: Defer', () => {
     it('should defer', () => {
         const fn = (num: number) => integerGenerator(0, 5).map((int) => int + num);
-        const gen = defer(fn, (dg) => dg.map((num) => `Your number is ${num}`));
+        const gen = defer((dg) => dg.map((num) => `Your number is ${num}`))(fn);
 
         const result = gen(100).create();
         expect(result.startsWith('Your number is ')).toBeTrue();
@@ -17,15 +18,13 @@ describe('Data Generators: Defer', () => {
     });
 
     it('allows overriding original generators and mapping to something else using defer', () => {
-        const gen2 = defer(
-            withOverrides(
-                struct({
-                    id: uuidGenerator,
-                    value: stringGenerator(6),
-                    enabled: booleanGenerator()
-                })
-            ),
-            (dg) => dg.map((v) => `${v.id}|${v.enabled}|${v.value}`)
+        const gen2 = struct({
+            id: uuidGenerator,
+            value: stringGenerator(6),
+            enabled: booleanGenerator()
+        }).pipe(
+            withOverrides(),
+            defer((dg) => dg.map((v) => `${v.id}|${v.enabled}|${v.value}`))
         );
 
         const results = gen2({
