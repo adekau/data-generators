@@ -38,11 +38,3 @@ export const dgFlatMap =
     <T, U>(project: (output: T) => DataGenerator<U>) =>
     (dg: DataGenerator<T>) =>
         dg.flatMap(project);
-
-/**
- * Pipeable version of {@link DataGenerator.ap}
- */
-export const dgAp =
-    <T, U>(projectGenerator: DataGenerator<(output: T) => U>) =>
-    (dg: DataGenerator<T>) =>
-        dg.ap(projectGenerator);
