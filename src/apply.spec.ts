@@ -32,12 +32,12 @@ describe('Data Generators: Apply', () => {
             a: constant('test')
         }).pipe(apS('b', struct({ ab: constant('testtest') })));
 
-		expect(gen.create()).toEqual({
-			a: 'test',
-			b: {
-				ab: 'testtest'
-			}
-		})
+        expect(gen.create()).toEqual({
+            a: 'test',
+            b: {
+                ab: 'testtest'
+            }
+        });
     });
 
     describe('pipe', () => {

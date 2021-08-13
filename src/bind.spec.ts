@@ -1,10 +1,9 @@
+import { apS } from './apply';
 import { bind, bindTo } from './bind';
 import { constant } from './constant';
+import { incrementGenerator } from './increment';
 import { integerGenerator, stringGenerator } from './primitives';
 import { struct } from './struct';
-import { incrementGenerator } from './increment';
-import { many } from './many';
-import { apS } from './apply';
 
 describe('Data Generators: Bind', () => {
     it('should bind an existing data generator', () => {

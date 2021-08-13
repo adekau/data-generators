@@ -1,4 +1,3 @@
-import { DataGenerator } from './data-generator.interface';
 import { defer } from './defer';
 import { integerGenerator } from './primitives';
 import { struct, withOverrides } from './struct';
@@ -28,4 +27,3 @@ export const dateGenerator = struct({
         )
     )
 );
-

@@ -10,7 +10,7 @@ export const dgAp =
 
 /**
  * Applies a generator on a struct
- * 
+ *
  * @param name the name on the struct to bind to
  * @param dgT the generator to use for the value
  * @returns a data generator that generates the input value with `{ [name]: generatorOutput }` appended

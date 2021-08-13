@@ -15,7 +15,7 @@ export const bindTo =
 
 /**
  * Like `apS`, but allows the generator to be dependent on previous struct values.
- * 
+ *
  * @param name the object property name to bind to
  * @param f callback that gives access to previous generator output for use in creating a new generator
  * @returns a new object generator with the returned generator of `f` used to compute property `name`.
