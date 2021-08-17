@@ -1,4 +1,5 @@
-import { createGenerator } from './data-generator';
+import { apT } from './apply';
+import { constant } from './constant';
 import { DataGenerator } from './data-generator.interface';
 
 /**
@@ -69,5 +70,5 @@ export function tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
     ]
 ): DataGenerator<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>;
 export function tuple(...generators: DataGenerator<any>[]): DataGenerator<any[]> {
-    return createGenerator(() => generators.map((gen) => gen.create()));
+    return generators.reduce((prev, cur) => prev.pipe(apT(cur)), constant([]) as DataGenerator<any[]>);
 }

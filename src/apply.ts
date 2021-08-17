@@ -24,3 +24,9 @@ export const apS =
     (dgA: DataGenerator<A>): DataGenerator<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }> => {
         return dgT.ap(dgA.map((a) => (t: T) => Object.assign({}, a, { [name]: t }) as any));
     };
+
+export const apT =
+    <T, A extends unknown[]>(dgT: DataGenerator<T>) =>
+    (dgA: DataGenerator<A>): DataGenerator<[...A, T]> => {
+        return dgA.ap(dgT.map((t) => (a: A) => [...a, t]));
+    };

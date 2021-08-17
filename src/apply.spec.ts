@@ -1,8 +1,9 @@
-import { apS, dgAp } from './apply';
+import { apS, apT, dgAp } from './apply';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
 import { booleanGenerator, integerGenerator, stringGenerator } from './primitives';
 import { struct } from './struct';
+import { tuple } from './tuple';
 
 describe('Data Generators: Apply', () => {
     it('should apply into a struct', () => {
@@ -47,6 +48,20 @@ describe('Data Generators: Apply', () => {
 
             const result = gen.createMany(5);
             expect(result.every((bool) => typeof bool === 'boolean')).toBeTrue();
+        });
+    });
+
+    describe('apT', () => {
+        it('should append to a tuple', () => {
+            const gen = tuple(constant(5), integerGenerator(), booleanGenerator()).pipe(apT(stringGenerator()));
+
+            expect(gen.create().length).toBe(4);
+            expect(gen.create()).toEqual([
+                jasmine.any(Number),
+                jasmine.any(Number),
+                jasmine.any(Boolean),
+                jasmine.any(String)
+            ]);
         });
     });
 });

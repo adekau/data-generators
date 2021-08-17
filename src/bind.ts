@@ -25,7 +25,7 @@ export const bindTo =
  *     bind('str', ({ num }) => stringGenerator(num))
  * ).createMany(2); // [{ num: 2, str: 'a!' }, { num: 7, str: '1_)Z/Mi' }]
  */
-export const bind =
+export const bindS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, f: (a: A) => DataGenerator<T>) =>
     (dgA: DataGenerator<A>): DataGenerator<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }> => {
         return dgA.flatMap((a) => f(a).map((t) => Object.assign({}, a, { [name]: t }) as any));

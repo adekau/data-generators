@@ -15,5 +15,6 @@ export { dateGenerator } from './date';
 export { defer } from './defer';
 export { functionGenerator, toFunctionGenerator } from './function';
 export { withDefault } from './default';
-export { bind, bindTo } from './bind';
-export { dgAp, apS } from './apply';
+export { bindS, bindTo } from './bind';
+export { dgAp, apS, apT } from './apply';
+export { withS, withT, withoutS, withoutT } from './with'

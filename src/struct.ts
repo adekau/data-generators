@@ -1,5 +1,8 @@
+import { apS } from './apply';
+import { constant } from './constant';
 import { createGenerator } from './data-generator';
 import { DataGenerator } from './data-generator.interface';
+import { withS } from './with';
 
 /**
  * Creates a generator that generates an object adhering to an interface using the provided generators for
@@ -15,15 +18,11 @@ import { DataGenerator } from './data-generator.interface';
  * }).create();
  * // Example Output: { isRequired: true, fieldId: 52, value: 'aVE3^x' }
  */
-export const struct = <T>(generators: { [K in keyof T]: DataGenerator<T[K]> }): DataGenerator<T> =>
-    createGenerator(() => {
-        return Object.keys(generators).reduce((acc, key) => {
-            return {
-                ...acc,
-                [key]: generators[key as keyof typeof generators].create()
-            };
-        }, {} as T);
-    });
+export const struct = <T extends object>(generators: { [K in keyof T]: DataGenerator<T[K]> }): DataGenerator<T> => {
+    return Object.keys(generators).reduce((prev, cur) => {
+        return prev.pipe(withS(cur as keyof T, generators[cur as keyof T]));
+    }, constant({}) as DataGenerator<T>);
+};
 
 /**
  * Creates a generator that generates a potentially incomplete object adhering to a partial interface.

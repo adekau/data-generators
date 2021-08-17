@@ -1,5 +1,5 @@
 import { apS } from './apply';
-import { bind, bindTo } from './bind';
+import { bindS, bindTo } from './bind';
 import { constant } from './constant';
 import { incrementGenerator } from './increment';
 import { integerGenerator, stringGenerator } from './primitives';
@@ -17,7 +17,7 @@ describe('Data Generators: Bind', () => {
     it('should bind with previous data', () => {
         const gen = struct({
             a: integerGenerator()
-        }).pipe(bind('b', ({ a }) => constant(`Your number is ${a}.`)));
+        }).pipe(bindS('b', ({ a }) => constant(`Your number is ${a}.`)));
 
         const result = gen.create();
         expect(result.a).toBeInstanceOf(Number);
@@ -27,9 +27,9 @@ describe('Data Generators: Bind', () => {
     it('should bind with an existing struct', () => {
         const gen = incrementGenerator(1).pipe(
             bindTo('i'),
-            bind('a', ({ i }) => stringGenerator(i)),
+            bindS('a', ({ i }) => stringGenerator(i)),
             bindTo('test'),
-            bind('z', ({ test: { a, i } }) => constant(`(${a},${i})`))
+            bindS('z', ({ test: { a, i } }) => constant(`(${a},${i})`))
         );
 
         expect(gen.create()).toEqual({
@@ -46,7 +46,7 @@ describe('Data Generators: Bind', () => {
             bindTo('a'),
             apS('b', incrementGenerator(5)),
             bindTo('point'),
-            bind('display', ({ point: { a, b } }) => constant(`( ${a}, ${b} )`))
+            bindS('display', ({ point: { a, b } }) => constant(`( ${a}, ${b} )`))
         );
 
         expect(gen.createMany(3)).toEqual([
