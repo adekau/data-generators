@@ -9,8 +9,10 @@ import { DataGenerator } from './data-generator.interface';
  * @returns a tuple of values in order of the input generators.
  * @see struct
  * @example
+ * ```
  * tuple(stringGenerator(6), integerGenerator(), booleanGenerator()).create();
  * // Example Output: ['hZn,*Q', 3, false]
+ * ```
  */
 export function tuple<T1>(...generators: [DataGenerator<T1>]): DataGenerator<[T1]>;
 export function tuple<T1, T2>(...generators: [DataGenerator<T1>, DataGenerator<T2>]): DataGenerator<[T1, T2]>;

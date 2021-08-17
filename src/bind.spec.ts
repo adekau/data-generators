@@ -1,13 +1,14 @@
 import { apS } from './apply';
-import { bindS, bindTo } from './bind';
+import { bindS, bindT, bindToS, bindToT } from './bind';
 import { constant } from './constant';
 import { incrementGenerator } from './increment';
-import { integerGenerator, stringGenerator } from './primitives';
+import { booleanGenerator, integerGenerator, stringGenerator } from './primitives';
 import { struct } from './struct';
+import { tuple } from './tuple';
 
 describe('Data Generators: Bind', () => {
     it('should bind an existing data generator', () => {
-        const gen = stringGenerator().pipe(bindTo('a'));
+        const gen = stringGenerator().pipe(bindToS('a'));
 
         expect(gen.create()).toEqual({
             a: jasmine.stringMatching(/.{10}/)
@@ -26,9 +27,9 @@ describe('Data Generators: Bind', () => {
 
     it('should bind with an existing struct', () => {
         const gen = incrementGenerator(1).pipe(
-            bindTo('i'),
+            bindToS('i'),
             bindS('a', ({ i }) => stringGenerator(i)),
-            bindTo('test'),
+            bindToS('test'),
             bindS('z', ({ test: { a, i } }) => constant(`(${a},${i})`))
         );
 
@@ -43,9 +44,9 @@ describe('Data Generators: Bind', () => {
 
     it('uses apS to generate points', () => {
         const gen = incrementGenerator(1).pipe(
-            bindTo('a'),
+            bindToS('a'),
             apS('b', incrementGenerator(5)),
-            bindTo('point'),
+            bindToS('point'),
             bindS('display', ({ point: { a, b } }) => constant(`( ${a}, ${b} )`))
         );
 
@@ -63,5 +64,23 @@ describe('Data Generators: Bind', () => {
                 display: '( 3, 7 )'
             }
         ]);
+    });
+
+    describe('tuple', () => {
+        it('should bind to a tuple', () => {
+            const gen = integerGenerator().pipe(bindToT());
+
+            expect(gen.create()).toEqual([jasmine.any(Number)]);
+        });
+
+        it('should bind a tuple', () => {
+            const gen = tuple(integerGenerator(), booleanGenerator()).pipe(bindT(([n]) => stringGenerator(n)));
+
+            const result = gen.create();
+            expect(result[0]).toBeInstanceOf(Number);
+            expect(result[1]).toBeInstanceOf(Boolean);
+            expect(result[2]).toBeInstanceOf(String);
+            expect(result[2].length).toBe(result[0]);
+        });
     });
 });

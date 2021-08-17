@@ -8,10 +8,12 @@ import { DataGenerator } from './data-generator.interface';
  * @param deferredProject a projection function that manipulates the returned data generator from `dataGeneratorFn` after the the returned function is called
  * @returns a proxy function with the same arguments as `dataGeneratorFn` and sends the output of `dataGeneratorFn` through `deferredProject`.
  * @example
+ * ```
  * // use case:
  * withOverrides(struct({ num1: numberGenerator(), num2: numberGenerator() }).map(({ num1, num2 }) => num1 + num2)); // type error, map caused the input to withOverloads to be DataGenerator<number>
  * // with defer:
  * defer(withOverrides(struct({ num1: numberGenerator(), num2: numberGenerator() })), (dg) => dg.map(({ num1, num2 }) => num1 + num2));
+ * ```
  */
 export const defer =
     <T, U, V extends any[]>(deferredProject: (arg: DataGenerator<T>) => DataGenerator<U>) =>

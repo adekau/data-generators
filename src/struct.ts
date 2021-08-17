@@ -11,12 +11,14 @@ import { withS } from './with';
  * @param generators an object of generators matching the interface
  * @returns a generator that creates an object instance adhering to the interface
  * @example
+ * ```
  * struct({
  *     isRequired: booleanGenerator(),
  *     fieldId: integerGenerator(),
  *     value: stringGenerator(6)
  * }).create();
  * // Example Output: { isRequired: true, fieldId: 52, value: 'aVE3^x' }
+ * ```
  */
 export const struct = <T extends object>(generators: { [K in keyof T]: DataGenerator<T[K]> }): DataGenerator<T> => {
     return Object.keys(generators).reduce((prev, cur) => {
