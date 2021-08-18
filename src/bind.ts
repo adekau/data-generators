@@ -3,11 +3,13 @@ import { DataGenerator } from './data-generator.interface';
 /**
  * Binds the generator output to a property on a new object with name `name`.
  *
+ * @category Transformer
  * @param name the object property name to bind to
  * @returns An object with the output of the called generator bound to property `name`.
  * @example
  * ```
- * integerGenerator().pipe(bindToS('num')).create(); // { num: 57 }
+ * integerGenerator().pipe(bindToS('num')).create();
+ * // { num: 57 }
  * ```
  */
 export const bindToS =
@@ -18,10 +20,12 @@ export const bindToS =
 /**
  * Binds the generator output to the first member of a new tuple.
  *
+ * @category Transformer
  * @returns a single element tuple generator
  * @example
  * ```
- * integerGenerator().pipe(bindToT()).create(); // [52]
+ * integerGenerator().pipe(bindToT()).create();
+ * // [52]
  * ```
  */
 export const bindToT =
@@ -32,6 +36,7 @@ export const bindToT =
 /**
  * Like `apS`, but allows the generator to be dependent on previous struct values.
  *
+ * @category Transformer
  * @param name the object property name to bind to
  * @param f callback that gives access to previous generator output for use in creating a new generator
  * @returns a new object generator with the returned generator of `f` used to compute property `name`.
@@ -40,7 +45,8 @@ export const bindToT =
  * integerGenerator(1, 10).pipe(
  *     bindToS('num'),
  *     bindS('str', ({ num }) => stringGenerator(num))
- * ).createMany(2); // [{ num: 2, str: 'a!' }, { num: 7, str: '1_)Z/Mi' }]
+ * ).createMany(2);
+ * // [{ num: 2, str: 'a!' }, { num: 7, str: '1_)Z/Mi' }]
  * ```
  */
 export const bindS =
@@ -51,7 +57,8 @@ export const bindS =
 
 /**
  * Like `apT`, but allows the generator to be dependent on other tuple values.
- * 
+ *
+ * @category Transformer
  * @param f callback that gives access to previous generator output in the tuple for use in creating a new generator
  * @returns a new tuple generator with the returned generator of `f` being used to compute the next member of the tuple.
  * @example
@@ -59,7 +66,8 @@ export const bindS =
  * integerGenerator(1, 10).pipe(
  *     bindToT(),
  *     bindT(([i]) => stringGenerator(i))
- * ).create(); // [4, 'hTyt']
+ * ).create();
+ * // [4, 'hTyt']
  * ```
  */
 export const bindT =

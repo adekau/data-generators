@@ -5,8 +5,19 @@ import { integerGenerator } from './primitives';
 /**
  * Generates a valid entry of an input enumeration.
  *
+ * @category Library
  * @param enumeration An enum. **Cannot be a `const enum`**.
  * @returns A random entry of the input enum
+ * @example
+ * ```
+ * enum EyeColor {
+ *     Green = 1,
+ *     Blue = 'blue',
+ *     Brown = 2
+ * }
+ * enumValueGenerator(EyeColor).createMany(5);
+ * // [2, 'blue', 'blue', 2, 1]
+ * ```
  */
 export const enumValueGenerator = <T extends Record<any, unknown>>(enumeration: T): DataGenerator<T[keyof T]> =>
     createGenerator(() => {

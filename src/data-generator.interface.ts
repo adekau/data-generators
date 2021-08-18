@@ -7,6 +7,7 @@ export interface DataGenerator<T> {
     /**
      * Generate a single output
      *
+     * @category Extraction
      * @returns a single value of type `T`.
      * @example
      * ```
@@ -18,6 +19,7 @@ export interface DataGenerator<T> {
     /**
      * Generate an array of input length of outputs
      *
+     * @category Extraction
      * @param length the number of outputs to generate
      * @returns an array of length `length` of generated outputs
      * @example
@@ -28,6 +30,7 @@ export interface DataGenerator<T> {
     createMany(length: number): T[];
 
     /**
+     * @category Transformer
      * @param project mapping function from a single output of {@link DataGenerator.create}
      * to a new value.
      * @returns a new {@link DataGenerator} that uses the projection function to generate output.
@@ -41,6 +44,7 @@ export interface DataGenerator<T> {
     map<U>(project: (output: T) => U): DataGenerator<U>;
 
     /**
+     * @category Transformer
      * @param project mapping function from single output of {@link DataGenerator.create} to
      * a new {@link DataGenerator}.
      * @returns a new data generator created by `project`.
@@ -54,6 +58,7 @@ export interface DataGenerator<T> {
     flatMap<U>(project: (output: T) => DataGenerator<U>): DataGenerator<U>;
 
     /**
+     * @category Transformer
      * @param projectGenerator a data generator that generates the mapping function
      * @returns a new data generator that applies the projection generator to the calling generator
      * @example
@@ -68,6 +73,7 @@ export interface DataGenerator<T> {
     /**
      * Provides the ability to pipeline functions together.
      *
+     * @category Transformer
      * @param fns the functions to pipe together using the calling DataGenerator as the initial input
      * @return the result of piping the DataGenerator through all the pipeline functions
      */

@@ -17,4 +17,4 @@ export { functionGenerator, toFunctionGenerator } from './function';
 export { withDefault } from './default';
 export { bindS, bindToS, bindT, bindToT } from './bind';
 export { dgAp, apS, apT } from './apply';
-export { withS, withT, withoutS, withoutT } from './with'
+export { withS, withT, withoutS, withoutT } from './with';

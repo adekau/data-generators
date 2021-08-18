@@ -2,12 +2,12 @@ import { apS } from './apply';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
 import { DataGenerator } from './data-generator.interface';
-import { withS } from './with';
 
 /**
  * Creates a generator that generates an object adhering to an interface using the provided generators for
  * interface members. Can be thought of as behaving similarly to RxJS `forkJoin`.
  *
+ * @category Creation
  * @param generators an object of generators matching the interface
  * @returns a generator that creates an object instance adhering to the interface
  * @example
@@ -29,6 +29,7 @@ export const struct = <T extends object>(generators: { [K in keyof T]: DataGener
 /**
  * Creates a generator that generates a potentially incomplete object adhering to a partial interface.
  *
+ * @category Creation
  * @param generators an object of optional generators matching the interface
  * @returns a generator that creates a partial object using the provided generators
  */
@@ -45,6 +46,7 @@ export const partialStruct = <T>(generators: { [K in keyof T]+?: DataGenerator<T
 /**
  * Creates a function that returns a new DataGenerator with properties of the original DataGenerator being optionally overridden.
  *
+ * @category Utility
  * @param dataGenerator The object DataGenerator to provide overrides for.
  * @returns a function that overrides the selected properties.
  */

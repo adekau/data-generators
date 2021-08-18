@@ -4,7 +4,8 @@ import { tuple } from './tuple';
 
 /**
  * Overrides the generator of a struct property.
- * 
+ *
+ * @category Transformer
  * @param name Name of struct key to override
  * @param using New generator to use in place of the old one
  * @returns A generator of the same type with `name` overridden.
@@ -24,7 +25,8 @@ export const withS =
 
 /**
  * Overrides the generator of a tuple member.
- * 
+ *
+ * @category Transformer
  * @param index Index of the tuple member to override
  * @param using New generator to use in place of the old one
  * @returns A generator of the same type with the generator at `index` overridden.
@@ -51,7 +53,8 @@ export const withT =
 
 /**
  * Omits a property of an object Data Generator from the output.
- * 
+ *
+ * @category Transformer
  * @param name Name of the struct member to omit
  * @returns An object Data Generator with the selected property omitted
  * @example
@@ -73,7 +76,8 @@ export const withoutS =
 
 /**
  * Omits a member of a tuple Data Generator from the output.
- * 
+ *
+ * @category Transformer
  * @param index Index of the tuple member to omit
  * @returns A tuple Data Generator with the selected index omitted.
  * @example

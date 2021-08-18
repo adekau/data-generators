@@ -5,9 +5,18 @@ import { either } from './either';
 /**
  * Creates a generator that modifies the input generator to have a chance of returning `undefined`.
  *
+ * @category Transformer
  * @param generator the base generator to generate a value from when not returning `undefined`
  * @param undefinedProbability the probability (between 0 and 100) of generating `undefined` (default 15)
  * @returns either a value from `generator` or `undefined`.
+ * @example
+ * ```
+ * // Can be used either as a pipe operator or standalone
+ * // Pipe Operator:
+ * integerGenerator().pipe(optional()); // type: DataGenerator<number | undefined>
+ * // Standalone
+ * optional(integerGenerator()); // type: DataGenerator<number | undefined>
+ * ```
  */
 export function optional(
     undefinedProbability?: number

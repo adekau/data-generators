@@ -4,6 +4,7 @@ import { DataGenerator } from './data-generator.interface';
  * Creates a Data Generator adhering to the interface, and automatically generates
  * the `createMany`, `map`, and `flatMap` functions using the `create` input provided.
  *
+ * @category Creation
  * @param create The function that generates data.
  * @returns a {@link DataGenerator} of type T
  */
@@ -25,6 +26,8 @@ export const createGenerator = <T>(create: () => T): DataGenerator<T> => ({
 
 /**
  * Pipeable version of {@link DataGenerator.map}.
+ *
+ * @category Transformer
  */
 export const dgMap =
     <T, U>(project: (output: T) => U) =>
@@ -33,6 +36,8 @@ export const dgMap =
 
 /**
  * Pipeable version of {@link DataGenerator.flatMap}
+ *
+ * @category Transformer
  */
 export const dgFlatMap =
     <T, U>(project: (output: T) => DataGenerator<U>) =>

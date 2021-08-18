@@ -7,6 +7,7 @@ import { struct, withOverrides } from './struct';
  *
  * **Note**: Year defaults to 1970 to (current year + 50)
  *
+ * @category Library
  * @param generatorOverrides optional overrides of the generators used to generate each date piece
  * @returns a random date {@link DataGenerator}
  */

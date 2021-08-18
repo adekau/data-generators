@@ -5,6 +5,7 @@ import { DataGenerator } from './data-generator.interface';
 /**
  * Similar to struct, but in a fixed length array format.
  *
+ * @category Creation
  * @param generators comma separated generators in order of how the tuple will output
  * @returns a tuple of values in order of the input generators.
  * @see struct

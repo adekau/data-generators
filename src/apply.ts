@@ -2,6 +2,8 @@ import { DataGenerator } from './data-generator.interface';
 
 /**
  * Pipeable version of {@link DataGenerator.ap}
+ *
+ * @category Transformer
  */
 export const dgAp =
     <T, U>(projectGenerator: DataGenerator<(output: T) => U>) =>
@@ -11,6 +13,7 @@ export const dgAp =
 /**
  * Applies a generator on a struct
  *
+ * @category Transformer
  * @param name the name on the struct to bind to
  * @param dgT the generator to use for the value
  * @returns a data generator that generates the input value with `{ [name]: generatorOutput }` appended
@@ -18,7 +21,8 @@ export const dgAp =
  * ```
  * constant({ i: 100 }).pipe(
  *     apS('j', incrementGenerator(1))
- * ).createMany(2); // [{ i: 100, j: 1 }, { i: 100, j: 2 }]
+ * ).createMany(2);
+ * // [{ i: 100, j: 1 }, { i: 100, j: 2 }]
  * ```
  */
 export const apS =
@@ -29,14 +33,16 @@ export const apS =
 
 /**
  * Applies a generator on a tuple.
- * 
+ *
+ * @category Transformer
  * @param dgT the generator to use for the value
  * @returns a tuple generator that appends the output `dgT` to the end of a tuple
  * @example
  * ```
  * constant([]).pipe(
  *     apT(integerGenerator())
- * ).create(); // [33]
+ * ).create();
+ * // [33]
  * ```
  */
 export const apT =
