@@ -22,7 +22,7 @@ import { withS } from './with';
  */
 export const struct = <T extends object>(generators: { [K in keyof T]: DataGenerator<T[K]> }): DataGenerator<T> => {
     return Object.keys(generators).reduce((prev, cur) => {
-        return prev.pipe(withS(cur as keyof T, generators[cur as keyof T]));
+        return prev.pipe(apS(cur as any, generators[cur as keyof T]));
     }, constant({}) as DataGenerator<T>);
 };
 
