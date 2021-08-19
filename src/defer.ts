@@ -11,9 +11,9 @@ import { DataGenerator } from './data-generator.interface';
  * @example
  * ```
  * // use case:
- * withOverrides(struct({ num1: numberGenerator(), num2: numberGenerator() }).map(({ num1, num2 }) => num1 + num2)); // type error, map caused the input to withOverloads to be DataGenerator<number>
+ * struct({ num1: numberGenerator(), num2: numberGenerator() }).map(({ num1, num2 }) => num1 + num2).pipe(withOverrides()); // type error, map caused the input to withOverloads to be DataGenerator<number>
  * // with defer:
- * defer(withOverrides(struct({ num1: numberGenerator(), num2: numberGenerator() })), (dg) => dg.map(({ num1, num2 }) => num1 + num2));
+ * struct({ num1: numberGenerator(), num2: numberGenerator() }).pipe(withOverrides(), defer((dg) => dg.map(({ num1, num2 }) => num1 + num2)));
  * ```
  */
 export const defer =
