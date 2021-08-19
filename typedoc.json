@@ -1,0 +1,10 @@
+{
+    "entryPoints": [
+        "./src/creation/index.ts",
+        "./src/transformer/index.ts",
+        "./src/library/index.ts",
+        "./src/utility/index.ts"
+    ],
+    "out": "docs",
+    "theme": "pages-plugin"
+}
