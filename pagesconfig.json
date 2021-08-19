@@ -5,7 +5,7 @@
             "pages": [
                 {
                     "title": "Getting Started",
-                    "source": "./documentation/getting-started.md"
+                    "source": "./guide/getting-started.md"
                 }
             ]
         }
