@@ -1,5 +1,5 @@
 import { B, L, N, U } from 'ts-toolbelt';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 import { tuple } from '../creation/tuple';
 
 /**

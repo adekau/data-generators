@@ -1,2 +1,2 @@
-export { DataGenerator } from './data-generator.interface';
+export * from './interfaces';
 export * from './creation';

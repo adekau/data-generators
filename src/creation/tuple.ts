@@ -1,6 +1,6 @@
 import { apT } from '../transformer/apply';
 import { constant } from './constant';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Similar to struct, but in a fixed length array format.

@@ -1,4 +1,4 @@
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Defer projections on a data generator returned by a function until after the function is called. Useful on a `struct` data generator wrapped in `withOverrides` to keep

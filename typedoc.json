@@ -1,5 +1,6 @@
 {
     "entryPoints": [
+        "./src/interfaces/index.ts",
         "./src/creation/index.ts",
         "./src/transformer/index.ts",
         "./src/library/index.ts",

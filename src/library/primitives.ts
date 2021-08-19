@@ -1,5 +1,5 @@
 import { createGenerator } from '../creation/data-generator';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 import { many } from '../transformer/many';
 
 /**

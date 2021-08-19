@@ -1,5 +1,5 @@
 import { createGenerator } from '../creation/data-generator';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Creates a generator that returns an array of length `length` of outputs from `baseGenerator`.

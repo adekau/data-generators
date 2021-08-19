@@ -1,4 +1,4 @@
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Creates a DataGenerator that generates functions for mock callbacks.

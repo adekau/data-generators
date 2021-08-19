@@ -1,5 +1,5 @@
 import { constant } from '../creation/constant';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Data Generator pipe operator for using a default generator in place of undefined outputs.

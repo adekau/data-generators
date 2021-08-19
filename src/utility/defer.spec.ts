@@ -1,7 +1,7 @@
 import { constant } from '../creation/constant';
 import { constantSequence } from '../creation/sequence';
 import { struct } from '../creation/struct';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 import { booleanGenerator, integerGenerator, stringGenerator } from '../library/primitives';
 import { uuidGenerator } from '../library/uuid-generator';
 import { withOverrides } from '../utility/struct';

@@ -1,5 +1,5 @@
 import { constant } from '../creation/constant';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 import { either } from '../creation/either';
 
 /**

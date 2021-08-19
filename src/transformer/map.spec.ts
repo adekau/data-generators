@@ -1,4 +1,4 @@
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { withDefault } from './default';
 import { many } from './many';

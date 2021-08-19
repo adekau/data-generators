@@ -1,4 +1,4 @@
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 import { apS } from '../transformer/apply';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';

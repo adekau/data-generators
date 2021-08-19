@@ -1,5 +1,5 @@
 import { createGenerator } from './data-generator';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Generator that always generates the same value

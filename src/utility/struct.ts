@@ -1,5 +1,5 @@
 import { partialStruct } from '../creation/struct';
-import { DataGenerator } from '../data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Creates a function that returns a new DataGenerator with properties of the original DataGenerator being optionally overridden.
