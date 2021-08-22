@@ -10,7 +10,7 @@ import { withoutS, withoutT, withS } from './with';
 describe('Data Generators: With', () => {
     it("should replace a struct key's generator", () => {
         const gen = struct({
-            str: constant('string')
+            str: constant<string>('string')
         }).pipe(
             withS('str', constant('wow')),
             bindS('q', ({ str }) => constant(str.concat('q'))),
