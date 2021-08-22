@@ -74,6 +74,7 @@
 						<section class="tsd-index-section ">
 							<h3>Creation Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="creation.html#anyOf" class="tsd-kind-icon">any<wbr>Of</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="creation.html#constant" class="tsd-kind-icon">constant</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="creation.html#constantSequence" class="tsd-kind-icon">constant<wbr>Sequence</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="creation.html#createGenerator" class="tsd-kind-icon">create<wbr>Generator</a></li>
@@ -90,6 +91,55 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Creation Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="anyOf" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> any<wbr>Of</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">any<wbr>Of&lt;T&gt;<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>generators<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/interfaces.DataGenerator.html" class="tsd-signature-type" data-tsd-kind="Interface">DataGenerator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Inner</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/any-of.ts#L21">creation/any-of.ts:21</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a data generator that outputs a value from any of the input generators at random.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code><span style="color: #795E26">anyOf</span><span style="color: #000000">(</span>
+<span style="color: #000000">    </span><span style="color: #795E26">integerGenerator</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">),</span>
+<span style="color: #000000">    </span><span style="color: #795E26">stringGenerator</span><span style="color: #000000">(</span><span style="color: #098658">5</span><span style="color: #000000">),</span>
+<span style="color: #000000">    </span><span style="color: #795E26">booleanGenerator</span><span style="color: #000000">()</span>
+<span style="color: #000000">).</span><span style="color: #795E26">createMany</span><span style="color: #000000">(</span><span style="color: #098658">5</span><span style="color: #000000">);</span>
+<span style="color: #008000">// [4, true, 5, &#039;A6eBd&#039;, false]</span>
+</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><a href="../interfaces/interfaces.DataGenerator.html" class="tsd-signature-type" data-tsd-kind="Interface">DataGenerator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>generators: <span class="tsd-signature-type">T</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Generators to pick any of for the next output</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/interfaces.DataGenerator.html" class="tsd-signature-type" data-tsd-kind="Interface">DataGenerator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Inner</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>a data generator that outputs a value from any of the input generators at random</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="constant" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> constant</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
@@ -99,7 +149,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/constant.ts#L11">creation/constant.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/constant.ts#L11">creation/constant.ts:11</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -110,7 +160,7 @@
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
 								<li>
-									<h4>T</h4>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">NarrowableConst</span></h4>
 								</li>
 							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -137,7 +187,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/sequence.ts#L34">creation/sequence.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/sequence.ts#L34">creation/sequence.ts:34</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -183,7 +233,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/data-generator.ts#L11">creation/data-generator.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/data-generator.ts#L11">creation/data-generator.ts:11</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -234,7 +284,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/either.ts#L18">creation/either.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/either.ts#L18">creation/either.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -294,7 +344,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/struct.ts#L36">creation/struct.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/struct.ts#L36">creation/struct.ts:36</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -332,7 +382,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/sequence.ts#L18">creation/sequence.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/sequence.ts#L18">creation/sequence.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -378,7 +428,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/struct.ts#L23">creation/struct.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/struct.ts#L23">creation/struct.ts:23</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -436,7 +486,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L18">creation/tuple.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L18">creation/tuple.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -475,7 +525,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L19">creation/tuple.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L19">creation/tuple.ts:19</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -498,7 +548,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L20">creation/tuple.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L20">creation/tuple.ts:20</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -524,7 +574,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L23">creation/tuple.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L23">creation/tuple.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -553,7 +603,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L26">creation/tuple.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L26">creation/tuple.ts:26</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -585,7 +635,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L29">creation/tuple.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L29">creation/tuple.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -620,7 +670,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L39">creation/tuple.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L39">creation/tuple.ts:39</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -658,7 +708,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L50">creation/tuple.ts:50</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L50">creation/tuple.ts:50</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -699,7 +749,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/1ac1010/src/creation/tuple.ts#L62">creation/tuple.ts:62</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/24429f7/src/creation/tuple.ts#L62">creation/tuple.ts:62</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -778,6 +828,9 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="creation.html#anyOf" class="tsd-kind-icon">any<wbr>Of</a>
+					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="creation.html#constant" class="tsd-kind-icon">constant</a>
 					</li>
