@@ -7,7 +7,7 @@
         "test": "karma start",
         "prettier": "prettier --write .",
         "clean:docs": "shx rm -rf ./docs",
-        "build": "prettier --write . && tsc",
+        "build": "prettier --write . && shx rm -rf ./lib && tsc",
         "build:docs": "npm run fix-typedoc-pages && npm run clean:docs && typedoc",
         "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs"
     },
