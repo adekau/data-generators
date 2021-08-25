@@ -26,6 +26,12 @@ module.exports = function (config) {
             'src/**/*.ts': 'karma-typescript'
         },
 
+        karmaTypescriptConfig: {
+            compilerOptions: {
+                downlevelIteration: true
+            }
+        },
+
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://www.npmjs.com/search?q=keywords:karma-reporter
