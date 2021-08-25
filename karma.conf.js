@@ -15,7 +15,12 @@ module.exports = function (config) {
         frameworks: ['jasmine', 'karma-typescript'],
 
         // list of files / patterns to load in the browser
-        files: ['src/**/*.ts'],
+        // files: ['src/**/*.ts'],
+        files: [
+            'src/creation/data-generator.ts',
+            'src/interfaces/data-generator.interface.ts',
+            'src/creation/data-generator-experimental.spec.ts'
+        ],
 
         // list of files / patterns to exclude
         exclude: [],

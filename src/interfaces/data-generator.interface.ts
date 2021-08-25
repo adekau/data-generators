@@ -3,7 +3,7 @@ type DataGeneratorFunction<T, R> = (arg: DataGenerator<T>) => R;
 /**
  * Interface for a factory that generates random test data
  */
-export interface DataGenerator<T> {
+export interface DataGenerator<T> extends Iterable<T> {
     /**
      * Generate a single output
      *

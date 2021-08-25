@@ -13,4 +13,6 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  * // [5, 6, 7, 8, 9, 10]
  * ```
  */
-export const incrementGenerator = (startWith: number = 0): DataGenerator<number> => createGenerator(() => startWith++);
+export const incrementGenerator = createGenerator(function* (startWith: number = 0) {
+    yield startWith++;
+});
