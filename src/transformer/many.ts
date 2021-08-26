@@ -1,5 +1,4 @@
-import { createGenerator } from '../creation/data-generator';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { take } from '../creation/data-generator';
 
 /**
  * Creates a generator that returns an array of length `length` of outputs from `baseGenerator`.
@@ -19,5 +18,9 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  */
 export const many =
     <T>(length: number) =>
-    (baseGenerator: DataGenerator<T>): DataGenerator<T[]> =>
-        createGenerator(() => baseGenerator.createMany(length));
+    (baseGenerator: () => Iterable<T>) =>
+        function* () {
+            while (true) {
+                yield [...take(length)(baseGenerator)()];
+            }
+        };

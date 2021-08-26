@@ -2,7 +2,7 @@ interface DG<T, R = any, N = unknown> extends Generator<T, R, N> {
     createMany(n: number): T[];
 }
 
-fdescribe('Experimental', () => {
+describe('Experimental', () => {
     // it('', () => {
     //     const gen = createDG(function* (start: number) {
     //         while (true) {
@@ -184,9 +184,10 @@ fdescribe('Experimental', () => {
     it('struct', () => {
         // console.log([...take(3)(map((n: number) => n < 0.5)(num()))]);
 
-        const g = () => struct({
-            a: num().pipe(take(5))
-        });
+        const g = () =>
+            struct({
+                a: num().pipe(take(5))
+            });
 
         // const a = flatMap((n: number) => take(2)(str(n)))(int(1, 10));
         //num console.log([...take(11)(a)]);
@@ -197,4 +198,82 @@ fdescribe('Experimental', () => {
         // const g = num().pipe(take(2));
         // console.log([...g()], [...g()]);
     });
+});
+
+fdescribe('Experimental', () => {
+    function* num() {
+        while (true) {
+            yield Math.random();
+        }
+    }
+
+    function take(n: number) {
+        return function <T>(gen: () => Iterable<T>) {
+            return function* () {
+                let counter = 0;
+                for (const val of gen()) {
+                    yield val;
+                    if (++counter === n) break;
+                }
+            };
+        };
+    }
+
+    function map<T, U>(project: (t: T) => U) {
+        return function (gen: () => Iterable<T>) {
+            return function* () {
+                for (const x of gen()) {
+                    yield project(x);
+                }
+            };
+        };
+    }
+
+    function pipe<T0, T1>(inp: T0, fn1: (t0: T0) => T1): T1;
+    function pipe<T0, T1, T2>(inp: T0, fn1: (t0: T0) => T1, fn2: (t1: T1) => T2): T2;
+    // function pipe<T0, T1, T2, T3>(inp: T0, fn1: (t0: T0) => T1, fn2: (t1: T1) => T2, fn3: (t2: T2) => T3): () => T3;
+    function pipe(...fns: any[]): any {
+        return fns.reduce((y, f, i) => {
+            // console.log('--Index:', i)
+            // console.log('y', y);
+            // console.log('f', f)
+            return f(y);
+        });
+    }
+
+    interface DG<T> {
+        create(): T;
+        createMany(n: number): T[];
+        map<U>(project: (t: T) => U): DG<U>;
+        (): Iterable<T>;
+    }
+
+    function createG<T>(gen: () => Iterable<T>): DG<T> {
+        return Object.assign(gen, {
+            map<U>(project: (t: T) => U) {
+                return createG(map(project)(gen));
+            },
+            create() {
+                return [...take(1)(gen)()][0];
+            },
+            createMany(n: number) {
+                return [...take(n)(gen)()];
+            }
+        });
+    }
+
+    const gen = createG(num).map((n) => Math.round(n)).map((n) => `_${n}_`);
+
+    console.log(gen.createMany(4));
+    const newGen = pipe(
+        num,
+        map((n) => `${Math.round(n)}!`),
+        take(3)
+    );
+
+    // const gen = newGen();
+    // const gen2 = newGen();
+    // console.log([...gen], [...gen2], [...newGen()], [...newGen()]);
+
+    // console.log([...newGen()], [...newGen()]);
 });

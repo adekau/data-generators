@@ -18,8 +18,12 @@ module.exports = function (config) {
         // files: ['src/**/*.ts'],
         files: [
             'src/creation/data-generator.ts',
+            'src/creation/data-generator-experimental.spec.ts',
+            'src/creation/data-generator.spec.ts',
             'src/interfaces/data-generator.interface.ts',
-            'src/creation/data-generator-experimental.spec.ts'
+            'src/library/primitives.ts',
+            'src/transformer/many.ts'
+            // 'src/creation/experimental.spec.ts'
         ],
 
         // list of files / patterns to exclude
