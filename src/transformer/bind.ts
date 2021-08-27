@@ -1,3 +1,5 @@
+import { flatMap, map } from '../creation/data-generator';
+import { _struct } from '../creation/struct';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
@@ -14,8 +16,9 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  */
 export const bindToS =
     <TName extends string, T>(name: TName) =>
-    (generator: DataGenerator<T>): DataGenerator<{ [K in TName]: T }> =>
-        generator.map((out) => ({ [name]: out } as { [K in TName]: T }));
+    (gen: () => Iterable<T>): (() => Iterable<{ [K in TName]: T }>) => {
+        return () => _struct({ [name]: gen() })() as Iterable<{ [K in TName]: T }>;
+    };
 
 /**
  * Binds the generator output to the first member of a new tuple.
@@ -28,10 +31,10 @@ export const bindToS =
  * // [52]
  * ```
  */
-export const bindToT =
-    <T>() =>
-    (generator: DataGenerator<T>): DataGenerator<[T]> =>
-        generator.map((out) => [out]);
+// export const bindToT =
+//     <T>() =>
+//     (generator: DataGenerator<T>): DataGenerator<[T]> =>
+//         generator.map((out) => [out]);
 
 /**
  * Like `apS`, but allows the generator to be dependent on previous struct values.
@@ -50,9 +53,13 @@ export const bindToT =
  * ```
  */
 export const bindS =
-    <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, f: (a: A) => DataGenerator<T>) =>
-    (dgA: DataGenerator<A>): DataGenerator<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }> => {
-        return dgA.flatMap((a) => f(a).map((t) => Object.assign({}, a, { [name]: t }) as any));
+    <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, f: (a: A) => Iterable<T>) =>
+    (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
+        // return dgA.flatMap((a) => f(a).map((t) => Object.assign({}, a, { [name]: t }) as any));
+        return () =>
+            flatMap((a: A) => map((t: T) => Object.assign({}, a, { [name]: t }))(() => f(a))())(dgA)() as Iterable<
+                { [K in keyof A | TName]: K extends keyof A ? A[K] : T }
+            >;
     };
 
 /**
@@ -70,8 +77,8 @@ export const bindS =
  * // [4, 'hTyt']
  * ```
  */
-export const bindT =
-    <A extends unknown[], T>(f: (a: A) => DataGenerator<T>) =>
-    (dgA: DataGenerator<A>): DataGenerator<[...A, T]> => {
-        return dgA.flatMap((a) => f(a).map((t) => [...a, t]));
-    };
+// export const bindT =
+//     <A extends unknown[], T>(f: (a: A) => DataGenerator<T>) =>
+//     (dgA: DataGenerator<A>): DataGenerator<[...A, T]> => {
+//         return dgA.flatMap((a) => f(a).map((t) => [...a, t]));
+//     };

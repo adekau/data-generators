@@ -1,3 +1,5 @@
+import { map } from '../creation/data-generator';
+import { _struct } from '../creation/struct';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
@@ -5,10 +7,17 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  *
  * @category Transformer
  */
-export const dgAp =
-    <T, U>(projectGenerator: DataGenerator<(output: T) => U>) =>
-    (dg: DataGenerator<T>) =>
-        dg.ap(projectGenerator);
+export function ap<T, U>(projectGenerator: Iterable<(v: T) => U>) {
+    return function (gen: () => Iterable<T>) {
+        return function* () {
+            for (const fn of projectGenerator) {
+                for (const x of gen()) {
+                    yield fn(x);
+                }
+            }
+        };
+    };
+}
 
 /**
  * Applies a generator on a struct
@@ -26,9 +35,12 @@ export const dgAp =
  * ```
  */
 export const apS =
-    <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, dgT: DataGenerator<T>) =>
-    (dgA: DataGenerator<A>): DataGenerator<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }> => {
-        return dgT.ap(dgA.map((a) => (t: T) => Object.assign({}, a, { [name]: t }) as any));
+    <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, dgT: Iterable<T>) =>
+    (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
+        return () => map(
+            ({ out, append }: { out: A; append: T }) =>
+                Object.assign({}, out, { [name]: append }) as { [K in keyof A | TName]: K extends keyof A ? A[K] : T }
+        )(_struct({ out: dgA(), append: dgT }))();
     };
 
 /**

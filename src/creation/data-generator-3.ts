@@ -65,9 +65,7 @@ export function ap<T, U>(projectGenerator: Iterable<(v: T) => U>) {
     return function (gen: () => Iterable<T>) {
         return createGenerator(function* () {
             for (const fn of projectGenerator) {
-                console.log('got fn');
                 for (const x of gen()) {
-                    console.log('got num');
                     yield fn(x);
                 }
             }

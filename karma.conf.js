@@ -22,7 +22,17 @@ module.exports = function (config) {
             'src/creation/data-generator.spec.ts',
             'src/interfaces/data-generator.interface.ts',
             'src/library/primitives.ts',
-            'src/transformer/many.ts'
+            'src/transformer/many.ts',
+            'src/transformer/with.ts',
+            'src/creation/struct.ts',
+            'src/creation/constant.ts',
+            'src/creation/constant.spec.ts',
+            'src/transformer/apply.ts',
+            'src/transformer/apply.spec.ts',
+            'src/transformer/bind.ts',
+            'src/transformer/bind.spec.ts',
+            'src/library/increment.ts',
+            'src/library/increment.spec.ts'
             // 'src/creation/experimental.spec.ts'
         ],
 

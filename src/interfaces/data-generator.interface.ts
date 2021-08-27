@@ -2,15 +2,31 @@ type Transform<T> = T extends () => Iterable<infer U> ? U : never;
 type PFst<T, U> = (arg: () => Iterable<T>) => U;
 type UFn<T, U> = (arg: T) => U;
 
+export type Tail<T extends unknown[]> = T extends [unknown, ...infer Rest] ? Rest : [];
+export type Limiter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+export type Flat<T, Limit extends 1[] = Limiter> = {
+    0: T extends Iterable<infer U> ? Flat<U, Tail<Limit>> : T;
+    1: T;
+}[Limit['length'] extends 0 ? 1 : 0];
+
 export interface DataGenerator<T> extends Iterable<T> {
     create(): T;
     createMany(n: number): T[];
+    createAll(): T[];
     map<U>(project: (t: T) => U): DataGenerator<U>;
-    flatMap<U>(project: (t: T) => Iterable<U>): DataGenerator<U>;
+    flatMap<U>(project: (t: T) => Iterable<U>): DataGenerator<Flat<U>>;
     ap<U>(projectGenerator: Iterable<(t: T) => U>): DataGenerator<U>;
+    one(): DataGenerator<T>;
 
     pipe<T1>(fn1: PFst<T, T1>): DataGenerator<Transform<T1>>;
     pipe<T1, T2>(fn1: PFst<T, T1>, fn2: UFn<T1, T2>): DataGenerator<Transform<T2>>;
+    pipe<T1, T2, T3>(fn1: PFst<T, T1>, fn2: UFn<T1, T2>, fn3: UFn<T2, T3>): DataGenerator<Transform<T3>>;
+    pipe<T1, T2, T3, T4>(
+        fn1: PFst<T, T1>,
+        fn2: UFn<T1, T2>,
+        fn3: UFn<T2, T3>,
+        fn4: UFn<T3, T4>
+    ): DataGenerator<Transform<T4>>;
 }
 
 // type UnaryFunction<I, R> = (arg: I) => R;

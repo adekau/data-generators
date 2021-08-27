@@ -1,5 +1,4 @@
 import { createGenerator } from '../creation/data-generator';
-import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
  * Creates a generator that increments on each output from 0 by default, unless `startWith` is specified.
@@ -13,6 +12,10 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  * // [5, 6, 7, 8, 9, 10]
  * ```
  */
-export const incrementGenerator = createGenerator(function* (startWith: number = 0) {
-    yield startWith++;
-});
+export const incrementGenerator = (startWith: number = 0) =>
+    createGenerator(function* () {
+        let i = startWith;
+        while (true) {
+            yield i++;
+        }
+    });

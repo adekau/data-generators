@@ -1,5 +1,5 @@
-import { DataGenerator } from "../interfaces/data-generator.interface";
-
+import { DataGenerator, Flat } from '../interfaces/data-generator.interface';
+import { ap } from '../transformer/apply';
 
 export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
     return Object.assign(gen(), {
@@ -9,6 +9,9 @@ export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
         createMany(n: number) {
             return [...take(n)(gen)()];
         },
+        createAll() {
+            return [...this];
+        },
         map<U>(project: (t: T) => U) {
             return createGenerator(map(project)(gen));
         },
@@ -17,6 +20,9 @@ export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
         },
         ap<U>(projectGenerator: DataGenerator<(t: T) => U>) {
             return createGenerator(ap(projectGenerator)(gen));
+        },
+        one() {
+            return createGenerator(one<T>()(gen));
         },
         pipe(...fns: any[]): any {
             return createGenerator(fns.reduce((y, f) => f(y), gen));
@@ -51,22 +57,31 @@ export function map<T, U>(project: (t: T) => U) {
 
 export function flatMap<T, U>(project: (v: T) => Iterable<U>) {
     return function (gen: () => Iterable<T>) {
-        return function* () {
-            for (const x of gen()) {
-                yield* project(x);
-            }
-        };
+        return flat<Iterable<Iterable<U>>>()(map(project)(gen));
     };
 }
 
-export function ap<T, U>(projectGenerator: Iterable<(v: T) => U>) {
-    return function (gen: () => Iterable<T>) {
-        return function* () {
-            for (const fn of projectGenerator) {
-                for (const x of gen()) {
-                    yield fn(x);
+function isIterable(x: any): x is Iterable<unknown> {
+    return typeof x?.[Symbol.iterator] === 'function';
+}
+
+export function flat<T extends Iterable<unknown>>() {
+    return function (gen: () => T) {
+        return function* (): Generator<Flat<T>, void, unknown> {
+            for (const x of gen()) {
+                if (isIterable(x) && typeof x !== 'string') {
+                    yield* flat()(() => x)() as any;
+                } else {
+                    yield x as any;
                 }
             }
         };
     };
 }
+
+export function one<T>() {
+    return function (gen: () => Iterable<T>) {
+        return take(1)(gen);
+    };
+}
+

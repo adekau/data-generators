@@ -30,7 +30,6 @@ describe('Data Generators: Data Generator', () => {
         const gen = randomProbabilityGenerator.flatMap((n) => booleanGenerator(n));
 
         const results = gen.createMany(3);
-        console.log(results);
 
         expect(results.length).toBe(3);
         expect(results.every((x) => typeof x === 'boolean')).toBeTrue();

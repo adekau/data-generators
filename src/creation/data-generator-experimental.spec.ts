@@ -1,4 +1,8 @@
-import { ap, createGenerator, flatMap, take } from './data-generator';
+import { createGenerator } from './data-generator';
+import { apS } from '../transformer/apply';
+import { withS } from '../transformer/with';
+import { bindS, bindToS } from '../transformer/bind';
+import { constant } from './constant';
 
 function struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }) {
     return createGenerator(function* () {
@@ -30,22 +34,15 @@ describe('dg-experimental', () => {
                 yield i++;
             }
         });
-
-    const fnGen = [(n: number | string) => `_${n}_`, (n: number | string) => `$${n}$`];
-
-    const b = a(1).pipe(
-        ap(fnGen),
-        flatMap((str) => [str, 0])
-    );
-
-    console.log(b.createMany(17), b.pipe(take(6), ap(fnGen)).createMany(20));
+    const ch = a(32).map(String.fromCharCode);
 
     const c = struct({
         s: a(1),
-        g: [1, 2, 3]
+        g: a(15),
+        c: ch
     });
-
-    console.log(c.createMany(2), c.createMany(4));
-
-    console.log(createGenerator(() => 'test').createMany(2))
+    const d = c.pipe(
+        bindToS('test'),
+        bindS('q', ({ test }) => constant(`${test.c}_!`).one())
+    );
 });
