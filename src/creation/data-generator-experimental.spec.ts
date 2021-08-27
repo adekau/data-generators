@@ -3,6 +3,8 @@ import { apS } from '../transformer/apply';
 import { withS } from '../transformer/with';
 import { bindS, bindToS } from '../transformer/bind';
 import { constant } from './constant';
+import { either } from './either';
+import { charGenerator, integerGenerator } from '../library/primitives';
 
 function struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }) {
     return createGenerator(function* () {
@@ -36,13 +38,6 @@ describe('dg-experimental', () => {
         });
     const ch = a(32).map(String.fromCharCode);
 
-    const c = struct({
-        s: a(1),
-        g: a(15),
-        c: ch
-    });
-    const d = c.pipe(
-        bindToS('test'),
-        bindS('q', ({ test }) => constant(`${test.c}_!`).one())
-    );
+    const b = either(integerGenerator(), charGenerator);
+    console.log(b.createMany(5));
 });
