@@ -1,8 +1,9 @@
 import { constant } from '../creation/constant';
 import { createGenerator } from '../creation/data-generator';
 import { struct } from '../creation/struct';
+import { tuple } from '../creation/tuple';
 import { booleanGenerator, integerGenerator, stringGenerator } from '../library/primitives';
-import { ap, apS } from './apply';
+import { ap, apS, apT } from './apply';
 
 describe('Data Generators: Apply', () => {
     it('should apply into a struct', () => {
@@ -50,17 +51,17 @@ describe('Data Generators: Apply', () => {
         });
     });
 
-    // describe('apT', () => {
-    //     it('should append to a tuple', () => {
-    //         const gen = tuple(constant(5), integerGenerator(), booleanGenerator()).pipe(apT(stringGenerator()));
+    describe('apT', () => {
+        it('should append to a tuple', () => {
+            const gen = tuple(constant(5), integerGenerator(), booleanGenerator()).pipe(apT(stringGenerator()));
 
-    //         expect(gen.create().length).toBe(4);
-    //         expect(gen.create()).toEqual([
-    //             jasmine.any(Number),
-    //             jasmine.any(Number),
-    //             jasmine.any(Boolean),
-    //             jasmine.any(String)
-    //         ]);
-    //     });
-    // });
+            expect(gen.create().length).toBe(4);
+            expect(gen.create()).toEqual([
+                jasmine.any(Number),
+                jasmine.any(Number),
+                jasmine.any(Boolean),
+                jasmine.any(String)
+            ]);
+        });
+    });
 });

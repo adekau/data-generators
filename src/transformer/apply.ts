@@ -1,5 +1,6 @@
 import { map } from '../creation/data-generator';
 import { _struct } from '../creation/struct';
+import { _tuple } from '../creation/tuple';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
@@ -37,10 +38,13 @@ export function ap<T, U>(projectGenerator: Iterable<(v: T) => U>) {
 export const apS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, dgT: Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
-        return () => map(
-            ({ out, append }: { out: A; append: T }) =>
-                Object.assign({}, out, { [name]: append }) as { [K in keyof A | TName]: K extends keyof A ? A[K] : T }
-        )(_struct({ out: dgA(), append: dgT }))();
+        return () =>
+            map(
+                ({ out, append }: { out: A; append: T }) =>
+                    Object.assign({}, out, { [name]: append }) as {
+                        [K in keyof A | TName]: K extends keyof A ? A[K] : T;
+                    }
+            )(_struct({ out: dgA(), append: dgT }))();
     };
 
 /**
@@ -58,7 +62,7 @@ export const apS =
  * ```
  */
 export const apT =
-    <T, A extends unknown[]>(dgT: DataGenerator<T>) =>
-    (dgA: DataGenerator<A>): DataGenerator<[...A, T]> => {
-        return dgA.ap(dgT.map((t) => (a: A) => [...a, t]));
+    <T, A extends unknown[]>(dgT: Iterable<T>) =>
+    (dgA: () => Iterable<A>): (() => Iterable<[...A, T]>) => {
+        return () => map(([out, append]: [A, T]) => [...out, append])(_tuple(dgA(), dgT))() as Iterable<[...A, T]>;
     };

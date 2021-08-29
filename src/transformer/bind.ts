@@ -1,5 +1,6 @@
-import { flatMap, map } from '../creation/data-generator';
+import { flatMap, flatMapShallow, map, one } from '../creation/data-generator';
 import { _struct } from '../creation/struct';
+import { _tuple } from '../creation/tuple';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 
 /**
@@ -31,10 +32,11 @@ export const bindToS =
  * // [52]
  * ```
  */
-// export const bindToT =
-//     <T>() =>
-//     (generator: DataGenerator<T>): DataGenerator<[T]> =>
-//         generator.map((out) => [out]);
+export const bindToT =
+    <T>() =>
+    (generator: () => Iterable<T>): (() => Iterable<[T]>) => {
+        return () => _tuple(generator())();
+    };
 
 /**
  * Like `apS`, but allows the generator to be dependent on previous struct values.
@@ -55,11 +57,10 @@ export const bindToS =
 export const bindS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, f: (a: A) => Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
-        // return dgA.flatMap((a) => f(a).map((t) => Object.assign({}, a, { [name]: t }) as any));
         return () =>
-            flatMap((a: A) => map((t: T) => Object.assign({}, a, { [name]: t }))(() => f(a))())(dgA)() as Iterable<
-                { [K in keyof A | TName]: K extends keyof A ? A[K] : T }
-            >;
+            flatMap((a: A) => map((t: T) => Object.assign({}, a, { [name]: t }))(() => one<T>()(() => f(a))())())(
+                dgA
+            )() as Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>;
     };
 
 /**
@@ -77,8 +78,11 @@ export const bindS =
  * // [4, 'hTyt']
  * ```
  */
-// export const bindT =
-//     <A extends unknown[], T>(f: (a: A) => DataGenerator<T>) =>
-//     (dgA: DataGenerator<A>): DataGenerator<[...A, T]> => {
-//         return dgA.flatMap((a) => f(a).map((t) => [...a, t]));
-//     };
+export const bindT =
+    <A extends unknown[], T>(f: (a: A) => Iterable<T>) =>
+    (dgA: () => Iterable<A>): (() => Iterable<[...A, T]>) => {
+        return () =>
+            flatMapShallow((a: A) => map((t: T) => [...a, t] as [...A, T])(() => one<T>()(() => f(a))())())(() =>
+                dgA()
+            )();
+    };

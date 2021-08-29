@@ -1,9 +1,10 @@
 import { constant } from '../creation/constant';
 import { struct } from '../creation/struct';
+import { tuple } from '../creation/tuple';
 import { incrementGenerator } from '../library/increment';
-import { integerGenerator, stringGenerator } from '../library/primitives';
+import { booleanGenerator, integerGenerator, stringGenerator } from '../library/primitives';
 import { apS } from './apply';
-import { bindS, bindToS } from './bind';
+import { bindS, bindT, bindToS, bindToT } from './bind';
 
 describe('Data Generators: Bind', () => {
     it('should bind an existing data generator', () => {
@@ -65,21 +66,21 @@ describe('Data Generators: Bind', () => {
         ]);
     });
 
-    // describe('tuple', () => {
-    //     it('should bind to a tuple', () => {
-    //         const gen = integerGenerator().pipe(bindToT());
+    describe('tuple', () => {
+        it('should bind to a tuple', () => {
+            const gen = integerGenerator().pipe(bindToT());
 
-    //         expect(gen.create()).toEqual([jasmine.any(Number)]);
-    //     });
+            expect(gen.create()).toEqual([jasmine.any(Number)]);
+        });
 
-    //     it('should bind a tuple', () => {
-    //         const gen = tuple(integerGenerator(), booleanGenerator()).pipe(bindT(([n]) => stringGenerator(n)));
+        it('should bind a tuple', () => {
+            const gen = tuple(integerGenerator(1, 20), booleanGenerator()).pipe(bindT(([n]) => stringGenerator(n)));
 
-    //         const result = gen.create();
-    //         expect(result[0]).toBeInstanceOf(Number);
-    //         expect(result[1]).toBeInstanceOf(Boolean);
-    //         expect(result[2]).toBeInstanceOf(String);
-    //         expect(result[2].length).toBe(result[0]);
-    //     });
-    // });
+            const result = gen.create();
+            expect(result[0]).toBeInstanceOf(Number);
+            expect(result[1]).toBeInstanceOf(Boolean);
+            expect(result[2]).toBeInstanceOf(String);
+            expect(result[2].length).toBe(result[0]);
+        });
+    });
 });

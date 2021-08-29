@@ -61,6 +61,16 @@ export function flatMap<T, U>(project: (v: T) => Iterable<U>) {
     };
 }
 
+export function flatMapShallow<T, U>(project: (v: T) => Iterable<U>) {
+    return function (gen: () => Iterable<T>) {
+        return function* () {
+            for (const x of gen()) {
+                yield* project(x);
+            }
+        };
+    };
+}
+
 function isIterable(x: any): x is Iterable<unknown> {
     return typeof x?.[Symbol.iterator] === 'function';
 }
@@ -84,4 +94,3 @@ export function one<T>() {
         return take(1)(gen);
     };
 }
-
