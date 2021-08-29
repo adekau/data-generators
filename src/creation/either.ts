@@ -21,7 +21,6 @@ export const either = <T, U>(
     generatorB: Iterable<U>,
     probabilityA: number = 50
 ): DataGenerator<T | U> =>
-    // booleanGenerator(probabilityA).flatMap<T | U>((bool) => (bool ? one<T>()(generatorA)() : one<U>()(generatorB)()));
     booleanGenerator(probabilityA).flatMap((bool) =>
         bool ? one()(() => generatorA)() : one()(() => generatorB)()
-    ) as any;
+    ) as DataGenerator<T | U>;

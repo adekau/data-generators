@@ -37,7 +37,4 @@ describe('dg-experimental', () => {
             }
         });
     const ch = a(32).map(String.fromCharCode);
-
-    const b = either(integerGenerator(), charGenerator);
-    console.log(b.createMany(5));
 });

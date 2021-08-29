@@ -31,6 +31,8 @@ module.exports = function (config) {
             'src/creation/either.spec.ts',
             'src/creation/any-of.ts',
             'src/creation/any-of.spec.ts',
+            'src/creation/sequence.ts',
+            'src/creation/sequence.spec.ts',
             'src/transformer/apply.ts',
             'src/transformer/apply.spec.ts',
             'src/transformer/bind.ts',
