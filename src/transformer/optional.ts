@@ -1,6 +1,6 @@
 import { constant } from '../creation/constant';
 import { DataGenerator } from '../interfaces/data-generator.interface';
-import { either } from '../creation/either';
+import { either, _either } from '../creation/either';
 
 /**
  * Creates a generator that modifies the input generator to have a chance of returning `undefined`.
@@ -24,10 +24,10 @@ export function optional<T>(
 export function optional<T>(generator: DataGenerator<T>, undefinedProbability?: number): DataGenerator<T | undefined>;
 export function optional(...args: any[]): any {
     if (args.length === 0) {
-        return (generator: () => Iterable<any>) => () => either(constant(undefined), generator(), 15);
+        return (generator: () => Iterable<any>) => () => _either([undefined], generator(), 15)();
     }
     if (args.length === 1 && (typeof args[0] === 'number' || typeof args[0] === 'undefined')) {
-        return (generator: () => Iterable<any>) => () => either(constant(undefined), generator(), args[0] ?? 15);
+        return (generator: () => Iterable<any>) => () => _either(constant(undefined), generator(), args[0] ?? 15)();
     }
     return either(constant(undefined), args[0], args[1] ?? 15);
 }

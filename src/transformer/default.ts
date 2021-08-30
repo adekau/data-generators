@@ -1,6 +1,6 @@
 import { constant } from '../creation/constant';
 import { DataGenerator } from '../interfaces/data-generator.interface';
-import { flatMap } from './map';
+import { flatMap, flatMapShallow } from './map';
 import { one } from './one';
 
 /**
@@ -20,5 +20,5 @@ import { one } from './one';
 export const withDefault =
     <T>(defaultGenerator: Iterable<T>) =>
     (dg: () => Iterable<T | undefined>): (() => Iterable<T>) => {
-        return () => flatMap((t: T | undefined) => (t ? [t] : one<T>()(() => defaultGenerator)()))(dg)() as Iterable<T>;
+        return () => flatMapShallow((t: T | undefined) => (t ? [t] : one<T>()(() => defaultGenerator)()))(dg)() as Iterable<T>;
     };

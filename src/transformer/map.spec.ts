@@ -1,3 +1,5 @@
+import { constant } from '../creation/constant';
+import { either, _either } from '../creation/either';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { withDefault } from './default';
@@ -22,20 +24,6 @@ describe('Data Generators: Map', () => {
         });
 
         it('should pipe 9 functions', () => {
-            const g = integerGenerator(1, 5).pipe(optional());
-
-            const h = integerGenerator(1, 5).pipe(
-                map((num) => num + 20),
-                flatMap(() => stringGenerator().one()),
-                optional(50),
-                withDefault(charGenerator),
-                many(4),
-                // optional(50)
-            );
-
-            console.log(h.createMany(5));
-
-
             const gen = integerGenerator(1, 5).pipe(
                 map((num) => num + 20),
                 flatMap(() => stringGenerator().one()),
@@ -44,7 +32,7 @@ describe('Data Generators: Map', () => {
                 many(4),
                 optional(),
                 withDefault(charGenerator.pipe(many(3))),
-                map((strs) => (console.log('strs', strs), strs.map((str) => str.length))),
+                map((strs) => strs.map((str) => str.length)),
                 flatMap(
                     (nums): DataGenerator<string | number> =>
                         nums.every((num) => num === 1) ? charGenerator : integerGenerator(1, 10)

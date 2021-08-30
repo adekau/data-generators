@@ -31,7 +31,8 @@ export const enumValueGenerator = <T extends Record<any, unknown>>(enumeration: 
             const contains = enumKeys.indexOf(enumeration[randomKey] as any);
             if (contains !== -1) {
                 yield enumeration[enumKeys[contains]] as T[keyof T];
+            } else {
+                yield enumeration[randomKey] as T[keyof T];
             }
-            yield enumeration[randomKey] as T[keyof T];
         }
     });

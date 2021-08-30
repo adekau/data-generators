@@ -7,9 +7,9 @@ describe('Data Generators: Default', () => {
         const gen = constantSequence(undefined, undefined, 'hello').pipe(withDefault(stringGenerator()));
 
         expect(gen.createAll()).toEqual([
-            jasmine.objectContaining({ length: 10 }),
-            jasmine.objectContaining({ length: 10 }),
-            jasmine.objectContaining({ length: 5 }),
+            jasmine.stringMatching(/.{10}/),
+            jasmine.stringMatching(/.{10}/),
+            jasmine.stringMatching(/.{5}/)
         ]);
     });
 });
