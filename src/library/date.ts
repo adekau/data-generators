@@ -1,7 +1,9 @@
-import { defer } from '../utility/defer';
-import { integerGenerator } from './primitives';
-import { withOverrides } from '../utility/struct';
 import { struct } from '../creation/struct';
+import { integerGenerator } from './primitives';
+
+export type DateData = {
+    [K in 'year' | 'month' | 'date' | 'hours' | 'minutes' | 'seconds' | 'ms']: number;
+};
 
 /**
  * Creates a random date with optional overrides for each part of the date.
@@ -12,14 +14,18 @@ import { struct } from '../creation/struct';
  * @param generatorOverrides optional overrides of the generators used to generate each date piece
  * @returns a random date {@link DataGenerator}
  */
-// export const dateGenerator = struct({
-//     year: integerGenerator(1970, new Date().getFullYear() + 50),
-//     month: integerGenerator(0, 11),
-//     date: integerGenerator(1, 31),
-//     hours: integerGenerator(0, 23),
-//     minutes: integerGenerator(0, 59),
-//     seconds: integerGenerator(0, 59),
-//     ms: integerGenerator(0, 999)
+export const dateGenerator = (generatorOverrides?: { [K in keyof DateData]+?: Iterable<DateData[K]> }) =>
+    struct<DateData>({
+        year: generatorOverrides?.year ?? integerGenerator(1970, new Date().getFullYear() + 50),
+        month: generatorOverrides?.month ?? integerGenerator(0, 11),
+        date: generatorOverrides?.date ?? integerGenerator(1, 31),
+        hours: generatorOverrides?.hours ?? integerGenerator(0, 23),
+        minutes: generatorOverrides?.minutes ?? integerGenerator(0, 59),
+        seconds: generatorOverrides?.seconds ?? integerGenerator(0, 59),
+        ms: generatorOverrides?.ms ?? integerGenerator(0, 999)
+    }).map(
+        ({ year, month, date, hours, minutes, seconds, ms }) => new Date(year, month, date, hours, minutes, seconds, ms)
+    );
 // }).pipe(
 //     withOverrides(),
 //     defer((dg) =>

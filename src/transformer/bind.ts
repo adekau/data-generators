@@ -1,6 +1,6 @@
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
-import { flatMap, flatMapShallow, map } from './map';
+import { flatMapShallow, map } from './map';
 import { one } from './one';
 
 /**
@@ -58,9 +58,9 @@ export const bindS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, f: (a: A) => Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
         return () =>
-            flatMap((a: A) => map((t: T) => Object.assign({}, a, { [name]: t }))(() => one<T>()(() => f(a))())())(
-                dgA
-            )() as Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>;
+            flatMapShallow((a: A) =>
+                map((t: T) => Object.assign({}, a, { [name]: t }))(() => one<T>()(() => f(a))())()
+            )(dgA)() as Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>;
     };
 
 /**
