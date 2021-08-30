@@ -56,6 +56,30 @@ export function _struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]>
  * @param generators an object of optional generators matching the interface
  * @returns a generator that creates a partial object using the provided generators
  */
+export function partialStruct<T extends object>(gens: { [K in keyof T]+?: Iterable<T[K]> }) {
+    return createGenerator(_partialStruct(gens));
+}
+
+export function _partialStruct<T extends object>(gens: { [K in keyof T]+?: Iterable<T[K]> }) {
+    return function* () {
+        const iterators: [string, Iterator<unknown>][] = Object.entries(gens)
+            .map(([key, iterable]) => [key, (iterable as any)?.[Symbol.iterator]()])
+            .filter(([, x]) => x != null) as [string, Iterator<unknown>][];
+
+        while (true) {
+            const result: Partial<T> = {};
+            for (const [key, it] of iterators) {
+                const { value, done } = it.next();
+                if (!done) {
+                    result[key as keyof T] = value;
+                } else {
+                    return;
+                }
+            }
+            yield result;
+        }
+    };
+}
 // export const partialStruct = <T>(generators: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<Partial<T>> =>
 //     createGenerator(() => {
 //         return Object.keys(generators).reduce((acc, key) => {

@@ -2,19 +2,19 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
 import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { withDefault } from './default';
 import { many } from './many';
-import { dgFlatMap, dgMap } from './map';
+import { flatMap, map } from './map';
 import { optional } from './optional';
 
 describe('Data Generators: Map', () => {
     describe('pipe', () => {
         it('should pipe map', () => {
-            const gen = numberGenerator().pipe(dgMap((num) => num.toString()));
+            const gen = numberGenerator().pipe(map((num) => num.toString()));
 
             expect(gen.create()).toBeInstanceOf(String);
         });
 
         it('should pipe flatMap', () => {
-            const gen = integerGenerator(1, 10).pipe(dgFlatMap(stringGenerator));
+            const gen = integerGenerator(1, 10).pipe(flatMap((n) => stringGenerator(n).one()));
 
             const result = gen.createMany(5);
             expect(result.every((s) => typeof s === 'string')).toBeTrue();
@@ -22,16 +22,30 @@ describe('Data Generators: Map', () => {
         });
 
         it('should pipe 9 functions', () => {
+            const g = integerGenerator(1, 5).pipe(optional());
+
+            const h = integerGenerator(1, 5).pipe(
+                map((num) => num + 20),
+                flatMap(() => stringGenerator().one()),
+                optional(50),
+                withDefault(charGenerator),
+                many(4),
+                // optional(50)
+            );
+
+            console.log(h.createMany(5));
+
+
             const gen = integerGenerator(1, 5).pipe(
-                dgMap((num) => num + 20),
-                dgFlatMap(stringGenerator),
+                map((num) => num + 20),
+                flatMap(() => stringGenerator().one()),
                 optional(50),
                 withDefault(charGenerator),
                 many(4),
                 optional(),
                 withDefault(charGenerator.pipe(many(3))),
-                dgMap((strs) => strs.map((str) => str.length)),
-                dgFlatMap(
+                map((strs) => (console.log('strs', strs), strs.map((str) => str.length))),
+                flatMap(
                     (nums): DataGenerator<string | number> =>
                         nums.every((num) => num === 1) ? charGenerator : integerGenerator(1, 10)
                 )

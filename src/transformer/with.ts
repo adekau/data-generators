@@ -1,5 +1,8 @@
-import { createGenerator, map } from '../creation/data-generator';
-import { struct, _struct } from '../creation/struct';
+import { B, L, N, T, U } from 'ts-toolbelt';
+import { createGenerator } from '../creation/data-generator';
+import { _struct } from '../creation/struct';
+import { _tuple } from '../creation/tuple';
+import { map } from './map';
 
 /**
  * Overrides the generator of a struct property.
@@ -17,10 +20,11 @@ import { struct, _struct } from '../creation/struct';
  * ```
  */
 export function withS<TName extends keyof A, A extends object>(name: TName, using: Iterable<A[TName]>) {
-    return function (gen: () => Iterable<A>) {
-        return () => map(({ out, replace }: { out: A; replace: A[TName] }) => Object.assign({}, out, { [name]: replace }))(
-            _struct({ out: gen(), replace: using })
-        )();
+    return function (gen: () => Iterable<A>): () => Iterable<A> {
+        return () =>
+            map(({ out, replace }: { out: A; replace: A[TName] }) => Object.assign({}, out, { [name]: replace }))(
+                _struct({ out: gen(), replace: using })
+            )();
     };
 }
 /**
@@ -38,18 +42,20 @@ export function withS<TName extends keyof A, A extends object>(name: TName, usin
  * ).create(); // [5]
  * ```
  */
-// export const withT =
-//     <TIndex extends number, T extends unknown[]>(
-//         index: TIndex,
-//         using: B.Or<N.IsNegative<TIndex>, U.Has<N.Lower<TIndex, T['length']>, 0>> extends 1
-//             ? never
-//             : DataGenerator<T[TIndex]>
-//     ) =>
-//     (gen: () => Iterable<T>): DataGenerator<T> => {
-//         return tuple(gen, using).map(
-//             ([out, replace]) => [...out.slice(0, index), replace, ...out.slice(index + 1, out.length)] as any
-//         );
-//     };
+export const withT =
+    <TIndex extends number, T extends unknown[]>(
+        index: TIndex,
+        using: B.Or<N.IsNegative<TIndex>, U.Has<N.Lower<TIndex, T['length']>, 0>> extends 1
+            ? never
+            : Iterable<T[TIndex]>
+    ) =>
+    (gen: () => Iterable<T>): (() => Iterable<T>) => {
+        return () =>
+            map(
+                ([out, replace]: [T, any]) =>
+                    [...out.slice(0, index), replace, ...out.slice(index + 1, out.length)] as any
+            )(_tuple(gen(), using) as any)();
+    };
 
 /**
  * Omits a property of an object Data Generator from the output.
@@ -87,12 +93,13 @@ export const withoutS =
  * ).create(); // [28]
  * ```
  */
-// export const withoutT =
-//     <TIndex extends number, T extends unknown[]>(index: TIndex) =>
-//     (
-//         dgT: DataGenerator<T>
-//     ): B.Or<N.IsNegative<TIndex>, U.Has<N.Lower<TIndex, T['length']>, 0>> extends 1
-//         ? DataGenerator<T>
-//         : DataGenerator<L.Omit<T, TIndex>> => {
-//         return dgT.map((t) => t.filter((_, i) => i !== index)) as any;
-//     };
+export const withoutT =
+    <TIndex extends number, T extends unknown[]>(index: TIndex) =>
+    (
+        dgT: () => Iterable<T>
+    ): B.Or<N.IsNegative<TIndex>, U.Has<N.Lower<TIndex, T['length']>, 0>> extends 1
+        ? () => Iterable<T>
+        : () => Iterable<L.Omit<T, TIndex>> => {
+        // return dgT.map((t) => t.filter((_, i) => i !== index)) as any;
+        return () => map((t: T) => t.filter((_, i) => i !== index))(dgT)() as any;
+    };

@@ -1,6 +1,5 @@
-import { constant } from './constant';
-import { createGenerator } from './data-generator';
 import { DataGenerator } from '../interfaces/data-generator.interface';
+import { createGenerator } from './data-generator';
 
 /**
  * Creates a sequence of generators that on each `create` call creates from the next generator.

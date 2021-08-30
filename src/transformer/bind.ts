@@ -1,7 +1,7 @@
-import { flatMap, flatMapShallow, map, one } from '../creation/data-generator';
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { flatMap, flatMapShallow, map } from './map';
+import { one } from './one';
 
 /**
  * Binds the generator output to a property on a new object with name `name`.

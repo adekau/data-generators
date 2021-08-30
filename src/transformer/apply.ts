@@ -1,7 +1,7 @@
-import { map } from '../creation/data-generator';
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
 import { DataGenerator } from '../interfaces/data-generator.interface';
+import { map } from './map';
 
 /**
  * Pipeable version of {@link DataGenerator.ap}

@@ -1,4 +1,5 @@
-import { take } from '../creation/data-generator';
+import { _tuple } from '../creation/tuple';
+import { take } from './take';
 
 /**
  * Creates a generator that returns an array of length `length` of outputs from `baseGenerator`.
@@ -18,9 +19,11 @@ import { take } from '../creation/data-generator';
  */
 export const many =
     <T>(length: number) =>
-    (baseGenerator: () => Iterable<T>) =>
-        function* () {
-            while (true) {
-                yield [...take(length)(baseGenerator)()];
-            }
-        };
+    (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) =>
+    () =>
+        _tuple(...Array.from({ length }).map(() => baseGenerator()))();
+// function* () {
+//     while (true) {
+//         yield [...take(length)(baseGenerator)()];
+//     }
+// };

@@ -27,6 +27,51 @@ export interface DataGenerator<T> extends Iterable<T> {
         fn3: UFn<T2, T3>,
         fn4: UFn<T3, T4>
     ): DataGenerator<Transform<T4>>;
+    pipe<T1, T2, T3, T4, T5>(
+        fn1: PFst<T, T1>,
+        fn2: UFn<T1, T2>,
+        fn3: UFn<T2, T3>,
+        fn4: UFn<T3, T4>,
+        fn5: UFn<T4, T5>
+    ): DataGenerator<Transform<T5>>;
+    pipe<T1, T2, T3, T4, T5, T6>(
+        fn1: PFst<T, T1>,
+        fn2: UFn<T1, T2>,
+        fn3: UFn<T2, T3>,
+        fn4: UFn<T3, T4>,
+        fn5: UFn<T4, T5>,
+        fn6: UFn<T5, T6>
+    ): DataGenerator<Transform<T6>>;
+    pipe<T1, T2, T3, T4, T5, T6, T7>(
+        fn1: PFst<T, T1>,
+        fn2: UFn<T1, T2>,
+        fn3: UFn<T2, T3>,
+        fn4: UFn<T3, T4>,
+        fn5: UFn<T4, T5>,
+        fn6: UFn<T5, T6>,
+        fn7: UFn<T6, T7>
+    ): DataGenerator<Transform<T7>>;
+    pipe<T1, T2, T3, T4, T5, T6, T7, T8>(
+        fn1: PFst<T, T1>,
+        fn2: UFn<T1, T2>,
+        fn3: UFn<T2, T3>,
+        fn4: UFn<T3, T4>,
+        fn5: UFn<T4, T5>,
+        fn6: UFn<T5, T6>,
+        fn7: UFn<T6, T7>,
+        fn8: UFn<T7, T8>
+    ): DataGenerator<Transform<T8>>;
+    pipe<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
+        fn1: PFst<T, T1>,
+        fn2: UFn<T1, T2>,
+        fn3: UFn<T2, T3>,
+        fn4: UFn<T3, T4>,
+        fn5: UFn<T4, T5>,
+        fn6: UFn<T5, T6>,
+        fn7: UFn<T6, T7>,
+        fn8: UFn<T7, T8>,
+        fn9: UFn<T8, T9>
+    ): DataGenerator<Transform<T9>>;
 }
 
 // type UnaryFunction<I, R> = (arg: I) => R;

@@ -1,5 +1,5 @@
 import { booleanGenerator, integerGenerator, numberGenerator } from '../library/primitives';
-import { createGenerator, take } from './data-generator';
+import { createGenerator } from './data-generator';
 
 describe('Data Generators: Data Generator', () => {
     it('should create a data generator', () => {

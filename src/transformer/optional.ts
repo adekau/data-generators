@@ -18,16 +18,16 @@ import { either } from '../creation/either';
  * optional(integerGenerator()); // type: DataGenerator<number | undefined>
  * ```
  */
-export function optional(
+export function optional<T>(
     undefinedProbability?: number
-): <T>(generator: DataGenerator<T>) => DataGenerator<T | undefined>;
+): (generator: () => Iterable<T>) => () => Iterable<T | undefined>;
 export function optional<T>(generator: DataGenerator<T>, undefinedProbability?: number): DataGenerator<T | undefined>;
 export function optional(...args: any[]): any {
     if (args.length === 0) {
-        return (generator: DataGenerator<any>) => either(constant(undefined), generator, 15);
+        return (generator: () => Iterable<any>) => () => either(constant(undefined), generator(), 15);
     }
     if (args.length === 1 && (typeof args[0] === 'number' || typeof args[0] === 'undefined')) {
-        return (generator: DataGenerator<any>) => either(constant(undefined), generator, args[0] ?? 15);
+        return (generator: () => Iterable<any>) => () => either(constant(undefined), generator(), args[0] ?? 15);
     }
     return either(constant(undefined), args[0], args[1] ?? 15);
 }
