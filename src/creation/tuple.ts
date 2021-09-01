@@ -1,6 +1,11 @@
-import { apT } from '../transformer/apply';
-import { constant } from './constant';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { Head } from 'ts-toolbelt/out/List/Head';
+import { DataGenerator, Tail } from '../interfaces/data-generator.interface';
+import { createGenerator } from './data-generator';
+
+type IterableTuple<T extends Iterable<unknown>[], Final extends unknown[] = []> = {
+    0: Head<T> extends Iterable<infer U> ? IterableTuple<Tail<T>, [...Final, U]> : Final;
+    1: Final;
+}[T['length'] extends 0 ? 1 : 0];
 
 /**
  * Similar to struct, but in a fixed length array format.
@@ -15,63 +20,24 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  * // Example Output: ['hZn,*Q', 3, false]
  * ```
  */
-export function tuple<T1>(...generators: [DataGenerator<T1>]): DataGenerator<[T1]>;
-export function tuple<T1, T2>(...generators: [DataGenerator<T1>, DataGenerator<T2>]): DataGenerator<[T1, T2]>;
-export function tuple<T1, T2, T3>(
-    ...generators: [DataGenerator<T1>, DataGenerator<T2>, DataGenerator<T3>]
-): DataGenerator<[T1, T2, T3]>;
-export function tuple<T1, T2, T3, T4>(
-    ...generators: [DataGenerator<T1>, DataGenerator<T2>, DataGenerator<T3>, DataGenerator<T4>]
-): DataGenerator<[T1, T2, T3, T4]>;
-export function tuple<T1, T2, T3, T4, T5>(
-    ...generators: [DataGenerator<T1>, DataGenerator<T2>, DataGenerator<T3>, DataGenerator<T4>, DataGenerator<T5>]
-): DataGenerator<[T1, T2, T3, T4, T5]>;
-export function tuple<T1, T2, T3, T4, T5, T6>(
-    ...generators: [
-        DataGenerator<T1>,
-        DataGenerator<T2>,
-        DataGenerator<T3>,
-        DataGenerator<T4>,
-        DataGenerator<T5>,
-        DataGenerator<T6>
-    ]
-): DataGenerator<[T1, T2, T3, T4, T5, T6]>;
-export function tuple<T1, T2, T3, T4, T5, T6, T7>(
-    ...generators: [
-        DataGenerator<T1>,
-        DataGenerator<T2>,
-        DataGenerator<T3>,
-        DataGenerator<T4>,
-        DataGenerator<T5>,
-        DataGenerator<T6>,
-        DataGenerator<T7>
-    ]
-): DataGenerator<[T1, T2, T3, T4, T5, T6, T7]>;
-export function tuple<T1, T2, T3, T4, T5, T6, T7, T8>(
-    ...generators: [
-        DataGenerator<T1>,
-        DataGenerator<T2>,
-        DataGenerator<T3>,
-        DataGenerator<T4>,
-        DataGenerator<T5>,
-        DataGenerator<T6>,
-        DataGenerator<T7>,
-        DataGenerator<T8>
-    ]
-): DataGenerator<[T1, T2, T3, T4, T5, T6, T7, T8]>;
-export function tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
-    ...generators: [
-        DataGenerator<T1>,
-        DataGenerator<T2>,
-        DataGenerator<T3>,
-        DataGenerator<T4>,
-        DataGenerator<T5>,
-        DataGenerator<T6>,
-        DataGenerator<T7>,
-        DataGenerator<T8>,
-        DataGenerator<T9>
-    ]
-): DataGenerator<[T1, T2, T3, T4, T5, T6, T7, T8, T9]>;
-export function tuple(...generators: DataGenerator<any>[]): DataGenerator<any[]> {
-    return generators.reduce((prev, cur) => prev.pipe(apT(cur)), constant([]) as DataGenerator<any[]>);
+export function tuple<T extends Iterable<unknown>[]>(...gens: T): DataGenerator<IterableTuple<T>> {
+    return createGenerator(_tuple(...gens));
+}
+
+export function _tuple<T extends Iterable<unknown>[]>(...generators: T): () => Iterable<IterableTuple<T>> {
+    return function* () {
+        const iterators = generators.map((dg) => dg[Symbol.iterator]());
+
+        while (true) {
+            const result = [];
+            for (const it of iterators) {
+                const { value, done } = it.next();
+                if (done) {
+                    return;
+                }
+                result.push(value);
+            }
+            yield result as IterableTuple<T>;
+        }
+    };
 }

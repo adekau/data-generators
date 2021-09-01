@@ -6,9 +6,10 @@ describe('Data Generators: Default', () => {
     it('should default undefined values', () => {
         const gen = constantSequence(undefined, undefined, 'hello').pipe(withDefault(stringGenerator()));
 
-        expect(gen.create().length).toBe(10);
-        expect(gen.create().length).toBe(10);
-        expect(gen.create().length).toBe(5);
-        expect(gen.create().length).toBe(10);
+        expect(gen.createAll()).toEqual([
+            jasmine.stringMatching(/.{10}/),
+            jasmine.stringMatching(/.{10}/),
+            jasmine.stringMatching(/.{5}/)
+        ]);
     });
 });

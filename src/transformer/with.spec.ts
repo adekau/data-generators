@@ -23,6 +23,37 @@ describe('Data Generators: With', () => {
         });
     });
 
+    it('should restrict an infinite generator to finite', () => {
+        const gen = struct({
+            char: charGenerator,
+            str: stringGenerator(),
+            int: integerGenerator()
+        });
+
+        expect(gen.createMany(5).length).toBe(5);
+
+        const results = gen.pipe(withS('int', [1, 2, 3])).createMany(5);
+
+        expect(results.length).toBe(3);
+        expect(results).toEqual([
+            {
+                char: jasmine.stringMatching(/./),
+                str: jasmine.stringMatching(/.{10}/),
+                int: 1
+            },
+            {
+                char: jasmine.stringMatching(/./),
+                str: jasmine.stringMatching(/.{10}/),
+                int: 2
+            },
+            {
+                char: jasmine.stringMatching(/./),
+                str: jasmine.stringMatching(/.{10}/),
+                int: 3
+            }
+        ]);
+    });
+
     describe('Without', () => {
         it('should omit a struct property', () => {
             const gen = struct({
@@ -49,6 +80,16 @@ describe('Data Generators: With', () => {
 
             expect(gen.create().length).toBe(3);
             expect(gen.create()).toEqual([5, 's', {}]);
+        });
+
+        it('should not widen a stream', () => {
+            const gen = struct({
+                str: stringGenerator(),
+                num: [1, 2, 9, 10]
+            });
+
+            expect(gen.createMany(5).length).toBe(4);
+            expect(gen.pipe(withoutS('num')).createMany(5).length).toBe(4);
         });
     });
 });

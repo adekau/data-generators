@@ -1,5 +1,6 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { Inner } from '../types/inner.type';
+import { constant } from './constant';
 import { either } from './either';
 
 /**
@@ -18,8 +19,10 @@ import { either } from './either';
  * // [4, true, 5, 'A6eBd', false]
  * ```
  */
-export const anyOf = <T extends DataGenerator<unknown>[]>(...generators: T): DataGenerator<Inner<T>> => {
-    return generators.reduceRight((prev, next, i) =>
-        either(prev, next, 100 - 100 / (generators.length - i))
+export const anyOf = <T extends Iterable<unknown>[]>(...generators: T): DataGenerator<Inner<T>> => {
+    return (
+        generators.length
+            ? generators.reduceRight((prev, next, i) => either(prev, next, 100 - 100 / (generators.length - i)))
+            : constant(undefined)
     ) as DataGenerator<Inner<T>>;
 };

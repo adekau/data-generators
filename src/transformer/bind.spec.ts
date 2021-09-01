@@ -47,7 +47,7 @@ describe('Data Generators: Bind', () => {
             bindToS('a'),
             apS('b', incrementGenerator(5)),
             bindToS('point'),
-            bindS('display', ({ point: { a, b } }) => constant(`( ${a}, ${b} )`))
+            bindS('display', ({ point: { a, b } }) => [`( ${a}, ${b} )`])
         );
 
         expect(gen.createMany(3)).toEqual([
@@ -74,7 +74,7 @@ describe('Data Generators: Bind', () => {
         });
 
         it('should bind a tuple', () => {
-            const gen = tuple(integerGenerator(), booleanGenerator()).pipe(bindT(([n]) => stringGenerator(n)));
+            const gen = tuple(integerGenerator(1, 20), booleanGenerator()).pipe(bindT(([n]) => stringGenerator(n)));
 
             const result = gen.create();
             expect(result[0]).toBeInstanceOf(Number);

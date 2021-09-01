@@ -1,5 +1,6 @@
 import { either } from './either';
 import { integerGenerator, stringGenerator } from '../library/primitives';
+import { many } from '../transformer';
 
 describe('Data Generators: Either', () => {
     it('should generate value A when probability is 100', () => {

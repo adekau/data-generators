@@ -1,4 +1,5 @@
 import { createGenerator } from '../creation/data-generator';
+import { infinite } from '../creation/infinite';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { integerGenerator } from './primitives';
 
@@ -20,7 +21,7 @@ import { integerGenerator } from './primitives';
  * ```
  */
 export const enumValueGenerator = <T extends Record<any, unknown>>(enumeration: T): DataGenerator<T[keyof T]> =>
-    createGenerator(() => {
+    infinite(() => {
         const enumKeys = Object.keys(enumeration);
         const enumLength = enumKeys.length;
         const randomIndex = integerGenerator(0, enumLength - 1).create();
@@ -30,6 +31,7 @@ export const enumValueGenerator = <T extends Record<any, unknown>>(enumeration: 
         const contains = enumKeys.indexOf(enumeration[randomKey] as any);
         if (contains !== -1) {
             return enumeration[enumKeys[contains]] as T[keyof T];
+        } else {
+            return enumeration[randomKey] as T[keyof T];
         }
-        return enumeration[randomKey] as T[keyof T];
     });

@@ -1,4 +1,4 @@
-export { dateGenerator } from './date';
+// export { dateGenerator } from './date';
 export { enumValueGenerator } from './enum';
 export { functionGenerator } from './function';
 export { incrementGenerator } from './increment';

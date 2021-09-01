@@ -3,7 +3,7 @@ import { createGenerator } from '../creation/data-generator';
 import { struct } from '../creation/struct';
 import { tuple } from '../creation/tuple';
 import { booleanGenerator, integerGenerator, stringGenerator } from '../library/primitives';
-import { apS, apT, dgAp } from './apply';
+import { ap, apS, apT } from './apply';
 
 describe('Data Generators: Apply', () => {
     it('should apply into a struct', () => {
@@ -43,8 +43,8 @@ describe('Data Generators: Apply', () => {
 
     describe('pipe', () => {
         it('should pipe apply', () => {
-            const apgen = createGenerator(() => (num: number) => num > 5);
-            const gen = integerGenerator(1, 10).pipe(dgAp(apgen));
+            const apgen = createGenerator(() => [(num: number) => num > 5]);
+            const gen = integerGenerator(1, 10).pipe(ap(apgen));
 
             const result = gen.createMany(5);
             expect(result.every((bool) => typeof bool === 'boolean')).toBeTrue();

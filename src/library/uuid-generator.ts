@@ -7,4 +7,8 @@ import { createGenerator } from '../creation/data-generator';
  *
  * @category Library
  */
-export const uuidGenerator = createGenerator(() => v4());
+export const uuidGenerator = createGenerator(function* () {
+    while (true) {
+        yield v4();
+    }
+});

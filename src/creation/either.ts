@@ -1,5 +1,8 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { booleanGenerator } from '../library/primitives';
+import { flatMap, flatMapShallow } from '../transformer';
+import { one } from '../transformer/one';
+import { createGenerator } from './data-generator';
 
 /**
  * Creates a generator that returns either one value or another.
@@ -16,7 +19,20 @@ import { booleanGenerator } from '../library/primitives';
  * ```
  */
 export const either = <T, U>(
-    generatorA: DataGenerator<T>,
-    generatorB: DataGenerator<U>,
+    generatorA: Iterable<T>,
+    generatorB: Iterable<U>,
     probabilityA: number = 50
-): DataGenerator<T | U> => booleanGenerator(probabilityA).flatMap<T | U>((bool) => (bool ? generatorA : generatorB));
+): DataGenerator<T | U> => createGenerator(_either(generatorA, generatorB, probabilityA));
+
+export const _either = <T, U>(genA: Iterable<T>, genB: Iterable<U>, probA: number = 50): (() => Iterable<T | U>) => {
+    return function* () {
+        while (true) {
+            const bool = Math.round(Math.random() * 100) < probA;
+            const { value, done } = (bool ? genA : genB)[Symbol.iterator]().next();
+            if (done) {
+                return;
+            }
+            yield value;
+        }
+    };
+};

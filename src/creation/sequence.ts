@@ -1,6 +1,5 @@
-import { constant } from './constant';
-import { createGenerator } from './data-generator';
 import { DataGenerator } from '../interfaces/data-generator.interface';
+import { createGenerator } from './data-generator';
 
 /**
  * Creates a sequence of generators that on each `create` call creates from the next generator.
@@ -15,8 +14,12 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  * // ['r', '6wCg', 'Bob']
  * ```
  */
-export const sequence = <T>(...generators: DataGenerator<T>[]): DataGenerator<T | undefined> =>
-    createGenerator(() => generators.shift()).flatMap((gen) => (gen ? gen : constant(undefined)));
+export const sequence = <T>(...generators: DataGenerator<T>[]): DataGenerator<T> =>
+    createGenerator(function* () {
+        for (const gen of generators) {
+            yield gen.create();
+        }
+    });
 
 /**
  * Creates a sequence converting each input argument to a constant generator.
@@ -31,5 +34,4 @@ export const sequence = <T>(...generators: DataGenerator<T>[]): DataGenerator<T 
  * // [{ name: 'Tim' }, { name: 'Bob' }, { name: 'Alan' }]
  * ```
  */
-export const constantSequence = <T>(...constants: T[]): DataGenerator<T | undefined> =>
-    createGenerator(() => constants.shift()).flatMap(constant);
+export const constantSequence = <T>(...constants: T[]): DataGenerator<T> => createGenerator(() => [...constants]);

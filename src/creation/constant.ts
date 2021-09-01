@@ -1,5 +1,5 @@
-import { createGenerator } from './data-generator';
 import { DataGenerator } from '../interfaces/data-generator.interface';
+import { infinite } from './infinite';
 
 /**
  * Generator that always generates the same value
@@ -8,4 +8,4 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  * @param value The value to always generate
  * @returns a generator that outputs the input
  */
-export const constant = <T>(value: T): DataGenerator<T> => createGenerator(() => value);
+export const constant = <T>(value: T): DataGenerator<T> => infinite(() => value);

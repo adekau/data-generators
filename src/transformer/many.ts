@@ -1,5 +1,5 @@
-import { createGenerator } from '../creation/data-generator';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { _tuple } from '../creation/tuple';
+import { take } from './take';
 
 /**
  * Creates a generator that returns an array of length `length` of outputs from `baseGenerator`.
@@ -19,5 +19,6 @@ import { DataGenerator } from '../interfaces/data-generator.interface';
  */
 export const many =
     <T>(length: number) =>
-    (baseGenerator: DataGenerator<T>): DataGenerator<T[]> =>
-        createGenerator(() => baseGenerator.createMany(length));
+    (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) => {
+        return () => _tuple(...Array.from({ length }).map(() => baseGenerator()))();
+    };

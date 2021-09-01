@@ -1,4 +1,4 @@
-import { booleanGenerator, numberGenerator, stringGenerator } from '../library';
+import { booleanGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { anyOf } from './any-of';
 
 describe('Data Generators: anyOf', () => {
@@ -7,6 +7,6 @@ describe('Data Generators: anyOf', () => {
 
         expect(
             gen.createMany(20).every((x) => typeof x === 'boolean' || typeof x === 'number' || typeof x === 'string')
-        );
+        ).toBeTrue();
     });
 });

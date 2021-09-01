@@ -1,25 +1,47 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
+import { ap } from '../transformer/apply';
+import { flatMap, map } from '../transformer/map';
+import { one } from '../transformer/one';
+import { take } from '../transformer/take';
 
 /**
- * Creates a Data Generator adhering to the interface, and automatically generates
- * the `createMany`, `map`, and `flatMap` functions using the `create` input provided.
+ * Lifts an iterable into a data generator allowing use of data transformation operators.
  *
  * @category Creation
- * @param create The function that generates data.
- * @returns a {@link DataGenerator} of type T
+ * @param gen A function that returns an iterable
+ * @returns A new Data Generator that outputs based on the input `Iterable`.
  */
-export const createGenerator = <T>(create: () => T): DataGenerator<T> => ({
-    create,
-    createMany: (length: number) => Array.from({ length }).map(create),
-    map: <U>(project: (output: T) => U) => createGenerator(() => project(create())),
-    flatMap: <U>(project: (output: T) => DataGenerator<U>) => createGenerator(() => project(create()).create()),
-    ap: <U>(projectGenerator: DataGenerator<(output: T) => U>) => projectGenerator.map((fn) => fn(create())),
-    pipe: (...fns: Array<(arg: any) => any>) => {
-        const firstFn = fns.shift();
-        if (!firstFn) {
-            return createGenerator(create);
+export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
+    return Object.assign(gen(), {
+        create() {
+            return [...take(1)(gen)()][0];
+        },
+        createMany(n: number) {
+            return [...take(n)(gen)()];
+        },
+        createAll() {
+            return [...this];
+        },
+        map<U>(project: (t: T) => U) {
+            return createGenerator(map(project)(gen));
+        },
+        flatMap<U>(project: (t: T) => DataGenerator<U>) {
+            return createGenerator(flatMap(project)(gen));
+        },
+        ap<U>(projectGenerator: DataGenerator<(t: T) => U>) {
+            return createGenerator(ap(projectGenerator)(gen));
+        },
+        one() {
+            return createGenerator(one<T>()(gen));
+        },
+        take(n: number) {
+            return createGenerator(take(n)(gen));
+        },
+        pipe(...fns: any[]): any {
+            return createGenerator(fns.reduce((y, f) => f(y), gen));
+        },
+        [Symbol.iterator]() {
+            return gen()[Symbol.iterator]();
         }
-        const firstInvocation = firstFn(createGenerator(create));
-        return fns.reduce((prev, cur) => cur(prev), firstInvocation);
-    }
-});
+    });
+}
