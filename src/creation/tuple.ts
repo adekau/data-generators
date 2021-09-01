@@ -1,8 +1,6 @@
-import { apT } from '../transformer/apply';
-import { constant } from './constant';
+import { Head } from 'ts-toolbelt/out/List/Head';
 import { DataGenerator, Tail } from '../interfaces/data-generator.interface';
 import { createGenerator } from './data-generator';
-import { Head } from 'ts-toolbelt/out/List/Head';
 
 /**
  * Similar to struct, but in a fixed length array format.

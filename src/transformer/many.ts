@@ -19,11 +19,6 @@ import { take } from './take';
  */
 export const many =
     <T>(length: number) =>
-    (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) =>
-    () =>
-        _tuple(...Array.from({ length }).map(() => baseGenerator()))();
-// function* () {
-//     while (true) {
-//         yield [...take(length)(baseGenerator)()];
-//     }
-// };
+    (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) => {
+        return () => _tuple(...Array.from({ length }).map(() => baseGenerator()))();
+    };

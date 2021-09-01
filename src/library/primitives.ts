@@ -1,4 +1,5 @@
 import { createGenerator } from '../creation/data-generator';
+import { infinite } from '../creation/infinite';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { many } from '../transformer/many';
 
@@ -11,11 +12,7 @@ import { many } from '../transformer/many';
  * @returns a random number bounded by `min` and `max`
  */
 export const numberGenerator = (min: number = 0, max: number = 1): DataGenerator<number> =>
-    createGenerator(function* () {
-        while (true) {
-            yield min + Math.random() * (max - min);
-        }
-    });
+    infinite(() => min + Math.random() * (max - min));
 
 /**
  * Creates a random integer generator with optional bounds.

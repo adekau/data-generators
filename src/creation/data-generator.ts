@@ -27,6 +27,9 @@ export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
         one() {
             return createGenerator(one<T>()(gen));
         },
+        take(n: number) {
+            return createGenerator(take(n)(gen));
+        },
         pipe(...fns: any[]): any {
             return createGenerator(fns.reduce((y, f) => f(y), gen));
         },

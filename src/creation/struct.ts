@@ -80,12 +80,3 @@ export function _partialStruct<T extends object>(gens: { [K in keyof T]+?: Itera
         }
     };
 }
-// export const partialStruct = <T>(generators: { [K in keyof T]+?: DataGenerator<T[K]> }): DataGenerator<Partial<T>> =>
-//     createGenerator(() => {
-//         return Object.keys(generators).reduce((acc, key) => {
-//             return {
-//                 ...acc,
-//                 [key]: generators[key as keyof typeof generators]?.create()
-//             };
-//         }, {});
-//     });

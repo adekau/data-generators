@@ -26,12 +26,3 @@ export const dateGenerator = (generatorOverrides?: { [K in keyof DateData]+?: It
     }).map(
         ({ year, month, date, hours, minutes, seconds, ms }) => new Date(year, month, date, hours, minutes, seconds, ms)
     );
-// }).pipe(
-//     withOverrides(),
-//     defer((dg) =>
-//         dg.map(
-//             ({ year, month, date, hours, minutes, seconds, ms }) =>
-//                 new Date(year, month, date, hours, minutes, seconds, ms)
-//         )
-//     )
-// );

@@ -1,11 +1,11 @@
-import { constant } from '../creation/constant';
-import { either, _either } from '../creation/either';
+import { createGenerator } from '../creation/data-generator';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { withDefault } from './default';
 import { many } from './many';
 import { flatMap, map } from './map';
 import { optional } from './optional';
+import { iif } from '../creation/iif';
 
 describe('Data Generators: Map', () => {
     describe('pipe', () => {
@@ -21,6 +21,16 @@ describe('Data Generators: Map', () => {
             const result = gen.createMany(5);
             expect(result.every((s) => typeof s === 'string')).toBeTrue();
             expect(result.every((s) => s.length <= 10 && s.length >= 1)).toBeTrue();
+        });
+
+        it('should flatMap', () => {
+            const gen = createGenerator(() => [true, false, true, false]).pipe(
+                flatMap((bool) => iif(() => bool, ['hello', ['world']], [[[1]], 2]))
+            );
+
+            const results = gen.createAll();
+            expect(results.length).toBe(8);
+            expect(results).toEqual(['hello', 'world', 1, 2, 'hello', 'world', 1, 2]);
         });
 
         it('should pipe 9 functions', () => {
