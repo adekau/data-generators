@@ -17,12 +17,6 @@ import { createGenerator } from './data-generator';
  * // Example Output: { isRequired: true, fieldId: 52, value: 'aVE3^x' }
  * ```
  */
-// export const struct = <T extends object>(generators: { [K in keyof T]: DataGenerator<T[K]> }): DataGenerator<T> => {
-//     return Object.keys(generators).reduce((prev, cur) => {
-//         return prev.pipe(apS(cur as any, generators[cur as keyof T]));
-//     }, constant({}) as DataGenerator<T>);
-// };
-
 export function struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }) {
     return createGenerator(_struct(gens));
 }
