@@ -34,5 +34,4 @@ export const sequence = <T>(...generators: DataGenerator<T>[]): DataGenerator<T>
  * // [{ name: 'Tim' }, { name: 'Bob' }, { name: 'Alan' }]
  * ```
  */
-export const constantSequence = <T>(...constants: T[]): DataGenerator<T> =>
-    createGenerator(() => [...constants]);
+export const constantSequence = <T>(...constants: T[]): DataGenerator<T> => createGenerator(() => [...constants]);

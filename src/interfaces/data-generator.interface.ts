@@ -39,7 +39,7 @@ export interface DataGenerator<T> extends Iterable<T> {
 
     /**
      * Generate an array of all outputs of the generator.
-     * 
+     *
      * @category Extraction
      * @returns an array of the outputs of the exhausted data generator
      * @example

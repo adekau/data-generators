@@ -6,7 +6,7 @@ function isIterable(x: any): x is Iterable<unknown> {
 
 /**
  * Recursively flattens a generator of generators into a generator of all the flattened generators' outputs.
- * 
+ *
  * @category Transformer
  * @returns a flattened Data Generator
  */

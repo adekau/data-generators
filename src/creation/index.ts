@@ -7,4 +7,3 @@ export { infinite } from './infinite';
 export { constantSequence, sequence } from './sequence';
 export { partialStruct, struct } from './struct';
 export { tuple } from './tuple';
-

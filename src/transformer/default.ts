@@ -20,5 +20,6 @@ import { one } from './one';
 export const withDefault =
     <T>(defaultGenerator: Iterable<T>) =>
     (dg: () => Iterable<T | undefined>): (() => Iterable<T>) => {
-        return () => flatMapShallow((t: T | undefined) => (t ? [t] : one<T>()(() => defaultGenerator)()))(dg)() as Iterable<T>;
+        return () =>
+            flatMapShallow((t: T | undefined) => (t ? [t] : one<T>()(() => defaultGenerator)()))(dg)() as Iterable<T>;
     };

@@ -1,8 +1,8 @@
-import { take } from "./take";
+import { take } from './take';
 
 /**
  * Limits a generator to one output
- * 
+ *
  * @category Transformer
  * @returns A generator that emits a single output
  */

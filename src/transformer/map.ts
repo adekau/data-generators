@@ -29,7 +29,7 @@ export function flatMap<T, U>(project: (v: T) => Iterable<U>) {
 
 /**
  * A shallow version of {@link flatMap}, only flattens one level.
- * 
+ *
  * @category Transformer
  */
 export function flatMapShallow<T, U>(project: (v: T) => Iterable<U>) {
