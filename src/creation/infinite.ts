@@ -3,6 +3,7 @@ import { createGenerator } from './data-generator';
 /**
  * Creates an infinite generator
  *
+ * @category Creation
  * @param gen A function that returns the next output
  * @returns an inifite generator
  */

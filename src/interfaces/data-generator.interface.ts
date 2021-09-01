@@ -100,7 +100,7 @@ export interface DataGenerator<T> extends Iterable<T> {
     one(): DataGenerator<T>;
 
     /**
-     * @category Tranformer
+     * @category Transformer
      * @param n the number of outputs to allow
      * @returns a new data generator that can only output `n` value(s)
      */

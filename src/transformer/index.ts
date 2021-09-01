@@ -1,8 +1,11 @@
-export { apS, apT, ap } from './apply';
+export { ap, apS, apT } from './apply';
 export { bindS, bindT, bindToS, bindToT } from './bind';
 export { withDefault } from './default';
+export { flat } from './flat';
 export { toFunctionGenerator } from './function';
 export { many } from './many';
-export { flatMap, map, flatMapShallow } from './map';
+export { flatMap, flatMapShallow, map } from './map';
+export { one } from './one';
 export { optional } from './optional';
+export { take } from './take';
 export { withoutS, withoutT, withS, withT } from './with';

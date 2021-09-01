@@ -2,6 +2,11 @@ import { Head } from 'ts-toolbelt/out/List/Head';
 import { DataGenerator, Tail } from '../interfaces/data-generator.interface';
 import { createGenerator } from './data-generator';
 
+type IterableTuple<T extends Iterable<unknown>[], Final extends unknown[] = []> = {
+    0: Head<T> extends Iterable<infer U> ? IterableTuple<Tail<T>, [...Final, U]> : Final;
+    1: Final;
+}[T['length'] extends 0 ? 1 : 0];
+
 /**
  * Similar to struct, but in a fixed length array format.
  *
@@ -15,12 +20,6 @@ import { createGenerator } from './data-generator';
  * // Example Output: ['hZn,*Q', 3, false]
  * ```
  */
-
-type IterableTuple<T extends Iterable<unknown>[], Final extends unknown[] = []> = {
-    0: Head<T> extends Iterable<infer U> ? IterableTuple<Tail<T>, [...Final, U]> : Final;
-    1: Final;
-}[T['length'] extends 0 ? 1 : 0];
-
 export function tuple<T extends Iterable<unknown>[]>(...gens: T): DataGenerator<IterableTuple<T>> {
     return createGenerator(_tuple(...gens));
 }

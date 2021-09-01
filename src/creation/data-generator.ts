@@ -4,6 +4,13 @@ import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
 import { take } from '../transformer/take';
 
+/**
+ * Lifts an iterable into a data generator allowing use of data transformation operators.
+ *
+ * @category Creation
+ * @param gen A function that returns an iterable
+ * @returns A new Data Generator that outputs based on the input `Iterable`.
+ */
 export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
     return Object.assign(gen(), {
         create() {
