@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-const aliases = ['creation', 'library', 'transformer', 'interface'];
+const aliases = ['library', 'transformer', 'interfaces'];
 
 aliases
     .map((alias) => path.resolve(__dirname, `../${alias}`))
