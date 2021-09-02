@@ -9,9 +9,6 @@
     "types": "index.d.ts",
     "typesVersions": {
         ">=4.2": {
-            "library": [
-                "dist/types/library"
-            ],
             "*": [
                 "dist/types/*"
             ]
@@ -29,7 +26,10 @@
         "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs"
     },
     "files": [
-        "/dist/**/*",
+        "dist/cjs/**/*",
+        "dist/esm/**/!(*.tsbuildinfo)",
+        "dist/esm5/**/*",
+        "dist/types/**/*",
         "library",
         "interface",
         "transformer",
@@ -76,8 +76,6 @@
     "devDependencies": {
         "@types/jasmine": "^3.8.2",
         "@types/uuid": "^8.3.1",
-        "babel-core": "^6.26.3",
-        "babel-loader": "^8.2.2",
         "jasmine-core": "^3.8.0",
         "karma": "^6.3.4",
         "karma-chrome-launcher": "^3.1.0",
@@ -86,11 +84,8 @@
         "karma-typescript": "^5.5.1",
         "prettier": "2.3.2",
         "shx": "^0.3.3",
-        "ts-loader": "^9.2.5",
         "typedoc": "^0.21.5",
         "typedoc-plugin-pages": "^1.1.0",
-        "typescript": "^4.3.5",
-        "webpack": "^5.51.1",
-        "webpack-cli": "^4.8.0"
+        "typescript": "^4.3.5"
     }
 }
