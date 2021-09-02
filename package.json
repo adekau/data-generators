@@ -2,19 +2,40 @@
     "name": "@nwps/data-generators",
     "version": "1.0.0-rc.4",
     "description": "Mock unit test data generation",
-    "main": "lib/index.js",
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm5/index.js",
+    "typings": "dist/esm5/index.d.ts",
+    "sideEffects": false,
     "scripts": {
         "test": "karma start",
         "prettier": "prettier --write .",
         "clean:docs": "shx rm -rf ./docs",
-        "build": "prettier --write . && shx rm -rf ./lib && tsc",
+        "build:clean": "shx rm -rf ./dist",
+        "build:base": "tsc --project ./tsconfig.json",
+        "build:cjs": "tsc --project ./tsconfig.cjs.json",
+        "webpack": "webpack",
+        "build": "npm run prettier && npm run build:clean && npm run build:base && npm run build:cjs",
         "build:docs": "npm run fix-typedoc-pages && npm run clean:docs && typedoc",
         "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs"
     },
     "files": [
-        "lib/**/*"
+        "/dist/**/*",
+        "library",
+        "creation",
+        "interface",
+        "transformer",
+        "tsconfig.json"
     ],
-    "types": "lib/index.d.ts",
+    "exports": {
+        ".": {
+            "node": "./dist/cjs/index.js",
+            "default": "./dist/esm5/index.js"
+        },
+        "./library": {
+            "node": "./dist/cjs/library/index.js",
+            "default": "./dist/esm5/library/index.js"
+        }
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/tyler-technologies/data-generators.git"
@@ -37,6 +58,8 @@
     "devDependencies": {
         "@types/jasmine": "^3.8.2",
         "@types/uuid": "^8.3.1",
+        "babel-core": "^6.26.3",
+        "babel-loader": "^8.2.2",
         "jasmine-core": "^3.8.0",
         "karma": "^6.3.4",
         "karma-chrome-launcher": "^3.1.0",
@@ -45,8 +68,11 @@
         "karma-typescript": "^5.5.1",
         "prettier": "2.3.2",
         "shx": "^0.3.3",
+        "ts-loader": "^9.2.5",
         "typedoc": "^0.21.5",
         "typedoc-plugin-pages": "^1.1.0",
-        "typescript": "^4.3.5"
+        "typescript": "^4.3.5",
+        "webpack": "^5.51.1",
+        "webpack-cli": "^4.8.0"
     }
 }
