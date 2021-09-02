@@ -1,1 +1,1 @@
-export { DataGenerator } from './data-generator.interface';
+export { DataGenerator } from '../internal/interfaces/data-generator.interface';

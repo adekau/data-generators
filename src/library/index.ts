@@ -1,7 +1,7 @@
-export { dateGenerator as date, dateGenerator } from './date';
-export { enumValueGenerator as enumValue, enumValueGenerator } from './enum';
-export { functionGenerator as func, functionGenerator } from './function';
-export { incrementGenerator as incr, incrementGenerator } from './increment';
+export { dateGenerator as date, dateGenerator } from '../internal/library/date';
+export { enumValueGenerator as enumValue, enumValueGenerator } from '../internal/library/enum';
+export { functionGenerator as func, functionGenerator } from '../internal/library/function';
+export { incrementGenerator as incr, incrementGenerator } from '../internal/library/increment';
 export {
     booleanGenerator as boolean,
     booleanGenerator,
@@ -13,5 +13,5 @@ export {
     numberGenerator,
     stringGenerator as string,
     stringGenerator
-} from './primitives';
-export { uuidGenerator as uuid, uuidGenerator } from './uuid-generator';
+} from '../internal/library/primitives';
+export { uuidGenerator as uuid, uuidGenerator } from '../internal/library/uuid-generator';

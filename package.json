@@ -2,19 +2,57 @@
     "name": "@nwps/data-generators",
     "version": "1.0.0-rc.4",
     "description": "Mock unit test data generation",
-    "main": "lib/index.js",
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm5/index.js",
+    "es2015": "./dist/esm/index.js",
+    "esnext": "./dist/esm5/index.js",
+    "types": "index.d.ts",
+    "typesVersions": {
+        ">=4.1": {
+            "*": [
+                "dist/types/*"
+            ]
+        }
+    },
+    "sideEffects": false,
     "scripts": {
         "test": "karma start",
         "prettier": "prettier --write .",
         "clean:docs": "shx rm -rf ./docs",
-        "build": "prettier --write . && shx rm -rf ./lib && tsc",
+        "build:clean": "shx rm -rf ./dist",
+        "build:all": "npm run build:clean && tsc -b ./src/tsconfig.cjs.json ./src/tsconfig.esm.json ./src/tsconfig.esm5.json ./src/tsconfig.types.json",
+        "build": "npm run prettier && npm run build:all && node ./scripts/alias",
         "build:docs": "npm run fix-typedoc-pages && npm run clean:docs && typedoc",
         "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs"
     },
     "files": [
-        "lib/**/*"
+        "dist/cjs/**/*",
+        "dist/esm/**/!(*.tsbuildinfo)",
+        "dist/esm5/**/*",
+        "dist/types/**/*",
+        "library",
+        "interface",
+        "transformer",
+        "tsconfig.json"
     ],
-    "types": "lib/index.d.ts",
+    "exports": {
+        ".": {
+            "node": "./dist/cjs/index.js",
+            "default": "./dist/esm5/index.js"
+        },
+        "./library": {
+            "node": "./dist/cjs/library/index.js",
+            "default": "./dist/esm5/library/index.js"
+        },
+        "./transformer": {
+            "node": "./dist/cjs/transformer/index.js",
+            "default": "./dist/esm5/transformer/index.js"
+        },
+        "./interface": {
+            "node": "./dist/cjs/interface/index.js",
+            "default": "./dist/esm5/interface/index.js"
+        }
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/tyler-technologies/data-generators.git"
@@ -32,6 +70,7 @@
     "homepage": "https://github.com/tyler-technologies/data-generators#readme",
     "dependencies": {
         "ts-toolbelt": "^9.6.0",
+        "tslib": "^2.3.1",
         "uuid": "^8.3.2"
     },
     "devDependencies": {

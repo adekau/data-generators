@@ -1,7 +1,4 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
-import { booleanGenerator } from '../library/primitives';
-import { flatMap, flatMapShallow } from '../transformer';
-import { one } from '../transformer/one';
 import { createGenerator } from './data-generator';
 
 /**
