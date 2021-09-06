@@ -3,7 +3,7 @@ export { enumValueGenerator as enumValue, enumValueGenerator } from '../internal
 export { functionGenerator as func, functionGenerator } from '../internal/library/function';
 export { incrementGenerator as incr, incrementGenerator } from '../internal/library/increment';
 export {
-    booleanGenerator as boolean,
+    booleanGenerator as bool,
     booleanGenerator,
     charGenerator as char,
     charGenerator,

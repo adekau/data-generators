@@ -74,7 +74,95 @@
 				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
 					<h1>Getting Started</h1>
 				</a>
-				<p>To be written...</p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>Installation</h2>
+				</a>
+				<p>Installation instructions can be found in the <a href="../../index.html">readme</a>, located at the repository root.</p>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<p>This library&#39;s primary purpose is to generate randomized mock data for JavaScript/TypeScript unit testing.</p>
+				<p>Both NWPS projects I have been on have used Jasmine for JavaScript unit testing on the front end, and xUnit + AutoFixture for C# unit testing on the back end. This library also aims to be familiar to both front end and back end developers. For those reasons the API is modeled after RxJS and AutoFixture. </p>
+				<p>An example may better explain what this library is for: say you have a generator for a large interface called <code>Person</code>. You&#39;re writing multiple unit tests for a function that formats the person&#39;s name. So the only fields on <code>Person</code> that you care about fixing to some hard coded values for these tests are <code>firstName</code>, <code>middleInitial</code>, and <code>lastName</code>.
+				Everything else on that contract you don&#39;t care about and can be filled randomly.</p>
+				<p>For one of the tests, you want to verify the results when <code>firstName</code> is <code>undefined</code>, <code>null</code>, or empty string.</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">personGenerator</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;./person.generator&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">withS</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nwps/data-generators/transformer&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #795E26">it</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;should handle invalid first name values&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">persons</span><span style="color: #000000"> = </span><span style="color: #001080">personGenerator</span>
+<span style="color: #000000">        .</span><span style="color: #795E26">pipe</span><span style="color: #000000">(</span>
+<span style="color: #000000">            </span><span style="color: #795E26">withS</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;firstName&#039;</span><span style="color: #000000">, [</span><span style="color: #0000FF">undefined</span><span style="color: #000000">, </span><span style="color: #0000FF">null</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;&#039;</span><span style="color: #000000">]) </span><span style="color: #008000">// 1</span>
+<span style="color: #000000">        ).</span><span style="color: #795E26">createAll</span><span style="color: #000000">(); </span><span style="color: #008000">// 2</span>
+<span style="color: #000000">    </span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">for</span><span style="color: #000000"> (</span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">person</span><span style="color: #000000"> </span><span style="color: #0000FF">of</span><span style="color: #000000"> </span><span style="color: #001080">persons</span><span style="color: #000000">) {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// expect(myNameFormatter(person)).toBe(...)</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<ol>
+					<li><code>withS</code> takes a property on the generator and overwrites it with a new one (can be anything that is iterable).<ul>
+							<li><strong>Note</strong> the name <code>withS</code> has the <code>S</code> on the end due to it operating on a struct (introduced below), there is also <code>withT</code> for tuples. Also, <code>with</code> is a JavaScript reserved word, so some creativity was necessary.</li>
+						</ul>
+					</li>
+					<li>Here, <code>createAll</code> will return an array of 3 persons, the first having <code>firstName: undefined</code>, second <code>firstName: null</code> and third <code>firstName: &#39;&#39;</code>.
+					It only creates 3 because the replacement generator provided for firstName in <code>withS</code> can only output at most 3 values.</li>
+				</ol>
+				<a href="#primitives" id="primitives" style="color: inherit; text-decoration: none;">
+					<h3>Primitives</h3>
+				</a>
+				<p><code>@nwps/data-generators</code> includes some generators out of the box under <code>@nwps/data-generators/library</code> for primitive data types such as strings, booleans, numbers, etc.</p>
+				<p>To generate a value from these, the methods <code>create</code>, <code>createMany</code>, and <code>createAll</code> are available.</p>
+				<p><code>create</code> generates a single value, <code>createMany</code> allows you to specify how many values to generate and returns the values in an array, while <code>createAll</code> creates values from the generator until the generator is exhausted of values to generate.</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">int</span><span style="color: #000000">, </span><span style="color: #001080">bool</span><span style="color: #000000">, </span><span style="color: #001080">date</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nwps/data-generators/library&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">take</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nwps/data-generators/transformer&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #795E26">int</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">10</span><span style="color: #000000">).</span><span style="color: #795E26">create</span><span style="color: #000000">(); </span><span style="color: #008000">// random integer between 1 and 10</span>
+<span style="color: #795E26">bool</span><span style="color: #000000">(</span><span style="color: #098658">70</span><span style="color: #000000">).</span><span style="color: #795E26">createMany</span><span style="color: #000000">(</span><span style="color: #098658">3</span><span style="color: #000000">); </span><span style="color: #008000">// Array of 3 random booleans each with a 70% probability of being true</span>
+<span style="color: #795E26">date</span><span style="color: #000000">({ </span><span style="color: #001080">minutes:</span><span style="color: #000000"> </span><span style="color: #795E26">int</span><span style="color: #000000">(</span><span style="color: #098658">10</span><span style="color: #000000">, </span><span style="color: #098658">40</span><span style="color: #000000">) })</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">pipe</span><span style="color: #000000">(</span><span style="color: #795E26">take</span><span style="color: #000000">(</span><span style="color: #098658">3</span><span style="color: #000000">))</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">createAll</span><span style="color: #000000">(); </span><span style="color: #008000">// Array of 3 random dates with minutes randomized between 10 and 40</span>
+</code></pre>
+				<a href="#combinators" id="combinators" style="color: inherit; text-decoration: none;">
+					<h3>Combinators</h3>
+				</a>
+				<p>While the library provides the primitive building blocks, the index and transformer modules provide various <a href="https://en.wikipedia.org/wiki/Combinatory_logic#In_computing">combinators</a> for creating generators of more complex structure.</p>
+				<p>Besides the primitive types in JavaScript, there are also Objects and Arrays (which are Objects as well). <code>struct</code> creates a new generator that generates an object, and <code>tuple</code> creates a new generator that generates an array. These functions are available in the index module (<code>@nwps/data-generators</code>).</p>
+				<p>A common use case of <code>struct</code> is creating a shareable generator for an interface/contract. For example, contact info,</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">struct</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nwps/data-generators&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">string</span><span style="color: #000000">, </span><span style="color: #001080">date</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nwps/data-generators/library&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">interface</span><span style="color: #000000"> </span><span style="color: #267F99">ContactInfo</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">firstName</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">lastName</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">email</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">    </span><span style="color: #001080">updatedAt</span><span style="color: #000000">: </span><span style="color: #267F99">Date</span><span style="color: #000000">;</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">contactInfoGenerator</span><span style="color: #000000"> = </span><span style="color: #795E26">struct</span><span style="color: #000000">&lt;</span><span style="color: #267F99">ContactInfo</span><span style="color: #000000">&gt;({</span>
+<span style="color: #000000">    </span><span style="color: #001080">firstName:</span><span style="color: #000000"> </span><span style="color: #795E26">string</span><span style="color: #000000">(</span><span style="color: #098658">6</span><span style="color: #000000">), </span><span style="color: #008000">// random string of length 6</span>
+<span style="color: #000000">    </span><span style="color: #001080">lastName:</span><span style="color: #000000"> </span><span style="color: #795E26">string</span><span style="color: #000000">(), </span><span style="color: #008000">// random string of length 10</span>
+<span style="color: #000000">    </span><span style="color: #001080">email:</span><span style="color: #000000"> </span><span style="color: #795E26">string</span><span style="color: #000000">(</span><span style="color: #098658">20</span><span style="color: #000000">),</span>
+<span style="color: #000000">    </span><span style="color: #001080">updatedAt:</span><span style="color: #000000"> </span><span style="color: #795E26">date</span><span style="color: #000000">()</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<p>Then using the generator is the same as the primitives above: <code>create</code>, <code>createMany</code>, or <code>createAll</code>.</p>
+				<blockquote>
+					<p><strong>Warning</strong> when using <code>createAll</code> on an infinite generator (a generator that can always create a new value) will cause a stack overflow. More on this later on.</p>
+				</blockquote>
+				<p>In addition to <code>struct</code>, there is <code>tuple</code>. Tuple will generally be used less often than <code>struct</code>. A use case for <code>tuple</code> would be implementing a more complex data generator
+				using a similar technique commonly used for RxJS Observables. If you need multiple generated values, and then want to map to a single value, in RxJS you would use <code>forkJoin</code> or <code>combineLatest</code>. Here tuple can be used for a similar purpose.</p>
+				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">tuple</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nwps/data-generators&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">int</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@nwps/data-generators/library&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #795E26">tuple</span><span style="color: #000000">(</span><span style="color: #795E26">int</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">50</span><span style="color: #000000">), [</span><span style="color: #A31515">&#039;Bob&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;Jim&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;Larry&#039;</span><span style="color: #000000">])</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">pipe</span><span style="color: #000000">(</span>
+<span style="color: #000000">        </span><span style="color: #795E26">map</span><span style="color: #000000">(([</span><span style="color: #001080">num</span><span style="color: #000000">, </span><span style="color: #001080">name</span><span style="color: #000000">]) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #A31515">`</span><span style="color: #0000FF">${</span><span style="color: #001080">name</span><span style="color: #0000FF">}</span><span style="color: #A31515">, your lucky number is </span><span style="color: #0000FF">${</span><span style="color: #001080">num</span><span style="color: #0000FF">}</span><span style="color: #A31515">!`</span><span style="color: #000000">)</span>
+<span style="color: #000000">    )</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">createAll</span><span style="color: #000000">();</span>
+<span style="color: #008000">// outputs, for example,</span>
+<span style="color: #008000">// [&#039;Bob, your lucky number is 48!&#039;, &#039;Jim, your lucky number is 32!&#039;, &#039;Larry, your lucky number is 7!&#039;]</span>
+</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">

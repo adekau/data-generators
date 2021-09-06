@@ -16,7 +16,7 @@ export type DateData = {
  */
 export const dateGenerator = (generatorOverrides?: { [K in keyof DateData]+?: Iterable<DateData[K]> }) =>
     struct<DateData>({
-        year: generatorOverrides?.year ?? integerGenerator(1970, new Date().getFullYear() + 50),
+        year: generatorOverrides?.year ?? integerGenerator(new Date().getFullYear() - 50, new Date().getFullYear() + 50),
         month: generatorOverrides?.month ?? integerGenerator(0, 11),
         date: generatorOverrides?.date ?? integerGenerator(1, 31),
         hours: generatorOverrides?.hours ?? integerGenerator(0, 23),
