@@ -1,4 +1,3 @@
-import { createGenerator } from '../creation/data-generator';
 import { infinite } from '../creation/infinite';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { many } from '../transformer/many';
@@ -46,7 +45,7 @@ export const charGenerator: DataGenerator<string> = integerGenerator(32, 126).ma
  * Creates a random boolean generator with optional probability.
  *
  * @category Library
- * @param probabilityTrue the probability (between 0 and 100) percent of returning true. (default 50)
+ * @param probabilityTrue the probability (percentage between 0 and 100) of returning true. (default 50)
  * @returns A random weighted probability boolean.
  */
 export const booleanGenerator = (probabilityTrue: number = 50): DataGenerator<boolean> =>

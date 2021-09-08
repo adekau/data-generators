@@ -5,9 +5,9 @@ import { createGenerator } from './data-generator';
  * Creates a generator that returns either one value or another.
  *
  * @category Creation
- * @param generatorA A generator to potentially create a value from
- * @param generatorB A generator to potentially create a value from
- * @param probabilityA The probability of generating a value from `generatorA`
+ * @param generatorA An `Iterable` to potentially create a value from, with probability `probabilityA`
+ * @param generatorB An `Iterable` to potentially create a value from, with probability `100 - probabilityA`
+ * @param probabilityA The probability (percentage between 0 and 100) of generating a value from `generatorA` (default 50)
  * @returns Either a value from `generatorA`, or a value from `generatorB`.
  * @example
  * ```
