@@ -28,7 +28,7 @@ it('should handle invalid first name values', () => {
 });
 ```
 1. `withS` takes a property on the generator and overwrites it with a new one (can be anything that is iterable).
-   * **Note** the name `withS` has the `S` on the end due to it operating on a struct (introduced below), there is also `withT` for tuples. Also, `with` is a JavaScript reserved word, so some creativity was necessary.
+   * **Note** the name `withS` has the `S` on the end due to it operating on a struct (introduced below), there is also `withT` for tuples. Also, `with` is a JavaScript reserved word so some creativity was necessary.
 2. Here, `createAll` will return an array of 3 persons, the first having `firstName: undefined`, second `firstName: null` and third `firstName: ''`. 
    It only creates 3 because the replacement generator provided for firstName in `withS` can only output at most 3 values.
 
@@ -84,6 +84,7 @@ using a similar technique commonly used for RxJS Observables. If you need multip
 ```typescript
 import { tuple } from '@nwps/data-generators';
 import { int } from '@nwps/data-generators/library';
+import { map } from '@nwps/data-generators/transformer';
 
 tuple(int(1, 50), ['Bob', 'Jim', 'Larry'])
     .pipe(
