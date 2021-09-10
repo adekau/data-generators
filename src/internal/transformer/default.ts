@@ -2,6 +2,7 @@ import { constant } from '../creation/constant';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { flatMap, flatMapShallow } from './map';
 import { one } from './one';
+import { pipe } from './pipe';
 
 /**
  * Data Generator pipe operator for using a default generator in place of undefined outputs.
@@ -20,6 +21,8 @@ import { one } from './one';
 export const withDefault =
     <T>(defaultGenerator: Iterable<T>) =>
     (dg: () => Iterable<T | undefined>): (() => Iterable<T>) => {
-        return () =>
-            flatMapShallow((t: T | undefined) => (t ? [t] : one<T>()(() => defaultGenerator)()))(dg)() as Iterable<T>;
+        return pipe(
+            dg,
+            flatMapShallow((t) => (t ? [t] : pipe(() => defaultGenerator, one())()))
+        );
     };

@@ -92,6 +92,10 @@
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="index.html#struct" class="tsd-kind-icon">struct</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="index.html#tuple" class="tsd-kind-icon">tuple</a></li>
 							</ul>
+							<h3>Utility Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="index.html#isDataGenerator" class="tsd-kind-icon">is<wbr>Data<wbr>Generator</a></li>
+							</ul>
 						</section>
 					</div>
 				</section>
@@ -116,7 +120,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/any-of.ts#L22">src/internal/creation/any-of.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/any-of.ts#L22">src/internal/creation/any-of.ts:22</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -165,7 +169,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/constant.ts#L11">src/internal/creation/constant.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/constant.ts#L11">src/internal/creation/constant.ts:11</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -203,7 +207,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/sequence.ts#L37">src/internal/creation/sequence.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/sequence.ts#L37">src/internal/creation/sequence.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -249,7 +253,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/data-generator.ts#L14">src/internal/creation/data-generator.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/data-generator.ts#L17">src/internal/creation/data-generator.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -299,7 +303,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/iif.ts#L12">src/internal/creation/iif.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/iif.ts#L12">src/internal/creation/iif.ts:12</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -364,7 +368,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/either.ts#L18">src/internal/creation/either.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/either.ts#L18">src/internal/creation/either.ts:18</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -393,19 +397,19 @@
 								<li>
 									<h5>generatorA: <span class="tsd-signature-type">Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>A generator to potentially create a value from</p>
+										<p>An <code>Iterable</code> to potentially create a value from, with probability <code>probabilityA</code></p>
 									</div>
 								</li>
 								<li>
 									<h5>generatorB: <span class="tsd-signature-type">Iterable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">U</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>A generator to potentially create a value from</p>
+										<p>An <code>Iterable</code> to potentially create a value from, with probability <code>100 - probabilityA</code></p>
 									</div>
 								</li>
 								<li>
 									<h5>probabilityA: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 50</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>The probability of generating a value from <code>generatorA</code></p>
+										<p>The probability (percentage between 0 and 100) of generating a value from <code>generatorA</code> (default 50)</p>
 									</div>
 								</li>
 							</ul>
@@ -424,7 +428,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/infinite.ts#L10">src/internal/creation/infinite.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/infinite.ts#L10">src/internal/creation/infinite.ts:10</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -474,7 +478,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/struct.ts#L53">src/internal/creation/struct.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/struct.ts#L53">src/internal/creation/struct.ts:53</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -509,7 +513,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/sequence.ts#L17">src/internal/creation/sequence.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/sequence.ts#L17">src/internal/creation/sequence.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -555,7 +559,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/struct.ts#L20">src/internal/creation/struct.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/struct.ts#L20">src/internal/creation/struct.ts:20</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -602,7 +606,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/72402fb/src/internal/creation/tuple.ts#L23">src/internal/creation/tuple.ts:23</a></li>
+									<li>Defined in <a href="https://github.com/tyler-technologies/data-generators/blob/87c9bf9/src/internal/creation/tuple.ts#L24">src/internal/creation/tuple.ts:24</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -638,6 +642,41 @@
 					</ul>
 				</section>
 			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Utility Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="isDataGenerator" class="tsd-anchor"></a>
+					<h3>is<wbr>Data<wbr>Generator</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Data<wbr>Generator<span class="tsd-signature-symbol">(</span>v<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">v</span><span class="tsd-signature-symbol"> is </span><a href="../interfaces/interfaces.DataGenerator.html" class="tsd-signature-type" data-tsd-kind="Interface">DataGenerator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in src/internal/is-data-generator.ts:11</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Test a value to see if it is a Data Generator. Also acts as a type guard.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>v: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A value to test</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">v</span><span class="tsd-signature-symbol"> is </span><a href="../interfaces/interfaces.DataGenerator.html" class="tsd-signature-type" data-tsd-kind="Interface">DataGenerator</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>boolean</p>
+						</li>
+					</ul>
+				</section>
+			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
@@ -647,6 +686,9 @@
 					</li>
 					<li class=" pp-nav pp-page">
 						<a href="../pages/Guide/getting-started.html">Getting <wbr>Started</a>
+					</li>
+					<li class=" pp-nav pp-page">
+						<a href="../pages/Guide/infinite-and-finite-generators.html">Infinite and <wbr>Finite <wbr>Generators</a>
 					</li>
 					<li class="label pp-nav pp-group">
 						<span>API</span>
@@ -693,6 +735,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="index.html#infinite" class="tsd-kind-icon">infinite</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="index.html#isDataGenerator" class="tsd-kind-icon">is<wbr>Data<wbr>Generator</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="index.html#partialStruct" class="tsd-kind-icon">partial<wbr>Struct</a>

@@ -1,5 +1,6 @@
 import { Head } from 'ts-toolbelt/out/List/Head';
-import { DataGenerator, Tail } from '../interfaces/data-generator.interface';
+import { DataGenerator } from '../interfaces/data-generator.interface';
+import { Tail } from '../types/flat.type';
 import { createGenerator } from './data-generator';
 
 type IterableTuple<T extends Iterable<unknown>[], Final extends unknown[] = []> = {

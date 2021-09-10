@@ -1,15 +1,9 @@
-type Transform<T> = T extends () => Iterable<infer U> ? U : never;
-type PFst<T, U> = (arg: () => Iterable<T>) => U;
-type UFn<T, U> = (arg: T) => U;
-
-export type Tail<T extends unknown[]> = T extends [unknown, ...infer Rest] ? Rest : [];
-export type Limiter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-export type Flat<T, Limit extends 1[] = Limiter> = {
-    0: T extends Iterable<infer U> ? Flat<U, Tail<Limit>> : T;
-    1: T;
-}[Limit['length'] extends 0 ? 1 : 0];
+import { Flat } from '../types/flat.type';
+import { PFst, Transform, UFn } from '../types/pipe.type';
 
 export interface DataGenerator<T> extends Iterable<T> {
+    /** @internal */
+    readonly brand: unique symbol;
     /**
      * Generate a single output
      *
@@ -107,7 +101,7 @@ export interface DataGenerator<T> extends Iterable<T> {
     take(n: number): DataGenerator<T>;
 
     /**
-     * Provides the ability to pipeline functions together.
+     * Provides the ability to pipeline [[`transformer`]]s together.
      *
      * @category Transformer
      * @param fns the functions to pipe together using the calling DataGenerator as the initial input

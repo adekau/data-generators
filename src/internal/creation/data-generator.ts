@@ -1,7 +1,10 @@
+import { getBrand } from '../brand';
 import { DataGenerator } from '../interfaces/data-generator.interface';
+import { isDataGenerator } from '../is-data-generator';
 import { ap } from '../transformer/apply';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
+import { pipe } from '../transformer/pipe';
 import { take } from '../transformer/take';
 
 /**
@@ -12,7 +15,8 @@ import { take } from '../transformer/take';
  * @returns A new Data Generator that outputs based on the input `Iterable`.
  */
 export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
-    return Object.assign(gen(), {
+    return Object.assign(gen(), <DataGenerator<T>>{
+        brand: Symbol.for(getBrand()),
         create() {
             return [...take(1)(gen)()][0];
         },
@@ -38,7 +42,8 @@ export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
             return createGenerator(take(n)(gen));
         },
         pipe(...fns: any[]): any {
-            return createGenerator(fns.reduce((y, f) => f(y), gen));
+            const piped = pipe(gen, ...(fns as [any]));
+            return isDataGenerator(piped) ? piped : createGenerator(piped as any);
         },
         [Symbol.iterator]() {
             return gen()[Symbol.iterator]();

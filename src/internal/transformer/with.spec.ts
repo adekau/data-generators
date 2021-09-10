@@ -3,14 +3,14 @@ import { struct } from '../creation/struct';
 import { tuple } from '../creation/tuple';
 import { booleanGenerator, charGenerator, integerGenerator, stringGenerator } from '../library/primitives';
 import { apT } from './apply';
-import { bindS } from './bind';
+import { bindS, bindT } from './bind';
 import { optional } from './optional';
-import { withoutS, withoutT, withS } from './with';
+import { withoutS, withoutT, withS, withT } from './with';
 
 describe('Data Generators: With', () => {
     it("should replace a struct key's generator", () => {
         const gen = struct({
-            str: constant<string>('string')
+            str: constant('string')
         }).pipe(
             withS('str', constant('wow')),
             bindS('q', ({ str }) => constant(str.concat('q'))),
@@ -21,6 +21,15 @@ describe('Data Generators: With', () => {
             str: 'wow',
             q: jasmine.stringMatching(/./)
         });
+    });
+
+    it("should replace a tuple member's generator", () => {
+        const gen = tuple(constant('string')).pipe(
+            bindT(([str]) => constant(`${str}!`)),
+            withT(1, charGenerator)
+        );
+
+        expect(gen.create()).toEqual(['string', jasmine.stringMatching(/./)]);
     });
 
     it('should restrict an infinite generator to finite', () => {

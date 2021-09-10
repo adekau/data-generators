@@ -9,3 +9,4 @@ export { one } from '../internal/transformer/one';
 export { optional } from '../internal/transformer/optional';
 export { take as dgTake, take } from '../internal/transformer/take';
 export { withoutS, withoutT, withS, withT } from '../internal/transformer/with';
+export { pipe } from '../internal/transformer/pipe';

@@ -1,7 +1,7 @@
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
-import { DataGenerator } from '../interfaces/data-generator.interface';
 import { map } from './map';
+import { pipe } from './pipe';
 
 /**
  * Pipeable version of {@link DataGenerator.ap}
@@ -38,13 +38,15 @@ export function ap<T, U>(projectGenerator: Iterable<(v: T) => U>) {
 export const apS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, dgT: Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
-        return () =>
+        return pipe(
+            _struct({ out: dgA(), append: dgT }),
             map(
-                ({ out, append }: { out: A; append: T }) =>
+                ({ out, append }) =>
                     Object.assign({}, out, { [name]: append }) as {
                         [K in keyof A | TName]: K extends keyof A ? A[K] : T;
                     }
-            )(_struct({ out: dgA(), append: dgT }))();
+            )
+        );
     };
 
 /**
@@ -64,5 +66,8 @@ export const apS =
 export const apT =
     <T, A extends unknown[]>(dgT: Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<[...A, T]>) => {
-        return () => map(([out, append]: [A, T]) => [...out, append])(_tuple(dgA(), dgT))() as Iterable<[...A, T]>;
+        return pipe(
+            _tuple(dgA(), dgT),
+            map(([a, t]) => [...a, t])
+        );
     };

@@ -24,7 +24,7 @@ export const either = <T, U>(
 export const _either = <T, U>(genA: Iterable<T>, genB: Iterable<U>, probA: number = 50): (() => Iterable<T | U>) => {
     return function* () {
         while (true) {
-            const bool = Math.round(Math.random() * 100) < probA;
+            const bool = 0.01 + Math.random() * 99.99 <= probA;
             const { value, done } = (bool ? genA : genB)[Symbol.iterator]().next();
             if (done) {
                 return;

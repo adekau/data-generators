@@ -2,6 +2,7 @@ import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
 import { flatMapShallow, map } from './map';
 import { one } from './one';
+import { pipe } from './pipe';
 
 /**
  * Binds the generator output to a property on a new object with name `name`.
@@ -57,10 +58,20 @@ export const bindToT =
 export const bindS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, f: (a: A) => Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
-        return () =>
-            flatMapShallow((a: A) =>
-                map((t: T) => Object.assign({}, a, { [name]: t }))(() => one<T>()(() => f(a))())()
-            )(dgA)() as Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>;
+        return pipe(
+            dgA,
+            flatMapShallow((a) =>
+                pipe(
+                    () => f(a),
+                    map((t) => Object.assign({}, a, { [name]: t })),
+                    one()
+                )()
+            )
+        ) as () => Iterable<
+            {
+                [K in keyof A | TName]: K extends keyof A ? A[K] : T;
+            }
+        >;
     };
 
 /**
@@ -81,8 +92,14 @@ export const bindS =
 export const bindT =
     <A extends unknown[], T>(f: (a: A) => Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<[...A, T]>) => {
-        return () =>
-            flatMapShallow((a: A) => map((t: T) => [...a, t] as [...A, T])(() => one<T>()(() => f(a))())())(() =>
-                dgA()
-            )();
+        return pipe(
+            dgA,
+            flatMapShallow((a) =>
+                pipe(
+                    () => f(a),
+                    map((t) => [...a, t] as [...A, T]),
+                    one()
+                )()
+            )
+        );
     };

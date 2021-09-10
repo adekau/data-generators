@@ -1,5 +1,6 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { flat } from './flat';
+import { pipe } from './pipe';
 
 /**
  * Pipeable version of {@link DataGenerator.map}.
@@ -23,7 +24,7 @@ export function map<T, U>(project: (t: T) => U) {
  */
 export function flatMap<T, U>(project: (v: T) => Iterable<U>) {
     return function (gen: () => Iterable<T>) {
-        return flat<Iterable<Iterable<U>>>()(map(project)(gen));
+        return pipe(gen, map(project), flat());
     };
 }
 

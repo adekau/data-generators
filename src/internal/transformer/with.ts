@@ -3,6 +3,7 @@ import { createGenerator } from '../creation/data-generator';
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
 import { map } from './map';
+import { pipe } from './pipe';
 
 /**
  * Overrides the generator of a struct property.
@@ -21,10 +22,10 @@ import { map } from './map';
  */
 export function withS<TName extends keyof A, A extends object>(name: TName, using: Iterable<A[TName]>) {
     return function (gen: () => Iterable<A>): () => Iterable<A> {
-        return () =>
-            map(({ out, replace }: { out: A; replace: A[TName] }) => Object.assign({}, out, { [name]: replace }))(
-                _struct({ out: gen(), replace: using })
-            )();
+        return pipe(
+            _struct({ out: gen(), replace: using }),
+            map(({ out, replace }) => Object.assign({}, out, { [name]: replace }))
+        );
     };
 }
 /**
@@ -50,11 +51,10 @@ export const withT =
             : Iterable<T[TIndex]>
     ) =>
     (gen: () => Iterable<T>): (() => Iterable<T>) => {
-        return () =>
-            map(
-                ([out, replace]: [T, any]) =>
-                    [...out.slice(0, index), replace, ...out.slice(index + 1, out.length)] as any
-            )(_tuple(gen(), using) as any)();
+        return pipe(
+            _tuple(gen(), using),
+            map(([out, replace]) => [...out.slice(0, index), replace, ...out.slice(index + 1, out.length)] as any)
+        );
     };
 
 /**
@@ -77,7 +77,10 @@ export const withT =
 export const withoutS =
     <TName extends keyof A, A extends object>(name: TName) =>
     (gen: () => Iterable<A>): (() => Iterable<{ [K in keyof A as K extends TName ? never : K]: A[K] }>) => {
-        return () => createGenerator(gen).map(({ [name]: _, ...rest }) => rest) as any;
+        return pipe(
+            gen,
+            map(({ [name]: _, ...rest }) => rest)
+        ) as any;
     };
 
 /**
@@ -100,6 +103,8 @@ export const withoutT =
     ): B.Or<N.IsNegative<TIndex>, U.Has<N.Lower<TIndex, T['length']>, 0>> extends 1
         ? () => Iterable<T>
         : () => Iterable<L.Omit<T, TIndex>> => {
-        // return dgT.map((t) => t.filter((_, i) => i !== index)) as any;
-        return () => map((t: T) => t.filter((_, i) => i !== index))(dgT)() as any;
+        return pipe(
+            dgT,
+            map((t) => t.filter((_, i) => i !== index))
+        ) as any;
     };

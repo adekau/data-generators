@@ -1,3 +1,4 @@
+import { pipe } from './pipe';
 import { take } from './take';
 
 /**
@@ -8,6 +9,6 @@ import { take } from './take';
  */
 export function one<T>() {
     return function (gen: () => Iterable<T>) {
-        return take(1)(gen);
+        return pipe(gen, take(1));
     };
 }

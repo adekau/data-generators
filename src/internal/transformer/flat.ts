@@ -1,4 +1,4 @@
-import { Flat } from '../interfaces/data-generator.interface';
+import { Flat } from '../types/flat.type';
 
 function isIterable(x: any): x is Iterable<unknown> {
     return typeof x?.[Symbol.iterator] === 'function';
