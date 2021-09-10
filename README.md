@@ -6,6 +6,10 @@ This library is intended to provide an abstraction over [ES6 Generator Functions
 
 It's API is modeled after both RxJS and the fluent API of AutoFixture, so that it will look familiar to both C# and JavaScript developers.
 
+## Documentation
+
+Documentation can be found at https://tyler-technologies.github.io/data-generators
+
 ## Installing
 
 ```bash
