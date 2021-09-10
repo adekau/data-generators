@@ -116,57 +116,45 @@ The `ap` and `bind` transformers all add members to a [[`struct`]] or [[`tuple`]
 
 -   `ap` appends a member to the end of an existing struct or tuple.
 
-    ```
+    ```ts
     import { struct, tuple, constant } from '@nwps/data-generators';
     import { apS, apT } from '@nwps/data-generators/transformer';
     import { date } from '@nwps/data-generators/library';
 
     struct({
         name: constant('Bob')
-    }).pipe(
-        apS('birthDate', date())
-    );
+    }).pipe(apS('birthDate', date()));
     // Outputs an object with type { name: 'Bob', birthDate: Date }
 
-    tuple(constant('Bob')).pipe(
-        apT(date())
-    );
+    tuple(constant('Bob')).pipe(apT(date()));
     // Outputs an array with type ['Bob', Date]
     ```
 
 -   `bindTo` transforms a non struct or tuple into a struct or tuple.
 
-    ```
+    ```ts
     import { bindToS, bindToT } from '@nwps/data-generators/transformer';
     import { int } from '@nwps/data-generators/library';
 
-    int().pipe(
-        bindToS('luckyNumber')
-    );
+    int().pipe(bindToS('luckyNumber'));
     // Outputs an object with type { luckyNumber: number }
 
-    int().pipe(
-        bindToT()
-    );
+    int().pipe(bindToT());
     // Outputs an array with type [number]
     ```
 
 -   `bind` appends a member to the end of an existing struct or tuple just as `ap` does, but allows you to use the existing values.
 
-    ```
+    ```ts
     import { struct, tuple } from '@nwps/data-generators';
     import { bindS, bindT } from '@nwps/data-generators/transformer';
     import { int, string } from '@nwps/data-generators/library';
 
     struct({
         strLen: int(5, 10)
-    }).pipe(
-        bindS('str', ({ strLen }) => string(strLen))
-    );
+    }).pipe(bindS('str', ({ strLen }) => string(strLen)));
     // Outputs an object with type { strLen: number; str: string } where str.length = strLen
 
-    tuple(int(5, 10)).pipe(
-        bindT(([strLen]) => string(strLen))
-    );
+    tuple(int(5, 10)).pipe(bindT(([strLen]) => string(strLen)));
     // Outputs an array with type [number, string] where arr[1].length = arr[0]
     ```
