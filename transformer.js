@@ -7,6 +7,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 exports.__esModule = true;
 var ts = require("typescript");
 var factory = ts.factory;
+;
 var transformer = function (program) { return function (context) {
     return function (sourceFile) {
         var typeChecker = program.getTypeChecker();
@@ -35,18 +36,16 @@ function transformType(type, node, typeChecker) {
         case ts.SymbolFlags.Class:
         case ts.SymbolFlags.Interface:
         case ts.SymbolFlags.TypeLiteral:
-            console.log('interface | class | literal', type.symbol.name);
-            type.symbol.members.forEach(function (symbol) { return console.log(symbol.name); });
-            console.log('-----');
+            // console.log('interface | class | literal', type.symbol.name);
+            // type.symbol.members.forEach((symbol) => console.log(symbol.name));
+            // console.log('-----');
             return createStructNode(type, node, typeChecker);
         default:
-            console.log('primitive', type.intrinsicName);
-            console.log('-----');
-            return factory.createIdentifier('__primitive');
+            return createPrimitiveNode(type, node, typeChecker);
     }
 }
 function createStructNode(type, node, typeChecker) {
-    return factory.createCallExpression(factory.createPropertyAccessExpression(factory.createIdentifier("__dg"), factory.createIdentifier("struct")), undefined, [createStructObjectLiteralExpression(type, node, typeChecker)]);
+    return createIndexCallExpression("struct" /* STRUCT */, [createStructObjectLiteralExpression(type, node, typeChecker)]);
 }
 function createStructObjectLiteralExpression(type, node, typeChecker) {
     var structMembers = [];
@@ -55,6 +54,47 @@ function createStructObjectLiteralExpression(type, node, typeChecker) {
         structMembers.push(factory.createPropertyAssignment(member.name, transformType(typeOfMember, node, typeChecker)));
     });
     return factory.createObjectLiteralExpression(structMembers, false);
+}
+function createPrimitiveNode(type, node, typeChecker) {
+    switch (type.flags) {
+        case ts.TypeFlags.NumberLiteral:
+            return createConstantCallExpression(type);
+        case ts.TypeFlags.Number:
+            return createLibraryCallExpression("int" /* NUMBER */);
+        case ts.TypeFlags.String:
+        case ts.TypeFlags.StringLiteral:
+        case ts.TypeFlags.TemplateLiteral:
+        case ts.TypeFlags.StringMapping:
+            return createLibraryCallExpression("string" /* STRING */);
+        case ts.TypeFlags.Object:
+            if (type.symbol.flags & (ts.SymbolFlags.Transient | ts.SymbolFlags.Interface) && type.symbol.name.toLowerCase() === "date" /* DATE */) {
+                return createLibraryCallExpression("date" /* DATE */);
+            }
+        default:
+            return factory.createIdentifier('__primitive');
+    }
+}
+function createConstantCallExpression(type) {
+    switch (type.flags) {
+        case ts.TypeFlags.NumberLiteral:
+            return createIndexCallExpression("constant" /* CONSTANT */, [factory.createNumericLiteral(type.value)]);
+        case ts.TypeFlags.StringLiteral:
+            return createIndexCallExpression("constant" /* CONSTANT */, [factory.createStringLiteral(type.value)]);
+        default:
+            return createIndexCallExpression("constant" /* CONSTANT */, [factory.createIdentifier('undefined')]);
+    }
+}
+function createIndexCallExpression(access, args) {
+    if (args === void 0) { args = []; }
+    return createSingleAccessCallExpression("__dg" /* INDEX */, access, args);
+}
+function createLibraryCallExpression(access, args) {
+    if (args === void 0) { args = []; }
+    return createSingleAccessCallExpression("__dgLib" /* LIBRARY */, access, args);
+}
+function createSingleAccessCallExpression(base, access, args) {
+    if (args === void 0) { args = []; }
+    return factory.createCallExpression(factory.createPropertyAccessExpression(factory.createIdentifier(base), factory.createIdentifier(access)), undefined, args);
 }
 function appendDefaultImports(host) {
     return appendNamedImportNode(appendNamedImportNode(host, '__dgLib', '@nwps/data-generators/library'), '__dg', '@nwps/data-generators');
@@ -65,6 +105,6 @@ function appendNamedImportNode(host, namespace, from) {
     ]);
 }
 function isBuildNode(node) {
-    return ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.escapedText === 'build';
+    return ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.escapedText === "build" /* BUILD_NODE_NAME */;
 }
 exports["default"] = transformer;
