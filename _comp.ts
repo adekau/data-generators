@@ -20,7 +20,7 @@ function findInterfaces(file: string) {
 
     function visit(node: ts.Node) {
         if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
-            (node.typeArguments.forEach((typeNode: ts.TypeNode) => {
+            node.typeArguments.forEach((typeNode: ts.TypeNode) => {
                 const type = typechecker.getTypeFromTypeNode(typeNode);
                 let gen = struct({});
                 type.getSymbol().members.forEach((symbol) => {
@@ -32,7 +32,7 @@ function findInterfaces(file: string) {
                     }
                 });
                 console.log(gen.create());
-            }));
+            });
         }
         node.forEachChild(visit);
     }

@@ -5,4 +5,5 @@ dist
 /creation/
 /transformer/
 /interfaces/
+/compiler/
 .DS_STORE

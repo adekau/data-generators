@@ -1,3 +1,3 @@
-import compile from "./compiler";
+import { compile } from "./dist/cjs/compiler";
 
 compile('./input.ts');

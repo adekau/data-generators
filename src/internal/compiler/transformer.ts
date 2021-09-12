@@ -15,7 +15,7 @@ const enum CONSTANTS {
     NUMBER = 'int',
     STRING = 'string',
     DATE = 'date'
-};
+}
 
 const transformer: (program: ts.Program) => ts.TransformerFactory<ts.SourceFile> = (program) => (context) => {
     return (sourceFile) => {
@@ -33,15 +33,20 @@ const transformer: (program: ts.Program) => ts.TransformerFactory<ts.SourceFile>
             }
 
             return ts.visitEachChild(node, visitor, context);
-        }
+        };
 
         return ts.visitNode(sourceFile, visitor);
-    }
-}
+    };
+};
 
 function transformBuildNode(node: BuildNode, typeChecker: ts.TypeChecker): ts.Node {
-    const typeArgument = node.typeArguments[0];
-    const type = typeChecker.getTypeFromTypeNode(typeArgument);
+    const typeArgument = node.typeArguments?.[0];
+    let type: ts.Type;
+    if (typeArgument) {
+        type = typeChecker.getTypeFromTypeNode(typeArgument);
+    } else {
+        throw new Error('Expected type argument in build expression, but found none.');
+    }
 
     return transformType(type, node, typeChecker);
 }
@@ -64,35 +69,39 @@ function createStructNode(type: ts.Type, node: BuildNode, typeChecker: ts.TypeCh
     return createIndexCallExpression(CONSTANTS.STRUCT, [createStructObjectLiteralExpression(type, node, typeChecker)]);
 }
 
-function createStructObjectLiteralExpression(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function createStructObjectLiteralExpression(
+    type: ts.Type,
+    node: BuildNode,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
     const structMembers: ts.ObjectLiteralElementLike[] = [];
 
-    type.symbol.members.forEach((member) => {
+    type.symbol.members?.forEach((member) => {
         const typeOfMember = typeChecker.getTypeOfSymbolAtLocation(member, node);
         structMembers.push(
             factory.createPropertyAssignment(member.name, transformType(typeOfMember, node, typeChecker))
         );
     });
 
-    return factory.createObjectLiteralExpression(
-        structMembers,
-        false
-    )
+    return factory.createObjectLiteralExpression(structMembers, false);
 }
 
 function createPrimitiveNode(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
     switch (type.flags) {
         case ts.TypeFlags.NumberLiteral:
+        case ts.TypeFlags.StringLiteral:
+        case ts.TypeFlags.TemplateLiteral:
             return createConstantCallExpression(type as ts.LiteralType);
         case ts.TypeFlags.Number:
             return createLibraryCallExpression(CONSTANTS.NUMBER);
         case ts.TypeFlags.String:
-        case ts.TypeFlags.StringLiteral:
-        case ts.TypeFlags.TemplateLiteral:
         case ts.TypeFlags.StringMapping:
             return createLibraryCallExpression(CONSTANTS.STRING);
         case ts.TypeFlags.Object:
-            if (type.symbol.flags & (ts.SymbolFlags.Transient | ts.SymbolFlags.Interface) && type.symbol.name.toLowerCase() === CONSTANTS.DATE) {
+            if (
+                type.symbol.flags & (ts.SymbolFlags.Transient | ts.SymbolFlags.Interface) &&
+                type.symbol.name.toLowerCase() === CONSTANTS.DATE
+            ) {
                 return createLibraryCallExpression(CONSTANTS.DATE);
             }
         default:
@@ -121,10 +130,7 @@ function createLibraryCallExpression(access: string, args: ts.Expression[] = [])
 
 function createSingleAccessCallExpression(base: string, access: string, args: ts.Expression[] = []): ts.Expression {
     return factory.createCallExpression(
-        factory.createPropertyAccessExpression(
-            factory.createIdentifier(base),
-            factory.createIdentifier(access)
-        ),
+        factory.createPropertyAccessExpression(factory.createIdentifier(base), factory.createIdentifier(access)),
         undefined,
         args
     );
@@ -132,11 +138,17 @@ function createSingleAccessCallExpression(base: string, access: string, args: ts
 
 function appendDefaultImports(host: ts.ImportDeclaration): ts.ImportDeclaration[] {
     return appendNamedImportNode(
-        appendNamedImportNode(host, '__dgLib', '@nwps/data-generators/library'), '__dg', '@nwps/data-generators'
+        appendNamedImportNode(host, '__dgLib', '@nwps/data-generators/library'),
+        '__dg',
+        '@nwps/data-generators'
     );
 }
 
-function appendNamedImportNode(host: ts.ImportDeclaration | ts.ImportDeclaration[], namespace: string, from: string): ts.ImportDeclaration[] {
+function appendNamedImportNode(
+    host: ts.ImportDeclaration | ts.ImportDeclaration[],
+    namespace: string,
+    from: string
+): ts.ImportDeclaration[] {
     return [
         ...(Array.isArray(host) ? host : [host]),
         factory.createImportDeclaration(
@@ -153,7 +165,11 @@ function appendNamedImportNode(host: ts.ImportDeclaration | ts.ImportDeclaration
 }
 
 function isBuildNode(node: ts.Node): node is BuildNode {
-    return ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.escapedText === CONSTANTS.BUILD_NODE_NAME;
+    return (
+        ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.escapedText === CONSTANTS.BUILD_NODE_NAME
+    );
 }
 
 export default transformer;
