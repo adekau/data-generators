@@ -1,8 +1,12 @@
+/**
+ * @module input
+ */
+
 import * as dg from './dist/types/interfaces';
 declare function build<T>(): dg.DataGenerator<T>;
 
-interface InterfaceTwo {
-    subProperty: boolean;
+class TestClass {
+    species: string;
 }
 
 interface TestInterface {
@@ -10,7 +14,14 @@ interface TestInterface {
     age: number;
     children: number;
     birthDate: Date;
-    another: InterfaceTwo;
+    something: {
+        somethingTwo: string;
+    },
+    somethingElse: 5
 }
 
 const t = build<TestInterface>().create();
+const t2 = build<number>().create();
+const t3 = build<Date>().create();
+const t4 = build<TestClass>().create();
+t; t2; t3; t4;
