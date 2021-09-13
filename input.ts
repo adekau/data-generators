@@ -5,15 +5,19 @@
 import * as dg from './dist/types/interfaces';
 declare function build<T>(): dg.DataGenerator<T>;
 
-const a = 5;
+const enum Color {
+    Red = 1,
+    Blue = 2
+}
 
 interface TestInterface {
-    name: boolean;
-    fn: (a: string) => number;
-    a: typeof a;
-    b: [number, string][0];
-    c: undefined;
-    d: null;
+    name: `Bob`;
+    age: number;
+    date: Date;
+    bool: boolean;
+    col: Color;
+    fn: (b: number) => boolean;
+    und: void;
 }
 
 const t = build<TestInterface>();

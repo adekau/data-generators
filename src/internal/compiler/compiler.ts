@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 import { sync as globSync } from 'glob';
 import transform from './transformer';
 
-const CJS_CONFIG = {
+const CJS_CONFIG: ts.CompilerOptions = {
     experimentalDecorators: true,
     jsx: ts.JsxEmit.React,
     module: ts.ModuleKind.CommonJS,
@@ -11,7 +11,8 @@ const CJS_CONFIG = {
     noUnusedLocals: true,
     noUnusedParameters: true,
     stripInternal: true,
-    target: ts.ScriptTarget.ES2015
+    target: ts.ScriptTarget.ES2015,
+    strict: true
 };
 
 export default function compile(input: string, options: ts.CompilerOptions = CJS_CONFIG) {
