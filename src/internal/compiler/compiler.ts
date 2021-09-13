@@ -20,19 +20,15 @@ export default function compile(input: string, options: ts.CompilerOptions = CJS
     const compilerHost = ts.createCompilerHost(options);
     const program = ts.createProgram(files, options, compilerHost);
 
-    const msgs = {};
-
-    let emitResult = program.emit(undefined, undefined, undefined, undefined, {
+    const emitResult = program.emit(undefined, undefined, undefined, undefined, {
         before: [transform(program)]
     });
 
-    let allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+    const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
 
     allDiagnostics.forEach((diagnostic) => {
         let { line, character } = diagnostic.file?.getLineAndCharacterOfPosition(diagnostic.start ?? 0) ?? {};
         let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
         console.log(`${diagnostic.file?.fileName} (${line ?? 0 + 1},${character ?? 0 + 1}): ${message}`);
     });
-
-    return msgs;
 }

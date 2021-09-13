@@ -29,6 +29,7 @@ const CONSTANTS = {
     LIBRARY: '__dgLib' as const,
     LIBRARY_LOCATION: '@nwps/data-generators/library' as const,
     FUNCTION_TYPE_ID: '__call' as const,
+    DATA_GENERATOR_BUILDER_BRAND: '_dataGeneratorBuilderBrand' as const,
     STRUCT: nameOf('struct'),
     TUPLE: nameOf('tuple'),
     CONSTANT: nameOf('constant'),
@@ -52,7 +53,7 @@ const transformer: (program: ts.Program) => ts.TransformerFactory<ts.SourceFile>
                 return appendDefaultImports(node);
             }
 
-            if (isBuildNode(node)) {
+            if (isBuildNode(node, typeChecker)) {
                 return transformBuildNode(node, typeChecker);
             }
 
@@ -311,12 +312,22 @@ function appendNamedImportNode(
     ];
 }
 
-function isBuildNode(node: ts.Node): node is BuildNode {
-    return (
+function isBuildNode(node: ts.Node, typeChecker: ts.TypeChecker): node is BuildNode {
+    if (
         ts.isCallExpression(node) &&
         ts.isIdentifier(node.expression) &&
         node.expression.escapedText === CONSTANTS.BUILD_NODE_NAME
-    );
+    ) {
+        const type = typeChecker.getTypeAtLocation(node.expression);
+        if (type.flags & ts.TypeFlags.Object) {
+            const hasFunctionTypeId = !!type.symbol.members?.has(CONSTANTS.FUNCTION_TYPE_ID as ts.__String);
+            const hasBrand = !!type.symbol.members?.has(CONSTANTS.DATA_GENERATOR_BUILDER_BRAND as ts.__String);
+            return hasFunctionTypeId && hasBrand;
+        } else {
+            return false;
+        }
+    }
+    return false;
 }
 
 export default transformer;

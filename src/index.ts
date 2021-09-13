@@ -5,6 +5,7 @@
 /** Creation */
 export { anyOf } from './internal/creation/any-of';
 export { arrayGenerator as array, arrayGenerator } from './internal/creation/array';
+export { build } from './internal/creation/build';
 export { constant } from './internal/creation/constant';
 export { createGenerator } from './internal/creation/data-generator';
 export { either } from './internal/creation/either';
