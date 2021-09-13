@@ -3,7 +3,8 @@
         "./src/interfaces/index.ts",
         "./src/index.ts",
         "./src/transformer/index.ts",
-        "./src/library/index.ts"
+        "./src/library/index.ts",
+        "./src/compiler/index.ts"
     ],
     "out": "docs",
     "theme": "pages-plugin"
