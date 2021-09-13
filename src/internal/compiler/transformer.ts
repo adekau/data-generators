@@ -1,21 +1,35 @@
 import * as ts from 'typescript';
 import factory = ts.factory;
+import * as lib from '../../library';
+import * as dg from '../../index';
 
 interface BuildNode extends ts.CallExpression {
     expression: ts.Identifier;
 }
 
-const enum CONSTANTS {
-    BUILD_NODE_NAME = 'build',
-    INDEX = '__dg',
-    LIBRARY = '__dgLib',
-    STRUCT = 'struct',
-    TUPLE = 'tuple',
-    CONSTANT = 'constant',
-    NUMBER = 'int',
-    STRING = 'string',
-    DATE = 'date'
+function nameOf<TName extends keyof typeof lib | keyof typeof dg>(name: TName) {
+    return name;
 }
+
+const CONSTANTS = {
+    BUILD_NODE_NAME: 'build' as const,
+    INDEX: '__dg' as const,
+    INDEX_LOCATION: '@nwps/data-generators' as const,
+    LIBRARY: '__dgLib' as const,
+    LIBRARY_LOCATION: '@nwps/data-generators/library' as const,
+    FUNCTION_TYPE_ID: '__call' as const,
+    STRUCT: nameOf('struct'),
+    TUPLE: nameOf('tuple'),
+    CONSTANT: nameOf('constant'),
+    ARRAY: nameOf('array'),
+    OPTIONAL: nameOf('optional'),
+    ANY_OF: nameOf('anyOf'),
+    NUMBER: nameOf('int'),
+    STRING: nameOf('string'),
+    BOOLEAN: nameOf('bool'),
+    FUNCTION: nameOf('func'),
+    DATE: nameOf('date')
+};
 
 const transformer: (program: ts.Program) => ts.TransformerFactory<ts.SourceFile> = (program) => (context) => {
     return (sourceFile) => {
@@ -52,20 +66,25 @@ function transformBuildNode(node: BuildNode, typeChecker: ts.TypeChecker): ts.No
 }
 
 function transformType(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
-    switch (type.symbol?.flags) {
-        case ts.SymbolFlags.Class:
-        case ts.SymbolFlags.Interface:
-        case ts.SymbolFlags.TypeLiteral:
-            // console.log('interface | class | literal', type.symbol.name);
-            // type.symbol.members.forEach((symbol) => console.log(symbol.name));
-            // console.log('-----');
-            return createStructNode(type, node, typeChecker);
-        default:
-            return createPrimitiveNode(type, node, typeChecker);
+    const flags = type.symbol?.flags ?? 0;
+    // Check if there are function signatures
+    const signatures = typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call);
+
+    // If there are signatures, it's a function type.
+    if (signatures.length) {
+        return createLibraryCallExpression(CONSTANTS.FUNCTION, [transformType(typeChecker.getReturnTypeOfSignature(signatures[0]), node, typeChecker)])
+    } else if (flags & (ts.SymbolFlags.Class | ts.SymbolFlags.Interface | ts.SymbolFlags.TypeLiteral)) {
+        return createStructExpression(type, node, typeChecker);
+    } else {
+        return createPrimitiveExpression(type, node, typeChecker);
     }
 }
 
-function createStructNode(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function createOptionalExpression(base: ts.Expression): ts.Expression {
+    return createIndexCallExpression(CONSTANTS.OPTIONAL, [base]);
+}
+
+function createStructExpression(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
     return createIndexCallExpression(CONSTANTS.STRUCT, [createStructObjectLiteralExpression(type, node, typeChecker)]);
 }
 
@@ -78,45 +97,143 @@ function createStructObjectLiteralExpression(
 
     type.symbol.members?.forEach((member) => {
         const typeOfMember = typeChecker.getTypeOfSymbolAtLocation(member, node);
+        const transformed = transformType(typeOfMember, node, typeChecker);
         structMembers.push(
-            factory.createPropertyAssignment(member.name, transformType(typeOfMember, node, typeChecker))
+            factory.createPropertyAssignment(
+                member.name,
+                member.flags & ts.SymbolFlags.Optional ? createOptionalExpression(transformed) : transformed
+            )
         );
     });
 
     return factory.createObjectLiteralExpression(structMembers, false);
 }
 
-function createPrimitiveNode(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
-    switch (type.flags) {
-        case ts.TypeFlags.NumberLiteral:
-        case ts.TypeFlags.StringLiteral:
-        case ts.TypeFlags.TemplateLiteral:
-            return createConstantCallExpression(type as ts.LiteralType);
-        case ts.TypeFlags.Number:
-            return createLibraryCallExpression(CONSTANTS.NUMBER);
-        case ts.TypeFlags.String:
-        case ts.TypeFlags.StringMapping:
-            return createLibraryCallExpression(CONSTANTS.STRING);
-        case ts.TypeFlags.Object:
-            if (
-                type.symbol.flags & (ts.SymbolFlags.Transient | ts.SymbolFlags.Interface) &&
-                type.symbol.name.toLowerCase() === CONSTANTS.DATE
-            ) {
-                return createLibraryCallExpression(CONSTANTS.DATE);
-            }
-        default:
-            return factory.createIdentifier('__primitive');
+function createPrimitiveExpression(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+    const { flags } = type;
+
+    // unfortunately cannot use a switch statement here. For example "case ts.TypeFlags.Boolean" would never be true because
+    // a boolean is also an object type.
+    if (flags & ts.TypeFlags.Never) {
+        throw new Error(
+            `Unable to produce DataGenerator for 'never' type while attempting to build Data Generator for type '${node.typeArguments?.[0].getFullText()}'.`
+        );
+    } else if (flags & ts.TypeFlags.Undefined) {
+        console.log('undefined', type);
+        return factory.createIdentifier('__undefined');
+    } else if (flags & ts.TypeFlags.Null) {
+        console.log('null', type);
+        return factory.createIdentifier('__null');
+    } else if (flags & ts.TypeFlags.Literal) {
+        return createConstantCallExpression(type as ts.LiteralType);
+    } else if (flags & (ts.TypeFlags.String | ts.TypeFlags.StringMapping)) {
+        return createLibraryCallExpression(CONSTANTS.STRING);
+    } else if (flags & ts.TypeFlags.Number) {
+        return createLibraryCallExpression(CONSTANTS.NUMBER);
+    } else if (flags & ts.TypeFlags.Boolean) {
+        return createLibraryCallExpression(CONSTANTS.BOOLEAN);
+    } else if (flags & ts.TypeFlags.Union) {
+        return transformUnionType(type as ts.UnionType, node, typeChecker);
+    } else if (flags & ts.TypeFlags.Intersection) {
+        return transformIntersectionType(type as ts.IntersectionType, node, typeChecker);
+    }
+    // should always be the last else if, as a lot of primitive types are also object types.
+    else if (flags & ts.TypeFlags.Object) {
+        return transformObjectType(type as ts.ObjectType, node, typeChecker);
+    }
+    // fall through default
+    else {
+        return factory.createIdentifier('__unknown');
     }
 }
 
+function transformObjectType(type: ts.ObjectType, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+    // first check if it's a Date
+    if (
+        type.symbol?.flags & (ts.SymbolFlags.Transient | ts.SymbolFlags.Interface) &&
+        type.symbol.name.toLowerCase() === CONSTANTS.DATE
+    ) {
+        return createLibraryCallExpression(CONSTANTS.DATE);
+    }
+
+    if (type.objectFlags & ts.ObjectFlags.Reference) {
+        return transformTypeReference(type as ts.TypeReference, node, typeChecker);
+    } else {
+        return createIndexCallExpression(CONSTANTS.STRUCT, [factory.createObjectLiteralExpression([], false)]);
+    }
+}
+
+function transformTypeReference(type: ts.TypeReference, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+    const flags = type.target.objectFlags & ~ts.ObjectFlags.Reference;
+
+    if (flags & ts.ObjectFlags.Tuple) {
+        return createIndexCallExpression(
+            CONSTANTS.TUPLE,
+            createTupleArguments(type as ts.TupleType, node, typeChecker)
+        );
+    } else if (flags & ts.ObjectFlags.Interface && type.symbol?.name.toLowerCase() === 'array') {
+        return createArrayExpression(type, node, typeChecker);
+    } else {
+        return factory.createIdentifier('__typeReference');
+    }
+}
+
+function transformUnionType(type: ts.UnionType, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+    const expressions = type.types.map((unionType) => transformType(unionType, node, typeChecker));
+    return createIndexCallExpression(CONSTANTS.ANY_OF, expressions);
+}
+
+function transformIntersectionType(
+    type: ts.IntersectionType,
+    node: BuildNode,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
+    const types = type.types.filter((t) => t.flags & ts.TypeFlags.Object);
+    const propertyMap = new Map<string, ts.Symbol>();
+    types.map((t) => {
+        t.symbol.members?.forEach((member) => {
+            propertyMap.set(member.name, member);
+        });
+    });
+
+    return createStructExpression(
+        {
+            ...type,
+            symbol: {
+                ...type.symbol,
+                members: propertyMap as ts.SymbolTable
+            }
+        },
+        node,
+        typeChecker
+    );
+}
+
+function createArrayExpression(type: ts.TypeReference, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+    const typeArg = type.typeArguments?.[0];
+    if (!typeArg) {
+        return createIndexCallExpression(CONSTANTS.TUPLE);
+    }
+    const transformed = transformType(typeArg, node, typeChecker);
+    return createIndexCallExpression(CONSTANTS.ARRAY, [transformed]);
+}
+
+function createTupleArguments(type: ts.TupleType, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression[] {
+    return type.typeArguments?.map((typeArg) => transformType(typeArg, node, typeChecker)) ?? [];
+}
+
 function createConstantCallExpression(type: ts.LiteralType): ts.Expression {
-    switch (type.flags) {
-        case ts.TypeFlags.NumberLiteral:
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createNumericLiteral(type.value as number)]);
-        case ts.TypeFlags.StringLiteral:
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createStringLiteral(type.value as string)]);
-        default:
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
+    const { flags } = type;
+    if (flags & ts.TypeFlags.NumberLiteral) {
+        return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createNumericLiteral(type.value as number)]);
+    } else if (flags & ts.TypeFlags.StringLiteral) {
+        return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createStringLiteral(type.value as string)]);
+    } else if (flags & ts.TypeFlags.BooleanLiteral) {
+        return createIndexCallExpression(CONSTANTS.CONSTANT, [
+            (type as any).intrinsicName === 'true' ? factory.createTrue() : factory.createFalse()
+        ]);
+    } else {
+        return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
     }
 }
 
@@ -138,9 +255,9 @@ function createSingleAccessCallExpression(base: string, access: string, args: ts
 
 function appendDefaultImports(host: ts.ImportDeclaration): ts.ImportDeclaration[] {
     return appendNamedImportNode(
-        appendNamedImportNode(host, '__dgLib', '@nwps/data-generators/library'),
-        '__dg',
-        '@nwps/data-generators'
+        appendNamedImportNode(host, CONSTANTS.LIBRARY, CONSTANTS.LIBRARY_LOCATION),
+        CONSTANTS.INDEX,
+        CONSTANTS.INDEX_LOCATION
     );
 }
 

@@ -34,6 +34,7 @@
         "library",
         "interface",
         "transformer",
+        "compiler",
         "tsconfig.json"
     ],
     "exports": {
@@ -52,6 +53,10 @@
         "./interface": {
             "node": "./dist/cjs/interface/index.js",
             "default": "./dist/esm5/interface/index.js"
+        },
+        "./compiler": {
+            "node": "./dist/cjs/compiler/index.js",
+            "default": "./dist/esm5/compiler/index.js"
         }
     },
     "repository": {
