@@ -23,7 +23,8 @@
         "build:all": "npm run build:clean && tsc -b ./src/tsconfig.cjs.json ./src/tsconfig.esm.json ./src/tsconfig.esm5.json ./src/tsconfig.types.json",
         "build": "npm run prettier && npm run build:all && node ./scripts/alias",
         "build:docs": "npm run fix-typedoc-pages && npm run clean:docs && typedoc",
-        "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs"
+        "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs",
+        "compile:try": "tsc -b ./src/tsconfig.cjs.json && tsc comp.ts --m commonjs && node comp.js"
     },
     "files": [
         "dist/cjs/**/*",
@@ -33,6 +34,7 @@
         "library",
         "interface",
         "transformer",
+        "compiler",
         "tsconfig.json"
     ],
     "exports": {
@@ -51,6 +53,10 @@
         "./interface": {
             "node": "./dist/cjs/interface/index.js",
             "default": "./dist/esm5/interface/index.js"
+        },
+        "./compiler": {
+            "node": "./dist/cjs/compiler/index.js",
+            "default": "./dist/esm5/compiler/index.js"
         }
     },
     "repository": {
@@ -74,9 +80,11 @@
         "uuid": "^8.3.2"
     },
     "devDependencies": {
+        "@types/glob": "^7.1.4",
         "@types/jasmine": "^3.8.2",
         "@types/uuid": "^8.3.1",
         "fs-extra": "^10.0.0",
+        "glob": "^7.1.7",
         "jasmine-core": "^3.8.0",
         "karma": "^6.3.4",
         "karma-chrome-launcher": "^3.1.0",
