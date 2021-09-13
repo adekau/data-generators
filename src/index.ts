@@ -14,5 +14,7 @@ export { infinite } from './internal/creation/infinite';
 export { constantSequence, sequence } from './internal/creation/sequence';
 export { partialStruct, struct } from './internal/creation/struct';
 export { tuple } from './internal/creation/tuple';
+export { DataGenerator } from './internal/interfaces/data-generator.interface';
 export { isDataGenerator } from './internal/is-data-generator';
 export { optional } from './internal/transformer/optional';
+
