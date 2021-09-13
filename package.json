@@ -23,8 +23,7 @@
         "build:all": "npm run build:clean && tsc -b ./src/tsconfig.cjs.json ./src/tsconfig.esm.json ./src/tsconfig.esm5.json ./src/tsconfig.types.json",
         "build": "npm run prettier && npm run build:all && node ./scripts/alias",
         "build:docs": "npm run fix-typedoc-pages && npm run clean:docs && typedoc",
-        "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs",
-        "compile:try": "tsc -b ./src/tsconfig.cjs.json && tsc comp.ts --m commonjs && node comp.js"
+        "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs"
     },
     "files": [
         "dist/cjs/**/*",
