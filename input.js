@@ -12,6 +12,7 @@ const t = __dg.struct({
     bool: __dgLib.bool(),
     col: __dg.anyOf(__dg.constant(1), __dg.constant(2)),
     fn: __dgLib.func(__dgLib.bool()),
-    und: __dg.constant(undefined)
+    und: __dg.constant(undefined),
+    something: __dg.struct({ some: __dgLib.string() })
 });
 t;

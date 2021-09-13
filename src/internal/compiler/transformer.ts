@@ -160,7 +160,10 @@ function transformObjectType(type: ts.ObjectType, node: BuildNode, typeChecker: 
         return transformTypeReference(type as ts.TypeReference, node, typeChecker);
     } else if (flags & ts.ObjectFlags.Mapped) {
         return transformMappedType(type as MappedType, node, typeChecker);
-    } else if (flags & (ts.ObjectFlags.Interface | ts.ObjectFlags.Class)) {
+    } else if (
+        flags & (ts.ObjectFlags.Interface | ts.ObjectFlags.Class) ||
+        type.symbol.flags & ts.SymbolFlags.TypeLiteral
+    ) {
         return createStructExpression(type, node, typeChecker);
     } else {
         return createIndexCallExpression(CONSTANTS.STRUCT, [factory.createObjectLiteralExpression([], false)]);

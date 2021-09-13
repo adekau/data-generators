@@ -18,6 +18,9 @@ interface TestInterface {
     col: Color;
     fn: (b: number) => boolean;
     und: void;
+    something: {
+        some: string;
+    };
 }
 
 const t = build<TestInterface>();
