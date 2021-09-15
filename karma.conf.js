@@ -29,6 +29,13 @@ module.exports = function (config) {
         karmaTypescriptConfig: {
             compilerOptions: {
                 downlevelIteration: true
+            },
+            bundlerOptions: {
+                resolve: {
+                    alias: {
+                        'perf_hooks': './node_modules/@types/node/perf_hooks.d.ts'
+                    }
+                }
             }
         },
 
