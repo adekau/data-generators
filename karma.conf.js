@@ -34,7 +34,7 @@ module.exports = function (config) {
             bundlerOptions: {
                 resolve: {
                     alias: {
-                        'perf_hooks': './node_modules/@types/node/perf_hooks.d.ts'
+                        perf_hooks: './node_modules/@types/node/perf_hooks.d.ts'
                     }
                 }
             }

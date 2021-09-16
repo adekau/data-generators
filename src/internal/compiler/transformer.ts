@@ -77,7 +77,7 @@ const CONSTANTS = {
 /**
  * Transforms the TypeScript AST to search for the [[`build`]] method exported by the [[`index`]] module and
  * recursively transform the Type Parameter of [[`build`]] into a callable Data Generator.
- * 
+ *
  * @param program The TypeScript program reference provided by a compiler. Gives the transformer access to type information.
  * @returns a transformed Abstract Syntax Tree (AST)
  */
@@ -96,7 +96,7 @@ const transformer: (program: ts.Program) => ts.TransformerFactory<ts.SourceFile>
             }
 
             if (isBuildNode(node, typeChecker)) {
-                return transformBuildNode(node, typeChecker);
+                return transformBuildNode(node, sourceFile, typeChecker);
             }
 
             return ts.visitEachChild(node, visitor, context);
@@ -110,33 +110,42 @@ const transformer: (program: ts.Program) => ts.TransformerFactory<ts.SourceFile>
  * Takes a found build node and resolves the type argument and invokes transformation of the
  * type into a Data Generator
  */
-function transformBuildNode(node: BuildNode, typeChecker: ts.TypeChecker): ts.Node {
+function transformBuildNode(node: BuildNode, sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker): ts.Node {
     const typeArgument = node.typeArguments?.[0];
     let type: ts.Type;
     if (typeArgument) {
         type = typeChecker.getTypeFromTypeNode(typeArgument);
     } else {
-        throw new Error('Expected type argument in build expression, but found none.');
+        const { fileName } = sourceFile;
+        const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+        throw new Error(
+            `Expected type argument in build expression, but found none in file '${fileName}' line ${line} character ${character}.`
+        );
     }
 
-    return transformType(type, node, typeChecker);
+    return transformType(type, node, sourceFile, typeChecker);
 }
 
 /**
  * Kicks off the recursive process of transforming a type to a Data Generator.
  */
-function transformType(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function transformType(
+    type: ts.Type,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
     // Check if there are function signatures
     const signatures = typeChecker.getSignaturesOfType(type, ts.SignatureKind.Call);
 
     // If there are signatures, it's a function type.
     if (signatures.length) {
         return createLibraryCallExpression(CONSTANTS.FUNCTION, [
-            transformType(typeChecker.getReturnTypeOfSignature(signatures[0]), node, typeChecker)
+            transformType(typeChecker.getReturnTypeOfSignature(signatures[0]), node, sourceFile, typeChecker)
         ]);
     } else {
         // If there are no signatures, the type needs to be branched further
-        return resolveTypeExpression(type, node, typeChecker);
+        return resolveTypeExpression(type, node, sourceFile, typeChecker);
     }
 }
 
@@ -144,14 +153,21 @@ function transformType(type: ts.Type, node: BuildNode, typeChecker: ts.TypeCheck
  * Narrows the kind of a type based on its flags. From there it either returns an expression or continues narrowing
  * based on the refined type (object, union, intersection).
  */
-function resolveTypeExpression(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function resolveTypeExpression(
+    type: ts.Type,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
     const { flags } = type;
 
     // unfortunately cannot use a switch statement here. For example "case ts.TypeFlags.Boolean" would never be true because
     // a boolean is also an object type.
     if (flags & ts.TypeFlags.Never) {
+        const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+        const { fileName } = sourceFile;
         throw new Error(
-            `Unable to produce DataGenerator for 'never' type while attempting to build Data Generator for type '${node.typeArguments?.[0].getFullText()}'.`
+            `Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type '${node.typeArguments?.[0].getFullText()}' in file '${fileName}' line ${line} character ${character}.`
         );
     } else if (flags & ts.TypeFlags.VoidLike) {
         return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
@@ -166,15 +182,15 @@ function resolveTypeExpression(type: ts.Type, node: BuildNode, typeChecker: ts.T
     } else if (flags & ts.TypeFlags.Boolean) {
         return createLibraryCallExpression(CONSTANTS.BOOLEAN);
     } else if (flags & ts.TypeFlags.Union) {
-        return transformUnionType(type as ts.UnionType, node, typeChecker);
+        return transformUnionType(type as ts.UnionType, node, sourceFile, typeChecker);
     } else if (flags & ts.TypeFlags.Intersection) {
-        return transformIntersectionType(type as ts.IntersectionType, node, typeChecker);
+        return transformIntersectionType(type as ts.IntersectionType, node, sourceFile, typeChecker);
     }
     // should always be the last else if, as a lot of primitive types are also object types.
     else if (flags & ts.TypeFlags.Object) {
-        return transformObjectType(type as ts.ObjectType, node, typeChecker);
+        return transformObjectType(type as ts.ObjectType, node, sourceFile, typeChecker);
     }
-    // fall through default of constant undefined. 
+    // fall through default of constant undefined.
     else {
         return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
     }
@@ -182,9 +198,14 @@ function resolveTypeExpression(type: ts.Type, node: BuildNode, typeChecker: ts.T
 
 /**
  * Further refine an object type. Generally Object types are going to result in struct generators,
- * the exception being tuple types which are also classified under the object type as a reference. 
+ * the exception being tuple types which are also classified under the object type as a reference.
  */
-function transformObjectType(type: ts.ObjectType, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function transformObjectType(
+    type: ts.ObjectType,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
     // first check if it's a Date
     if (
         type.symbol?.flags & (ts.SymbolFlags.Transient | ts.SymbolFlags.Interface) &&
@@ -195,14 +216,14 @@ function transformObjectType(type: ts.ObjectType, node: BuildNode, typeChecker: 
 
     const flags = type.objectFlags;
     if (flags & ts.ObjectFlags.Reference) {
-        return transformTypeReference(type as ts.TypeReference, node, typeChecker);
+        return transformTypeReference(type as ts.TypeReference, node, sourceFile, typeChecker);
     } else if (flags & ts.ObjectFlags.Mapped) {
-        return transformMappedType(type as MappedType, node, typeChecker);
+        return transformMappedType(type as MappedType, node, sourceFile, typeChecker);
     } else if (
         flags & (ts.ObjectFlags.Interface | ts.ObjectFlags.Class) ||
         type.symbol.flags & ts.SymbolFlags.TypeLiteral
     ) {
-        return createStructExpression(type, node, typeChecker);
+        return createStructExpression(type, node, sourceFile, typeChecker);
     } else {
         // If none of the above, create an empty "struct({})"" generator. One such type that will reach this branch
         // is "{}".
@@ -211,21 +232,26 @@ function transformObjectType(type: ts.ObjectType, node: BuildNode, typeChecker: 
 }
 
 /**
- * Type references refer to other already defined types. Both tuple types and array types are reference types.  
+ * Type references refer to other already defined types. Both tuple types and array types are reference types.
  */
-function transformTypeReference(type: ts.TypeReference, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function transformTypeReference(
+    type: ts.TypeReference,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
     // Every flag here is going to include ObjectFlags.Reference, unset it to make the if statements easier to read.
     const flags = type.target.objectFlags & ~ts.ObjectFlags.Reference;
 
     if (flags & ts.ObjectFlags.Tuple) {
         return createIndexCallExpression(
             CONSTANTS.TUPLE,
-            createTupleArguments(type as ts.TupleType, node, typeChecker)
+            createTupleArguments(type as ts.TupleType, node, sourceFile, typeChecker)
         );
-    // As far as I know Array<T> is the only type that resolves with ObjectFlags.Reference | ObjectFlags.Interface,
-    // but to be safe also check that the symbol name is array
+        // As far as I know Array<T> is the only type that resolves with ObjectFlags.Reference | ObjectFlags.Interface,
+        // but to be safe also check that the symbol name is array
     } else if (flags & ts.ObjectFlags.Interface && type.symbol?.name.toLowerCase() === 'array') {
-        return createArrayExpression(type, node, typeChecker);
+        return createArrayExpression(type, node, sourceFile, typeChecker);
     } else {
         // Fall through case of creating a constant undefined generator.
         return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
@@ -235,23 +261,29 @@ function transformTypeReference(type: ts.TypeReference, node: BuildNode, typeChe
 /**
  * Union types are straight-forward, resolve each type in the union to a generator and pass those to anyOf
  */
-function transformUnionType(type: ts.UnionType, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
-    const expressions = type.types.map((unionType) => transformType(unionType, node, typeChecker));
+function transformUnionType(
+    type: ts.UnionType,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
+    const expressions = type.types.map((unionType) => transformType(unionType, node, sourceFile, typeChecker));
     return createIndexCallExpression(CONSTANTS.ANY_OF, expressions);
 }
 
 /**
  * Intersection types are less straight forward. Non-overlapping types, e.g. (`string & number`) will reduce to `never`
- * before we get here, but in cases like `string & { someOtherProperty: number }` where it's valid but doesn't make 
+ * before we get here, but in cases like `string & { someOtherProperty: number }` where it's valid but doesn't make
  * sense for a data generator to create something of this type, it will instead be ignored.
- * 
+ *
  * Here intersection will act as concatenation of interfaces, such as `{ a: string } & { b: number }` will create a generator
- * of type `{ a: string, b: number }`, and `string & { someOtherProperty: number }` will ignore the left hand side and 
+ * of type `{ a: string, b: number }`, and `string & { someOtherProperty: number }` will ignore the left hand side and
  * create a generator of type `{ someOtherProperty: number }`.
  */
 function transformIntersectionType(
     type: ts.IntersectionType,
     node: BuildNode,
+    sourceFile: ts.SourceFile,
     typeChecker: ts.TypeChecker
 ): ts.Expression {
     // Filters primitive types out. `string` is a javascript object, but is not an object type.
@@ -275,6 +307,7 @@ function transformIntersectionType(
             }
         },
         node,
+        sourceFile,
         typeChecker
     );
 }
@@ -282,9 +315,14 @@ function transformIntersectionType(
 /**
  * Mapped types are a bit weird as they have members defined at the type level rather than the symbol level.
  * Their symbols also have extra properties that keep track of the original type, name type, key type, etc.
- * Otherwise, the process for transforming these is almost identical to transforming an intersection type. 
+ * Otherwise, the process for transforming these is almost identical to transforming an intersection type.
  */
-function transformMappedType(type: MappedType, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function transformMappedType(
+    type: MappedType,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
     const propertyMap = new Map<string, ts.Symbol>();
 
     type.members.forEach((sym) => {
@@ -304,20 +342,29 @@ function transformMappedType(type: MappedType, node: BuildNode, typeChecker: ts.
             }
         },
         node,
+        sourceFile,
         typeChecker
     );
 }
 
-function createStructExpression(type: ts.Type, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
-    return createIndexCallExpression(CONSTANTS.STRUCT, [createStructObjectLiteralExpression(type, node, typeChecker)]);
+function createStructExpression(
+    type: ts.Type,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
+    return createIndexCallExpression(CONSTANTS.STRUCT, [
+        createStructObjectLiteralExpression(type, node, sourceFile, typeChecker)
+    ]);
 }
 
 /**
- * Creates the argument to pass to struct(). 
+ * Creates the argument to pass to struct().
  */
 function createStructObjectLiteralExpression(
     type: ts.Type,
     node: BuildNode,
+    sourceFile: ts.SourceFile,
     typeChecker: ts.TypeChecker
 ): ts.Expression {
     const structMembers: ts.ObjectLiteralElementLike[] = [];
@@ -327,7 +374,7 @@ function createStructObjectLiteralExpression(
         const typeOfMember = typeChecker.getTypeOfSymbolAtLocation(member, node);
         // Create syntax of the form "x: y" using the interface property name for x and the transformation of its type as y
         structMembers.push(
-            factory.createPropertyAssignment(member.name, transformType(typeOfMember, node, typeChecker))
+            factory.createPropertyAssignment(member.name, transformType(typeOfMember, node, sourceFile, typeChecker))
         );
     });
 
@@ -335,21 +382,31 @@ function createStructObjectLiteralExpression(
 }
 
 /**
- * Transform a type of form `x[]` to `array(build<x>())`. 
+ * Transform a type of form `x[]` to `array(build<x>())`.
  */
-function createArrayExpression(type: ts.TypeReference, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression {
+function createArrayExpression(
+    type: ts.TypeReference,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression {
     const typeArg = type.typeArguments?.[0];
     // in the case of an empty tuple type (`[]`).
     if (!typeArg) {
         return createIndexCallExpression(CONSTANTS.TUPLE);
     }
     // transform the type argument to a data generator to pass to the `array` creation function
-    const transformed = transformType(typeArg, node, typeChecker);
+    const transformed = transformType(typeArg, node, sourceFile, typeChecker);
     return createIndexCallExpression(CONSTANTS.ARRAY, [transformed]);
 }
 
-function createTupleArguments(type: ts.TupleType, node: BuildNode, typeChecker: ts.TypeChecker): ts.Expression[] {
-    return type.typeArguments?.map((typeArg) => transformType(typeArg, node, typeChecker)) ?? [];
+function createTupleArguments(
+    type: ts.TupleType,
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker
+): ts.Expression[] {
+    return type.typeArguments?.map((typeArg) => transformType(typeArg, node, sourceFile, typeChecker)) ?? [];
 }
 
 /**
@@ -401,7 +458,7 @@ function appendDefaultImports(host: ts.ImportDeclaration): ts.ImportDeclaration[
 }
 
 /**
- * Transform an ImportDeclaration into an array of import declarations to tack on an extra import to an existing node. 
+ * Transform an ImportDeclaration into an array of import declarations to tack on an extra import to an existing node.
  */
 function appendNamedImportNode(
     host: ts.ImportDeclaration | ts.ImportDeclaration[],
