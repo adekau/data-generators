@@ -66,6 +66,15 @@ describe('Data Generators Compiler: Transformer', () => {
         );
     });
 
+    it('should throw when a struct member reduces to never', () => {
+        const type = '{ property1: string; property2: string & number; }';
+        const structReducesToNever = () => transform(`build<${type}>();`);
+
+        expect(structReducesToNever).toThrowError(
+            `Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type '${type}' in file '/index.ts' line 0 character 33.`
+        );
+    });
+
     it('should transform a date', () => {
         const result = transform('build<Date>()');
         expect(result).toBe(`${LIB}.date();`);
@@ -95,6 +104,46 @@ describe('Data Generators Compiler: Transformer', () => {
         );
     });
 
+    it('should transform an array using the alias', () => {
+        const result = transform('build<Array<string>>()');
+        expect(result).toBe(`${INDEX}.array(${LIB}.string());`);
+    });
+
+    it('should throw when transforming an array of never', () => {
+        const neverArr = () => transform('build<never[]>()');
+        expect(neverArr).toThrowError(
+            "Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type 'never[]' in file '/index.ts' line 0 character 33."
+        );
+    });
+
+    it('should transform a union disjoint on an enum property', () => {
+        const result = transform(`
+        enum TestEnum {
+            Member1 = 'member1',
+            Member2 = 'member2'
+        }
+        type Disjoint = { type: TestEnum.Member1, property1: number; } | { type: TestEnum.Member2, property2: string; };
+        build<Disjoint>();
+        `);
+
+        expect(
+            result.includes(
+                singleLine(`
+                ${INDEX}.anyOf(
+                    ${INDEX}.struct({
+                        type: ${INDEX}.constant("member1"),
+                        property1: ${LIB}.int()
+                    }),
+                    ${INDEX}.struct({
+                        type: ${INDEX}.constant("member2"),
+                        property2: ${LIB}.string()
+                    })
+                );
+                `)
+            )
+        ).toBeTrue();
+    });
+
     it('should transform a simple struct', () => {
         expect(transform('build<{ str: string }>()')).toBe(
             singleLine(`
@@ -103,5 +152,68 @@ describe('Data Generators Compiler: Transformer', () => {
         });
         `)
         );
+    });
+
+    it('should transform an interface', () => {
+        const result = transform(`
+        interface TestInterface {
+            str: string;
+            num: number;
+            bool: boolean;
+            date: Date;
+            arr: string[];
+        }
+        build<TestInterface>();
+        `);
+
+        expect(
+            result.includes(
+                singleLine(`
+            ${INDEX}.struct({
+                str: ${LIB}.string(),
+                num: ${LIB}.int(),
+                bool: ${LIB}.bool(),
+                date: ${LIB}.date(),
+                arr: ${INDEX}.array(${LIB}.string())
+            });
+            `)
+            )
+        ).toBeTrue();
+    });
+
+    it('should transform a self referencing type and convert the circular type to constant undefined', () => {
+        const result = transform(`
+        type IncompleteJsonObject = string | number | boolean | IncompleteJsonObject[];
+        build<IncompleteJsonObject>();
+        `);
+
+        expect(
+            result.includes(
+                singleLine(`
+                ${INDEX}.anyOf(
+                    ${LIB}.string(),
+                    ${LIB}.int(),
+                    ${INDEX}.constant(false),
+                    ${INDEX}.constant(true),
+                    ${INDEX}.array(${INDEX}.constant(undefined))
+                );
+                `)
+            )
+        ).toBeTrue();
+
+        const result2 = transform(`
+        type Node<T> = { value: T; map: { next: Node<T>; prev: Node<T>; }; };
+        build<Node<number>>();
+        `);
+        console.log(result2);
+    });
+
+    fit('should transform a generic type', () => {
+        const result = transform(`
+        type Container<T> = { value: T };
+        build<Container<number>>();
+        `);
+
+        console.log(result);
     });
 });
