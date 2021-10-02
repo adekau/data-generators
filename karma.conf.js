@@ -1,5 +1,6 @@
 // Karma configuration
 // Generated on Fri Aug 06 2021 16:42:21 GMT-0400 (Eastern Daylight Time)
+const configureKarma = require('./dist/cjs/compiler').configureKarma;
 
 module.exports = function (config) {
     config.set({
@@ -15,7 +16,7 @@ module.exports = function (config) {
         frameworks: ['jasmine', 'karma-typescript'],
 
         // list of files / patterns to load in the browser
-        files: ['src/**/*.ts'],
+        files: ['dg-compiler-config.ts', 'src/**/*.ts'],
 
         // list of files / patterns to exclude
         exclude: [],
@@ -23,6 +24,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
         preprocessors: {
+            'dg-compiler-config.ts': 'karma-typescript',
             'src/**/*.ts': 'karma-typescript'
         },
 
@@ -60,7 +62,14 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://www.npmjs.com/search?q=keywords:karma-launcher
-        browsers: ['Chrome'],
+        browsers: ['ChromeDebugging'],
+
+        customLaunchers: {
+            ChromeDebugging: {
+                base: 'Chrome',
+                flags: ['--remote-debugging-port=9333']
+            }
+        },
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

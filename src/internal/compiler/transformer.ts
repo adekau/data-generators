@@ -1,7 +1,6 @@
 import * as ts from 'typescript';
+import { CONSTANTS } from './constants';
 import factory = ts.factory;
-import * as lib from '../../library';
-import * as dg from '../../index';
 
 /**
  * More permanent alias for passing the result of ts.isIdentifier on CallExpression.Expression
@@ -27,52 +26,12 @@ interface MappedType extends ts.ObjectType {
     members: Map<string, MappedSymbol>;
 }
 
-/**
- * Mimic the behavior of C# nameof so if anything changes in the future it's a type error here
- * and won't accidentally break things.
- */
-function nameOf<TName extends keyof typeof lib | keyof typeof dg>(name: TName) {
-    return name;
+declare global {
+    interface Window {
+        [CONSTANTS.DEBUG_WIDTH_ENV_VAR]?: number;
+        [CONSTANTS.DEBUG_ENABLE_ENV_VAR]?: boolean;
+    }
 }
-
-const CONSTANTS = {
-    // Name of the method to replace the AST node of with a Data Generator
-    BUILD_NODE_NAME: nameOf('build'),
-    /**
-     * Need to import methods under a "import *" node to make replacement using an identifier
-     * expression easier
-     */
-    INDEX: '__dg' as const,
-    INDEX_LOCATION: '@nwps/data-generators' as const,
-    LIBRARY: '__dgLib' as const,
-    LIBRARY_LOCATION: '@nwps/data-generators/library' as const,
-    /**
-     * TypeScript doesn't expose a lot of information about function types without the `FunctionTypeNode`
-     * `TypeNode` being present
-     */
-    FUNCTION_TYPE_ID: '__call' as const,
-    /**
-     * Part of identifying the build node (in conjunction with BUILD_NODE_NAME and FUNCTION_TYPE_ID)
-     * On the exported BUILD_NODE_NAME method will be a unique symbol under the name below.
-     */
-    DATA_GENERATOR_BUILDER_BRAND: '_dataGeneratorBuilderBrand' as const,
-
-    /**
-     * Data Generator Identifiers.
-     * The constants below are used for creating ts.Identifier expressions that will be resolved by
-     * the added "import *" expressions.
-     */
-    STRUCT: nameOf('struct'),
-    TUPLE: nameOf('tuple'),
-    CONSTANT: nameOf('constant'),
-    ARRAY: nameOf('array'),
-    ANY_OF: nameOf('anyOf'),
-    NUMBER: nameOf('int'),
-    STRING: nameOf('string'),
-    BOOLEAN: nameOf('bool'),
-    FUNCTION: nameOf('func'),
-    DATE: nameOf('date')
-};
 
 const transformationCache = new WeakMap<ts.Type, ts.Expression>();
 
@@ -140,7 +99,7 @@ function transformType(
     const resolutionStack: ts.Type[] = [];
 
     function _transformType(type: ts.Type): ts.Expression {
-        console.log(type);
+        debugTypeResolution('transforming type', type);
         if (resolutionStack.includes(type)) {
             console.warn(
                 ...report(
@@ -163,6 +122,7 @@ function transformType(
         let expression: ts.Expression;
         // If there are signatures, it's a function type.
         if (signatures.length) {
+            debugTypeResolution('is function');
             expression = createLibraryCallExpression(CONSTANTS.FUNCTION, [
                 _transformType(typeChecker.getReturnTypeOfSignature(signatures[0]))
             ]);
@@ -173,6 +133,21 @@ function transformType(
         transformationCache.set(type, expression);
         resolutionStack.pop();
         return expression;
+    }
+
+    function debugTypeResolution(message: string, type?: ts.Type) {
+        const prefix = resolutionStack
+            .map(() =>
+                Array.from({ length: debugWidth() })
+                    .map(() => ' ')
+                    .join('')
+            )
+            .join('');
+        if (type) {
+            debug(`${prefix}- ${message}`, type);
+        } else {
+            debug(`${prefix}- ${message}`);
+        }
     }
 
     /**
@@ -191,30 +166,53 @@ function transformType(
                 `Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type '${node.typeArguments![0].getFullText()}' in file '${fileName}' line ${line} character ${character}.`
             );
         } else if (flags & ts.TypeFlags.VoidLike) {
+            debugTypeResolution('is voidlike');
             return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
         } else if (flags & ts.TypeFlags.Null) {
+            debugTypeResolution('is null');
             return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createNull()]);
         } else if (flags & ts.TypeFlags.Literal) {
+            debugTypeResolution('is literal');
             return createConstantCallExpression(type as ts.LiteralType);
         } else if (flags & (ts.TypeFlags.String | ts.TypeFlags.StringMapping)) {
+            debugTypeResolution('is string');
             return createLibraryCallExpression(CONSTANTS.STRING);
         } else if (flags & ts.TypeFlags.Number) {
+            debugTypeResolution('is number');
             return createLibraryCallExpression(CONSTANTS.NUMBER);
         } else if (flags & ts.TypeFlags.Boolean) {
+            debugTypeResolution('is boolean');
             return createLibraryCallExpression(CONSTANTS.BOOLEAN);
         } else if (flags & ts.TypeFlags.Union) {
+            debugTypeResolution('is union');
             return transformUnionType(type as ts.UnionType);
         } else if (flags & ts.TypeFlags.Intersection) {
+            debugTypeResolution('is intersection');
             return transformIntersectionType(type as ts.IntersectionType);
         }
+        // else if (flags & ts.TypeFlags.TypeParameter) {
+        //     debugTypeResolution('is type parameter');
+        //     // debugTypeResolution('T', typeChecker.getTypeOfSymbolAtLocation(type.getProperties()[0], node));
+        //     console.log(typeChecker.getPropertiesOfType(type));
+        //     return factory.createIdentifier('__tParam');
+        // }
         // should always be the last else if, as a lot of primitive types are also object types.
         else if (flags & ts.TypeFlags.Object) {
+            debugTypeResolution('is object');
             return transformObjectType(type as ts.ObjectType);
         }
         // fall through default of constant undefined.
         else {
+            debugTypeResolution('is undefined (base resolve fallthrough)');
             return createConstantUndefinedExpression();
         }
+    }
+
+    function resolveTypeArguments(args: ts.Type[]) {
+        /**
+         * TODO: Resolve type arguments into some sort of map, maybe a weakmap by the identifier name object?
+         * Can use this map to resolve T for example to number
+         */
     }
 
     /**
@@ -230,19 +228,27 @@ function transformType(
             return createLibraryCallExpression(CONSTANTS.DATE);
         }
 
+        if (type.aliasTypeArguments?.length) {
+            debugTypeResolution('has alias type arguments');
+        }
+
         const flags = type.objectFlags;
         if (flags & ts.ObjectFlags.Reference) {
+            debugTypeResolution('is reference type');
             return transformTypeReference(type as ts.TypeReference);
         } else if (flags & ts.ObjectFlags.Mapped) {
+            debugTypeResolution('is mapped type');
             return transformMappedType(type as MappedType);
         } else if (
             flags & (ts.ObjectFlags.Interface | ts.ObjectFlags.Class) ||
             type.symbol.flags & ts.SymbolFlags.TypeLiteral
         ) {
+            debugTypeResolution('is interface/class');
             return createStructExpression(type);
         } else {
             // If none of the above, create an empty "struct({})"" generator. One such type that will reach this branch
             // is "{}".
+            debugTypeResolution('is {} (object fallthrough)');
             return createIndexCallExpression(CONSTANTS.STRUCT, [factory.createObjectLiteralExpression([], false)]);
         }
     }
@@ -251,17 +257,25 @@ function transformType(
      * Type references refer to other already defined types. Both tuple types and array types are reference types.
      */
     function transformTypeReference(type: ts.TypeReference): ts.Expression {
+        if (type.typeArguments?.length) {
+            debugTypeResolution('has type arguments');
+        }
+
         // Every flag here is going to include ObjectFlags.Reference, unset it to make the if statements easier to read.
         const flags = type.target.objectFlags & ~ts.ObjectFlags.Reference;
 
         if (flags & ts.ObjectFlags.Tuple) {
+            debugTypeResolution('is tuple');
             return createIndexCallExpression(CONSTANTS.TUPLE, createTupleArguments(type as ts.TupleType));
-            // As far as I know Array<T> is the only type that resolves with ObjectFlags.Reference | ObjectFlags.Interface,
-            // but to be safe also check that the symbol name is array
-        } else if (flags & ts.ObjectFlags.Interface && type.symbol?.name.toLowerCase() === 'array') {
+        }
+        // As far as I know Array<T> is the only type that resolves with ObjectFlags.Reference | ObjectFlags.Interface,
+        // but to be safe also check that the symbol name is array
+        else if (flags & ts.ObjectFlags.Interface && type.symbol?.name.toLowerCase() === 'array') {
+            debugTypeResolution('is array');
             return createArrayExpression(type);
         } else {
             // Fall through case of creating a constant undefined generator.
+            debugTypeResolution('is undefined (reference fallthrough)');
             return createConstantUndefinedExpression();
         }
     }
@@ -489,6 +503,22 @@ function isBuildNode(node: ts.Node, typeChecker: ts.TypeChecker): node is BuildN
         }
     }
     return false;
+}
+
+function debugEnabled() {
+    return !!window[CONSTANTS.DEBUG_ENABLE_ENV_VAR];
+}
+
+function debugWidth() {
+    return window[CONSTANTS.DEBUG_WIDTH_ENV_VAR] ?? CONSTANTS.DEBUG_WIDTH_DEFAULT;
+}
+
+type StringCoercible = { toString(): string } | undefined;
+function debug(...args: StringCoercible[]) {
+    if (!debugEnabled()) {
+        return;
+    }
+    console.debug(...args);
 }
 
 export default transformer;
