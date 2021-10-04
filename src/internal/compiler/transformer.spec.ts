@@ -211,8 +211,11 @@ describe('Data Generators Compiler: Transformer', () => {
     fit('should transform a generic type', () => {
         const result = transform(`
         type Container<T> = { value: T };
-        type Value<T> = { type: T };
-        build<Container<Array<number>>>();
+        type Value<T,G> = { type: T, type2: G };
+        interface Dumb {
+            bool: boolean;
+        }
+        build<Container<Value<Dumb, number>>>();
         `);
 
         console.log(result);

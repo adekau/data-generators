@@ -6,8 +6,8 @@ export interface IDataGeneratorCompilerConfig {
 }
 
 export const defaultDataGeneratorCompilerConfig: Required<IDataGeneratorCompilerConfig> = {
-    DG_DEBUG_ENABLED: false,
-    DG_DEBUG_WIDTH: 4
+    DG_DEBUG_ENABLED: CONSTANTS['DEBUG_ENABLE_DEFAULT'],
+    DG_DEBUG_WIDTH: CONSTANTS['DEBUG_WIDTH_DEFAULT']
 };
 
 export function configureKarma(config: IDataGeneratorCompilerConfig): void {

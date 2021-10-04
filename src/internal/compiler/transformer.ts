@@ -97,6 +97,7 @@ function transformType(
     typeChecker: ts.TypeChecker
 ): ts.Expression {
     const resolutionStack: ts.Type[] = [];
+    const genericMap: WeakMap<ts.Symbol, ts.Expression> = new WeakMap();
 
     function _transformType(type: ts.Type): ts.Expression {
         debugTypeResolution('transforming type', type);
@@ -135,7 +136,7 @@ function transformType(
         return expression;
     }
 
-    function debugTypeResolution(message: string, type?: ts.Type) {
+    function debugTypeResolution(message: string, extra?: StringCoercible) {
         const prefix = resolutionStack
             .map(() =>
                 Array.from({ length: debugWidth() })
@@ -143,8 +144,8 @@ function transformType(
                     .join('')
             )
             .join('');
-        if (type) {
-            debug(`${prefix}- ${message}`, type);
+        if (extra) {
+            debug(`${prefix}- ${message}`, extra);
         } else {
             debug(`${prefix}- ${message}`);
         }
@@ -189,13 +190,10 @@ function transformType(
         } else if (flags & ts.TypeFlags.Intersection) {
             debugTypeResolution('is intersection');
             return transformIntersectionType(type as ts.IntersectionType);
+        } else if (flags & ts.TypeFlags.TypeParameter) {
+            debugTypeResolution('is type parameter');
+            return genericMap.get(type.symbol) ?? factory.createIdentifier('__unresolvedGeneric');
         }
-        // else if (flags & ts.TypeFlags.TypeParameter) {
-        //     debugTypeResolution('is type parameter');
-        //     // debugTypeResolution('T', typeChecker.getTypeOfSymbolAtLocation(type.getProperties()[0], node));
-        //     console.log(typeChecker.getPropertiesOfType(type));
-        //     return factory.createIdentifier('__tParam');
-        // }
         // should always be the last else if, as a lot of primitive types are also object types.
         else if (flags & ts.TypeFlags.Object) {
             debugTypeResolution('is object');
@@ -206,13 +204,6 @@ function transformType(
             debugTypeResolution('is undefined (base resolve fallthrough)');
             return createConstantUndefinedExpression();
         }
-    }
-
-    function resolveTypeArguments(args: ts.Type[]) {
-        /**
-         * TODO: Resolve type arguments into some sort of map, maybe a weakmap by the identifier name object?
-         * Can use this map to resolve T for example to number
-         */
     }
 
     /**
@@ -228,8 +219,17 @@ function transformType(
             return createLibraryCallExpression(CONSTANTS.DATE);
         }
 
-        if (type.aliasTypeArguments?.length) {
-            debugTypeResolution('has alias type arguments');
+        if (type.aliasTypeArguments && type.aliasSymbol) {
+            const decl: ts.Node | undefined = type.aliasSymbol.declarations?.[0];
+            if (decl && ts.isTypeAliasDeclaration(decl)) {
+                const paramSymbols = decl.typeParameters?.map((p: any) => p.symbol);
+                const params = type.aliasTypeArguments.map((arg) => _transformType(arg));
+                for (let i = 0; i < params.length; i++) {
+                    if (paramSymbols?.[i]) {
+                        genericMap.set(paramSymbols[i], params[i]);
+                    }
+                }
+            }
         }
 
         const flags = type.objectFlags;
@@ -257,12 +257,21 @@ function transformType(
      * Type references refer to other already defined types. Both tuple types and array types are reference types.
      */
     function transformTypeReference(type: ts.TypeReference): ts.Expression {
-        if (type.typeArguments?.length) {
-            debugTypeResolution('has type arguments');
-        }
-
         // Every flag here is going to include ObjectFlags.Reference, unset it to make the if statements easier to read.
         const flags = type.target.objectFlags & ~ts.ObjectFlags.Reference;
+
+        if (type.typeArguments && type.symbol) {
+            const decl: ts.Node | undefined = type.symbol.declarations?.[0];
+            if (decl && ts.isTypeAliasDeclaration(decl)) {
+                const paramSymbols = decl.typeParameters?.map((p: any) => p.symbol);
+                const params = type.typeArguments.map((arg) => _transformType(arg));
+                for (let i = 0; i < params.length; i++) {
+                    if (paramSymbols?.[i]) {
+                        genericMap.set(paramSymbols[i], params[i]);
+                    }
+                }
+            }
+        }
 
         if (flags & ts.ObjectFlags.Tuple) {
             debugTypeResolution('is tuple');
@@ -519,6 +528,17 @@ function debug(...args: StringCoercible[]) {
         return;
     }
     console.debug(...args);
+}
+
+function hasTypeArguments(node: ts.Node): node is ts.HasTypeArguments {
+    return (
+        ts.isCallExpression(node) ||
+        ts.isNewExpression(node) ||
+        ts.isTaggedTemplateExpression(node) ||
+        ts.isJsxOpeningElement(node) ||
+        ts.isJsxSelfClosingElement(node) ||
+        Object.prototype.hasOwnProperty.call(node, 'typeArguments')
+    );
 }
 
 export default transformer;

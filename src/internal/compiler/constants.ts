@@ -14,6 +14,7 @@ export const CONSTANTS = {
      * Name of the environment variable to look for if debug is enabled
      */
     DEBUG_ENABLE_ENV_VAR: 'DG_DEBUG_ENABLED' as const,
+    DEBUG_ENABLE_DEFAULT: false as const,
     DEBUG_WIDTH_ENV_VAR: 'DG_DEBUG_WIDTH' as const,
     DEBUG_WIDTH_DEFAULT: 4 as const,
     /**
