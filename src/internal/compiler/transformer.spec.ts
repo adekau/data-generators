@@ -1,5 +1,6 @@
 import transformer from './transformer';
 import { transformFile } from 'ts-transformer-testing-library';
+import { CONSTANTS } from './constants';
 
 const INDEX = '__dg';
 const LIB = '__dgLib';
@@ -19,7 +20,10 @@ function transform(code: string) {
                         contents: 'export const build: { <T>() => any; _dataGeneratorBuilderBrand: any } = {} });'
                     }
                 ],
-                transforms: [transformer]
+                transforms: [(program) => transformer(program, {
+                    DG_DEBUG_ENABLED: true,
+                    DG_DEBUG_WIDTH: 4
+                })]
             }
         )
             .split(/\r?\n/)

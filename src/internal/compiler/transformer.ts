@@ -1,7 +1,9 @@
 import * as ts from 'typescript';
+import { defaultDataGeneratorCompilerConfig, IDataGeneratorCompilerConfig } from './configure';
 import { CONSTANTS } from './constants';
 import factory = ts.factory;
 
+type StringCoercible = { toString(): string } | undefined;
 /**
  * More permanent alias for passing the result of ts.isIdentifier on CallExpression.Expression
  */
@@ -42,36 +44,47 @@ const transformationCache = new WeakMap<ts.Type, ts.Expression>();
  * @param program The TypeScript program reference provided by a compiler. Gives the transformer access to type information.
  * @returns a transformed Abstract Syntax Tree (AST)
  */
-const transformer: (program: ts.Program) => ts.TransformerFactory<ts.SourceFile> = (program) => (context) => {
-    return (sourceFile) => {
-        const typeChecker = program.getTypeChecker();
+const transformer =
+    (
+        program: ts.Program,
+        config: IDataGeneratorCompilerConfig = defaultDataGeneratorCompilerConfig
+    ): ts.TransformerFactory<ts.SourceFile> =>
+    (context) => {
+        return (sourceFile) => {
+            const typeChecker = program.getTypeChecker();
+            const defaultedConfig = Object.assign({}, defaultDataGeneratorCompilerConfig, config);
 
-        // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
-        // imports to each file checked.
-        let hasAppendedDefaultImports = false;
+            // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
+            // imports to each file checked.
+            let hasAppendedDefaultImports = false;
 
-        const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
-            if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
-                hasAppendedDefaultImports = true;
-                return appendDefaultImports(node);
-            }
+            const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
+                if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
+                    hasAppendedDefaultImports = true;
+                    return appendDefaultImports(node);
+                }
 
-            if (isBuildNode(node, typeChecker)) {
-                return transformBuildNode(node, sourceFile, typeChecker);
-            }
+                if (isBuildNode(node, typeChecker)) {
+                    return transformBuildNode(node, sourceFile, typeChecker, defaultedConfig);
+                }
 
-            return ts.visitEachChild(node, visitor, context);
+                return ts.visitEachChild(node, visitor, context);
+            };
+
+            return ts.visitNode(sourceFile, visitor);
         };
-
-        return ts.visitNode(sourceFile, visitor);
     };
-};
 
 /**
  * Takes a found build node and resolves the type argument and invokes transformation of the
  * type into a Data Generator
  */
-function transformBuildNode(node: BuildNode, sourceFile: ts.SourceFile, typeChecker: ts.TypeChecker): ts.Node {
+function transformBuildNode(
+    node: BuildNode,
+    sourceFile: ts.SourceFile,
+    typeChecker: ts.TypeChecker,
+    config: Required<IDataGeneratorCompilerConfig>
+): ts.Node {
     const typeArgument = node.typeArguments?.[0];
     let type: ts.Type;
     if (typeArgument) {
@@ -84,7 +97,7 @@ function transformBuildNode(node: BuildNode, sourceFile: ts.SourceFile, typeChec
         );
     }
 
-    return transformType(type, node, sourceFile, typeChecker);
+    return transformType(type, node, sourceFile, typeChecker, config);
 }
 
 /**
@@ -94,7 +107,8 @@ function transformType(
     type: ts.Type,
     node: BuildNode,
     sourceFile: ts.SourceFile,
-    typeChecker: ts.TypeChecker
+    typeChecker: ts.TypeChecker,
+    config: Required<IDataGeneratorCompilerConfig>
 ): ts.Expression {
     const resolutionStack: ts.Type[] = [];
     const genericMap: WeakMap<ts.Symbol, ts.Expression> = new WeakMap();
@@ -139,7 +153,7 @@ function transformType(
     function debugTypeResolution(message: string, extra?: StringCoercible) {
         const prefix = resolutionStack
             .map(() =>
-                Array.from({ length: debugWidth() })
+                Array.from({ length: config.DG_DEBUG_WIDTH })
                     .map(() => ' ')
                     .join('')
             )
@@ -433,6 +447,13 @@ function transformType(
         return messages;
     }
 
+    function debug(...args: StringCoercible[]) {
+        if (!config.DG_DEBUG_ENABLED) {
+            return;
+        }
+        console.debug(...args);
+    }
+
     return _transformType(type);
 }
 
@@ -512,33 +533,6 @@ function isBuildNode(node: ts.Node, typeChecker: ts.TypeChecker): node is BuildN
         }
     }
     return false;
-}
-
-function debugEnabled() {
-    return !!window[CONSTANTS.DEBUG_ENABLE_ENV_VAR];
-}
-
-function debugWidth() {
-    return window[CONSTANTS.DEBUG_WIDTH_ENV_VAR] ?? CONSTANTS.DEBUG_WIDTH_DEFAULT;
-}
-
-type StringCoercible = { toString(): string } | undefined;
-function debug(...args: StringCoercible[]) {
-    if (!debugEnabled()) {
-        return;
-    }
-    console.debug(...args);
-}
-
-function hasTypeArguments(node: ts.Node): node is ts.HasTypeArguments {
-    return (
-        ts.isCallExpression(node) ||
-        ts.isNewExpression(node) ||
-        ts.isTaggedTemplateExpression(node) ||
-        ts.isJsxOpeningElement(node) ||
-        ts.isJsxSelfClosingElement(node) ||
-        Object.prototype.hasOwnProperty.call(node, 'typeArguments')
-    );
 }
 
 export default transformer;

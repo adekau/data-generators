@@ -16,7 +16,7 @@ module.exports = function (config) {
         frameworks: ['jasmine', 'karma-typescript'],
 
         // list of files / patterns to load in the browser
-        files: ['dg-compiler-config.ts', 'src/**/*.ts'],
+        files: ['src/**/*.ts'],
 
         // list of files / patterns to exclude
         exclude: [],
@@ -24,7 +24,6 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
         preprocessors: {
-            'dg-compiler-config.ts': 'karma-typescript',
             'src/**/*.ts': 'karma-typescript'
         },
 
