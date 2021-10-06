@@ -2,8 +2,14 @@ import * as ts from 'typescript';
 import { defaultDataGeneratorCompilerConfig, IDataGeneratorCompilerConfig } from './configure';
 import { CONSTANTS } from './constants';
 import factory = ts.factory;
+import * as Index from '../../index';
+import * as Library from '../../library';
 
+/**
+ * Any type that can be coerced to a string. Used for debugging in the [[debug]] function.
+ */
 type StringCoercible = { toString(): string } | undefined;
+
 /**
  * More permanent alias for passing the result of ts.isIdentifier on CallExpression.Expression
  */
@@ -28,13 +34,10 @@ interface MappedType extends ts.ObjectType {
     members: Map<string, MappedSymbol>;
 }
 
-declare global {
-    interface Window {
-        [CONSTANTS.DEBUG_WIDTH_ENV_VAR]?: number;
-        [CONSTANTS.DEBUG_ENABLE_ENV_VAR]?: boolean;
-    }
-}
-
+/**
+ * Keeps track of already resolved types to their resolved expressions to improve performance.
+ * Will not get in the way of GC due to the use of a WeakMap.
+ */
 const transformationCache = new WeakMap<ts.Type, ts.Expression>();
 
 /**
@@ -110,11 +113,24 @@ function transformType(
     typeChecker: ts.TypeChecker,
     config: Required<IDataGeneratorCompilerConfig>
 ): ts.Expression {
+    /**
+     * Keeps track of a stack of resolved types to enable detection of recursive or self-referencing types.
+     */
     const resolutionStack: ts.Type[] = [];
+    /**
+     * A WeakMap (to not get in the way of GC) of generic symbols to their resolved expressions.
+     * A symbol here might look like 'T' for a generic type alias.
+     * Can keep track of multiple generic symbols with the same name, for instance two different types parameterized by T
+     * due to being a map on the symbol's reference, which will be different for each since positions of the symbols will differ.
+     */
     const genericMap: WeakMap<ts.Symbol, ts.Expression> = new WeakMap();
 
+    /**
+     * Enables the recursive type resolution and keeps track of type-specific scoped information such as resolved types
+     * and generics.
+     */
     function _transformType(type: ts.Type): ts.Expression {
-        debugTypeResolution('transforming type', type);
+        debugTypeResolution(`Transforming type (${(type.symbol?.name || type.aliasSymbol?.name) ?? 'no name'})`, type);
         if (resolutionStack.includes(type)) {
             console.warn(
                 ...report(
@@ -150,20 +166,9 @@ function transformType(
         return expression;
     }
 
-    function debugTypeResolution(message: string, extra?: StringCoercible) {
-        const prefix = resolutionStack
-            .map(() =>
-                Array.from({ length: config.DG_DEBUG_WIDTH })
-                    .map(() => ' ')
-                    .join('')
-            )
-            .join('');
-        if (extra) {
-            debug(`${prefix}- ${message}`, extra);
-        } else {
-            debug(`${prefix}- ${message}`);
-        }
-    }
+    /***********************************************************
+     * KICK OFF TYPE RESOLUTION
+     * ********************************************************/
 
     /**
      * Narrows the kind of a type based on its flags. From there it either returns an expression or continues narrowing
@@ -177,9 +182,15 @@ function transformType(
         if (flags & ts.TypeFlags.Never) {
             const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
             const { fileName } = sourceFile;
-            throw new Error(
-                `Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type '${node.typeArguments![0].getFullText()}' in file '${fileName}' line ${line} character ${character}.`
+
+            console.warn(
+                ...report(
+                    `Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type '${node.typeArguments![0].getFullText()}' in file '${fileName}' line ${line} character ${character}.`,
+                    type
+                )
             );
+
+            return createConstantUndefinedExpression();
         } else if (flags & ts.TypeFlags.VoidLike) {
             debugTypeResolution('is voidlike');
             return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
@@ -220,6 +231,10 @@ function transformType(
         }
     }
 
+    /***********************************************************
+     * TYPE TRANSFORMATIONS
+     **********************************************************/
+
     /**
      * Further refine an object type. Generally Object types are going to result in struct generators,
      * the exception being tuple types which are also classified under the object type as a reference.
@@ -230,21 +245,11 @@ function transformType(
             type.symbol?.flags & (ts.SymbolFlags.Transient | ts.SymbolFlags.Interface) &&
             type.symbol.name.toLowerCase() === CONSTANTS.DATE
         ) {
+            debugTypeResolution('is date');
             return createLibraryCallExpression(CONSTANTS.DATE);
         }
 
-        if (type.aliasTypeArguments && type.aliasSymbol) {
-            const decl: ts.Node | undefined = type.aliasSymbol.declarations?.[0];
-            if (decl && ts.isTypeAliasDeclaration(decl)) {
-                const paramSymbols = decl.typeParameters?.map((p: any) => p.symbol);
-                const params = type.aliasTypeArguments.map((arg) => _transformType(arg));
-                for (let i = 0; i < params.length; i++) {
-                    if (paramSymbols?.[i]) {
-                        genericMap.set(paramSymbols[i], params[i]);
-                    }
-                }
-            }
-        }
+        transformGenericArguments(type.aliasTypeArguments, type.aliasSymbol);
 
         const flags = type.objectFlags;
         if (flags & ts.ObjectFlags.Reference) {
@@ -274,18 +279,7 @@ function transformType(
         // Every flag here is going to include ObjectFlags.Reference, unset it to make the if statements easier to read.
         const flags = type.target.objectFlags & ~ts.ObjectFlags.Reference;
 
-        if (type.typeArguments && type.symbol) {
-            const decl: ts.Node | undefined = type.symbol.declarations?.[0];
-            if (decl && ts.isTypeAliasDeclaration(decl)) {
-                const paramSymbols = decl.typeParameters?.map((p: any) => p.symbol);
-                const params = type.typeArguments.map((arg) => _transformType(arg));
-                for (let i = 0; i < params.length; i++) {
-                    if (paramSymbols?.[i]) {
-                        genericMap.set(paramSymbols[i], params[i]);
-                    }
-                }
-            }
-        }
+        transformGenericArguments(type.typeArguments, type.symbol);
 
         if (flags & ts.ObjectFlags.Tuple) {
             debugTypeResolution('is tuple');
@@ -367,6 +361,35 @@ function transformType(
         });
     }
 
+    /**
+     * Takes type arguments of an Object type or Reference type and resolves the generic type arguments and stores
+     * the resulting expressions into the genericMap for use later. When _transformType encounters a type parameter
+     * such as { someProperty: T }, the stored value in genericMap from here will be used to replace T with the
+     * resolved expression.
+     */
+    function transformGenericArguments(typeArguments: readonly ts.Type[] | undefined, symbol: ts.Symbol | undefined) {
+        if (typeArguments && symbol) {
+            const decl: ts.Node | undefined = symbol.declarations?.[0];
+            if (decl && ts.isTypeAliasDeclaration(decl)) {
+                const paramSymbols = typeChecker.getSymbolsInScope(decl, ts.SymbolFlags.TypeParameter);
+                debugTypeResolution(`Transforming type parameters (${symbol?.name ?? 'no name'})`);
+                const params = typeArguments.map((arg) => _transformType(arg));
+                for (let i = 0; i < params.length; i++) {
+                    if (paramSymbols?.[i]) {
+                        genericMap.set(paramSymbols[i], params[i]);
+                    }
+                }
+            }
+        }
+    }
+
+    /***********************************************************
+     * EXPRESSION CREATION FUNCTIONS
+     * ********************************************************/
+
+    /**
+     * Creates a struct() expression for an object type.
+     */
     function createStructExpression(type: ts.Type): ts.Expression {
         return createIndexCallExpression(CONSTANTS.STRUCT, [createStructObjectLiteralExpression(type)]);
     }
@@ -426,6 +449,33 @@ function transformType(
         }
     }
 
+    /***********************************************************
+     * HELPER FUNCTIONS
+     * ********************************************************/
+
+    /**
+     * Helper function that extends the [[debug]] function to indent by the config's number of spaces for each
+     * type in the resolutionStack. Also adds formatting to the strings.
+     */
+    function debugTypeResolution(message: string, extra?: StringCoercible) {
+        const prefix = resolutionStack
+            .map(() =>
+                Array.from({ length: config.DG_DEBUG_WIDTH })
+                    .map(() => ' ')
+                    .join('')
+            )
+            .join('');
+        if (extra) {
+            debug(`${prefix}- ${message}`, extra);
+        } else {
+            debug(`${prefix}- ${message}`);
+        }
+    }
+
+    /**
+     * Reports an error with a stack trace based on the type's declarations
+     * @returns an array of strings which can be spread to a logging function such as `console.warn`
+     */
     function report(error: string, type: ts.Type): string[] {
         const { aliasSymbol, symbol } = type;
         const messages: string[] = [error];
@@ -447,6 +497,9 @@ function transformType(
         return messages;
     }
 
+    /**
+     * Helper function that debug logs if debug logging is enabled in the configuration
+     */
     function debug(...args: StringCoercible[]) {
         if (!config.DG_DEBUG_ENABLED) {
             return;
@@ -454,21 +507,45 @@ function transformType(
         console.debug(...args);
     }
 
+    // Kick off the recursion (inside transformType) by calling the inner function
     return _transformType(type);
 }
 
+/***********************************************************
+ * TRANSFORMATION SCOPE INDEPENDENT HELPER FUNCTIONS
+ * ********************************************************/
+
+/**
+ * Creates constant(undefined)
+ */
 function createConstantUndefinedExpression(): ts.Expression {
     return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
 }
 
-function createIndexCallExpression(access: string, args: ts.Expression[] = []): ts.Expression {
+/**
+ * Creates a function call expression on the index data generator package (e.g. '@nwps/data-generators').
+ * @param access the index package function to call
+ * @param args arguments to call the function with
+ */
+function createIndexCallExpression(access: keyof typeof Index, args: ts.Expression[] = []): ts.Expression {
     return createSingleAccessCallExpression(CONSTANTS.INDEX, access, args);
 }
 
-function createLibraryCallExpression(access: string, args: ts.Expression[] = []): ts.Expression {
+/**
+ * Creates a function call expression on the library data generator package (e.g. '@nwps/data-generators/library').
+ * @param access the library package function to call
+ * @param args arguments to call the function with
+ */
+function createLibraryCallExpression(access: keyof typeof Library, args: ts.Expression[] = []): ts.Expression {
     return createSingleAccessCallExpression(CONSTANTS.LIBRARY, access, args);
 }
 
+/**
+ * Base function for calling a namespaced function in the form "namespace.function(...args)"
+ * @param base the base namespace name
+ * @param access the function to call from the namespace
+ * @param args arguments to call the function with
+ */
 function createSingleAccessCallExpression(base: string, access: string, args: ts.Expression[] = []): ts.Expression {
     return factory.createCallExpression(
         factory.createPropertyAccessExpression(factory.createIdentifier(base), factory.createIdentifier(access)),

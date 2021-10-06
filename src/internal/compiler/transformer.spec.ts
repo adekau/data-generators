@@ -20,10 +20,13 @@ function transform(code: string) {
                         contents: 'export const build: { <T>() => any; _dataGeneratorBuilderBrand: any } = {} });'
                     }
                 ],
-                transforms: [(program) => transformer(program, {
-                    DG_DEBUG_ENABLED: true,
-                    DG_DEBUG_WIDTH: 4
-                })]
+                transforms: [
+                    (program) =>
+                        transformer(program, {
+                            DG_DEBUG_ENABLED: true,
+                            DG_DEBUG_WIDTH: 4
+                        })
+                ]
             }
         )
             .split(/\r?\n/)
@@ -57,10 +60,9 @@ describe('Data Generators Compiler: Transformer', () => {
     });
 
     it('should throw when transforming never', () => {
-        const never = () => transform('build<never>()');
-        expect(never).toThrowError(
-            "Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type 'never' in file '/index.ts' line 0 character 33."
-        );
+        const never = transform('build<never>()');
+
+        expect(never).toBe('__dg.constant(undefined);');
     });
 
     it('should throw when calling build with no type argument', () => {
@@ -72,10 +74,15 @@ describe('Data Generators Compiler: Transformer', () => {
 
     it('should throw when a struct member reduces to never', () => {
         const type = '{ property1: string; property2: string & number; }';
-        const structReducesToNever = () => transform(`build<${type}>();`);
+        const structReducesToNever = transform(`build<${type}>();`);
 
-        expect(structReducesToNever).toThrowError(
-            `Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type '${type}' in file '/index.ts' line 0 character 33.`
+        expect(structReducesToNever).toBe(
+            singleLine(`
+            __dg.struct({
+                property1: __dgLib.string(),
+                property2: __dg.constant(undefined)
+            });
+            `)
         );
     });
 
@@ -114,10 +121,9 @@ describe('Data Generators Compiler: Transformer', () => {
     });
 
     it('should throw when transforming an array of never', () => {
-        const neverArr = () => transform('build<never[]>()');
-        expect(neverArr).toThrowError(
-            "Unable to produce DataGenerator for 'never' type while attempting to build DataGenerator for type 'never[]' in file '/index.ts' line 0 character 33."
-        );
+        const neverArr = transform('build<never[]>()');
+
+        expect(neverArr).toBe('__dg.array(__dg.constant(undefined));');
     });
 
     it('should transform a union disjoint on an enum property', () => {
@@ -204,24 +210,36 @@ describe('Data Generators Compiler: Transformer', () => {
                 `)
             )
         ).toBeTrue();
-
-        const result2 = transform(`
-        type Node<T> = { value: T; map: { next: Node<T>; prev: Node<T>; }; };
-        build<Node<number>>();
-        `);
-        console.log(result2);
     });
 
-    fit('should transform a generic type', () => {
+    it('should transform a mapped generic type', () => {
+        const result = transform(
+            'interface Dumb { bool: boolean }; type Q<T extends string> = { [K in keyof Dumb as `${K}_${T}`]: `${T}_${T}_!`}; build<Q<`Hello`>>();'
+        );
+
+        expect(result).toBe(
+            singleLine(`
+            ;__dg.struct({
+                bool_Hello: __dg.constant("Hello_Hello_!")
+            });
+            `)
+        );
+    });
+
+    it('should transform multiple generic parameters', () => {
         const result = transform(`
-        type Container<T> = { value: T };
-        type Value<T,G> = { type: T, type2: G };
-        interface Dumb {
-            bool: boolean;
-        }
-        build<Container<Value<Dumb, number>>>();
+        type Multiple<T, U, V> = { t: T, u: U, v: V };
+        build<Multiple<string, number, boolean[]>>();
         `);
 
-        console.log(result);
+        expect(result).toBe(
+            singleLine(`
+            __dg.struct({
+                t: __dgLib.string(),
+                u: __dgLib.int(),
+                v: __dg.array(__dgLib.bool())
+            });
+            `)
+        );
     });
 });
