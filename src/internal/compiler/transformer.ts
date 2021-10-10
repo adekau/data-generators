@@ -191,39 +191,61 @@ function transformType(
             );
 
             return createConstantUndefinedExpression();
+
+            /* Void / Undefined */
         } else if (flags & ts.TypeFlags.VoidLike) {
             debugTypeResolution('is voidlike');
             return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
+
+            /* Null */
         } else if (flags & ts.TypeFlags.Null) {
             debugTypeResolution('is null');
             return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createNull()]);
+
+            /* Literal types, e.g. 'Hello', 5, true, etc */
         } else if (flags & ts.TypeFlags.Literal) {
             debugTypeResolution('is literal');
             return createConstantCallExpression(type as ts.LiteralType);
+
+            /* String or `${StringLike}` */
         } else if (flags & (ts.TypeFlags.String | ts.TypeFlags.StringMapping)) {
             debugTypeResolution('is string');
             return createLibraryCallExpression(CONSTANTS.STRING);
+
+            /* Number */
         } else if (flags & ts.TypeFlags.Number) {
             debugTypeResolution('is number');
             return createLibraryCallExpression(CONSTANTS.NUMBER);
+
+            /* Boolean */
         } else if (flags & ts.TypeFlags.Boolean) {
             debugTypeResolution('is boolean');
             return createLibraryCallExpression(CONSTANTS.BOOLEAN);
+
+            /* Unions, e.g. `string | number` */
         } else if (flags & ts.TypeFlags.Union) {
             debugTypeResolution('is union');
             return transformUnionType(type as ts.UnionType);
+
+            /* Intersections, e.g. `{ a: string; } & { b: number; }` */
         } else if (flags & ts.TypeFlags.Intersection) {
             debugTypeResolution('is intersection');
             return transformIntersectionType(type as ts.IntersectionType);
+
+            /* Type Parameters, e.g. T in `func<T>()` */
         } else if (flags & ts.TypeFlags.TypeParameter) {
             debugTypeResolution('is type parameter');
             return genericMap.get(type.symbol) ?? factory.createIdentifier('__unresolvedGeneric');
         }
+
+        /* Objects, e.g. class/interface/literals ( { a: string } ) */
         // should always be the last else if, as a lot of primitive types are also object types.
         else if (flags & ts.TypeFlags.Object) {
             debugTypeResolution('is object');
             return transformObjectType(type as ts.ObjectType);
         }
+
+        /* Anything else */
         // fall through default of constant undefined.
         else {
             debugTypeResolution('is undefined (base resolve fallthrough)');
@@ -252,18 +274,26 @@ function transformType(
         transformGenericArguments(type.aliasTypeArguments, type.aliasSymbol);
 
         const flags = type.objectFlags;
+
+        /* References, e.g. Array, Map, etc */
         if (flags & ts.ObjectFlags.Reference) {
             debugTypeResolution('is reference type');
             return transformTypeReference(type as ts.TypeReference);
+
+            /* Mapped types, e.g. `type Nullable<T extends Record<any, any>> = { [K in keyof T]+?: T[K] | null; }` */
         } else if (flags & ts.ObjectFlags.Mapped) {
             debugTypeResolution('is mapped type');
             return transformMappedType(type as MappedType);
+
+            /* Interface or Class or Literal, e.g. `{ a: string }` */
         } else if (
             flags & (ts.ObjectFlags.Interface | ts.ObjectFlags.Class) ||
             type.symbol.flags & ts.SymbolFlags.TypeLiteral
         ) {
             debugTypeResolution('is interface/class');
             return createStructExpression(type);
+
+            /* Anything else */
         } else {
             // If none of the above, create an empty "struct({})"" generator. One such type that will reach this branch
             // is "{}".
