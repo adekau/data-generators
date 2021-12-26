@@ -23,7 +23,7 @@ function transform(code: string) {
                 transforms: [
                     (program) =>
                         transformer(program, {
-                            DG_DEBUG_ENABLED: true,
+                            DG_DEBUG_ENABLED: false,
                             DG_DEBUG_WIDTH: 4
                         })
                 ]
@@ -238,6 +238,51 @@ describe('Data Generators Compiler: Transformer', () => {
                 t: __dgLib.string(),
                 u: __dgLib.int(),
                 v: __dg.array(__dgLib.bool())
+            });
+            `)
+        );
+    });
+
+    it('should transform default generics', () => {
+        const result = transform(`
+        type Df<T = string> = { t: T; };
+        build<Df>();
+        `);
+
+        expect(result).toBe(
+            singleLine(`
+            __dg.struct({
+                t: __dgLib.string()
+            });
+            `)
+        );
+    });
+
+    it('should transform a more complex default generic', () => {
+        const result = transform(`
+        type Df<T = string | number> = { t: T; };
+        build<Df>();
+        `);
+
+        expect(result).toBe(
+            singleLine(`
+            __dg.struct({
+                t: __dg.anyOf(__dgLib.string(), __dgLib.int())
+            });
+            `)
+        );
+    });
+
+    it('should transform overridden default generic', () => {
+        const result = transform(`
+        type Dfo<T extends string = never> = { t: T; };
+        build<Dfo<'test'>>();
+        `);
+
+        expect(result).toBe(
+            singleLine(`
+            __dg.struct({
+                t: __dg.constant("test")
             });
             `)
         );
