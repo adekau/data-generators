@@ -219,8 +219,8 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            ;__dg.struct({
-                bool_Hello: __dg.constant("Hello_Hello_!")
+            ;${INDEX}.struct({
+                bool_Hello: ${INDEX}.constant("Hello_Hello_!")
             });
             `)
         );
@@ -234,10 +234,10 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            __dg.struct({
-                t: __dgLib.string(),
-                u: __dgLib.int(),
-                v: __dg.array(__dgLib.bool())
+            ${INDEX}.struct({
+                t: ${LIB}.string(),
+                u: ${LIB}.int(),
+                v: ${INDEX}.array(${LIB}.bool())
             });
             `)
         );
@@ -251,8 +251,8 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            __dg.struct({
-                t: __dgLib.string()
+            ${INDEX}.struct({
+                t: ${LIB}.string()
             });
             `)
         );
@@ -266,8 +266,8 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            __dg.struct({
-                t: __dg.anyOf(__dgLib.string(), __dgLib.int())
+            ${INDEX}.struct({
+                t: ${INDEX}.anyOf(${LIB}.string(), ${LIB}.int())
             });
             `)
         );
@@ -281,8 +281,8 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            __dg.struct({
-                t: __dg.constant("test")
+            ${INDEX}.struct({
+                t: ${INDEX}.constant("test")
             });
             `)
         );
