@@ -16,7 +16,7 @@ enum Enum2 {
 
 describe('Data Generators: Interpolate', () => {
     it('should interpolate a string of generators', () => {
-        const gen = interpolate`${enumValue(Value1)}-${enumValue(Enum2)}:${int(100,999)}`;
+        const gen = interpolate`${enumValue(Value1)}-${enumValue(Enum2)}:${int(100, 999)}`;
 
         const results = gen.createMany(5);
         const check = /^value[1-3]-member[1-4]:\d{3}/;

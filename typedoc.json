@@ -1,4 +1,5 @@
 {
+    "$schema": "https://typedoc.org/schema.json",
     "entryPoints": [
         "./src/interfaces/index.ts",
         "./src/index.ts",
@@ -7,6 +8,7 @@
         "./src/compiler/index.ts"
     ],
     "out": "docs",
+    "githubPages": true,
     "pluginPages": {
         "pages": [
             {
