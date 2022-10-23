@@ -6,6 +6,5 @@
         "./src/library/index.ts",
         "./src/compiler/index.ts"
     ],
-    "out": "docs",
-    "theme": "pages-plugin"
+    "out": "docs"
 }
