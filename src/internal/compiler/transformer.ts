@@ -198,7 +198,7 @@ function transformType(
             /* Void / Undefined */
         } else if (flags & ts.TypeFlags.VoidLike) {
             debugTypeResolution('is voidlike');
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
+            return createConstantUndefinedExpression();
 
             /* Null */
         } else if (flags & ts.TypeFlags.Null) {
@@ -319,12 +319,13 @@ function transformType(
 
         transformGenericArguments(type.typeArguments, type.symbol);
 
+        // Tuple type, e.g. [number, 'hello', 5, false]
         if (flags & ts.ObjectFlags.Tuple) {
             debugTypeResolution('is tuple');
             return createIndexCallExpression(CONSTANTS.TUPLE, createTupleArguments(type as ts.TupleType));
         }
-        // As far as I know Array<T> is the only type that resolves with ObjectFlags.Reference | ObjectFlags.Interface,
-        // but to be safe also check that the symbol name is array
+
+        // special case for Array<T>, which is a reference type (to class Array). Like Map, but has a syntax literal (`[]`)
         else if (type.symbol.escapedName.toString().toLowerCase() === 'array') {
             debugTypeResolution('is array');
             return createArrayExpression(type);
@@ -376,19 +377,33 @@ function transformType(
         });
     }
 
+    /**
+     * Further refine a mapped object type, members can be finite or infinite in quantity.
+     * Handle both possibilities.
+     */
     function transformMappedType(type: MappedType): ts.Expression {
+        /** Finite members */
         if (type.getProperties().length) {
             debugTypeResolution('is mapped type with properties');
             return transformMappedTypeWithMembers(type);
+
+            /** Potentially infinite members (index type) */
         } else if (typeChecker.getIndexInfosOfType(type).length) {
             debugTypeResolution('is index mapped type');
             return transformIndexMappedType(type);
+
+            /** Fall-through case, generate `constant(undefined)`. */
         } else {
             debugTypeResolution('mapped type fall-through (undefined)');
             return createConstantUndefinedExpression();
         }
     }
 
+    /**
+     * Index mapped types don't have finite statically defined constant members.
+     * Given that a struct data generator is going to want to have finite members, generate one struct property
+     * per index type.
+     */
     function transformIndexMappedType(type: MappedType): ts.Expression {
         const exprs = typeChecker
             .getIndexInfosOfType(type)
@@ -490,6 +505,10 @@ function transformType(
         return createIndexCallExpression(CONSTANTS.ARRAY, [transformed]);
     }
 
+    /**
+     * Recursively transform members of a tuple type, e.g. [number, 5, false] will run
+     * `_transformType` on number, 5, and false to get an array of expressions.
+     */
     function createTupleArguments(type: ts.TupleType): ts.Expression[] {
         return type.typeArguments?.map((typeArg) => _transformType(typeArg)) ?? [];
     }
@@ -515,6 +534,11 @@ function transformType(
         }
     }
 
+    /**
+     * Transforms interpolated template string types, e.g. `${string}!` would have
+     *   - texts: ["", "!"]
+     *   - types: intrinsicType: 'string'
+     */
     function createTemplateLiteralExpression(type: ts.TemplateLiteralType): ts.Expression {
         const { texts, types } = type;
 
