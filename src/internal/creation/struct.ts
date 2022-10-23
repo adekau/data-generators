@@ -23,7 +23,7 @@ export function struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> 
 
 export function _struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }) {
     return function* () {
-        const iterators: [string, Iterator<unknown>][] = Object.entries(gens).map(([key, iterable]) => [
+        const iterators: [string, Iterator<T[keyof T]>][] = Object.entries(gens).map(([key, iterable]) => [
             key,
             (iterable as any)[Symbol.iterator]()
         ]);
@@ -56,9 +56,9 @@ export function partialStruct<T extends object>(gens: { [K in keyof T]+?: Iterab
 
 export function _partialStruct<T extends object>(gens: { [K in keyof T]+?: Iterable<T[K]> }) {
     return function* () {
-        const iterators: [string, Iterator<unknown>][] = Object.entries(gens)
+        const iterators: [string, Iterator<T[keyof T]>][] = Object.entries(gens)
             .map(([key, iterable]) => [key, (iterable as any)?.[Symbol.iterator]()])
-            .filter(([, x]) => x != null) as [string, Iterator<unknown>][];
+            .filter(([, x]) => x != null) as [string, Iterator<T[keyof T]>][];
 
         while (true) {
             const result: Partial<T> = {};
