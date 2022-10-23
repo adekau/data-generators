@@ -1,6 +1,5 @@
 import transformer from './transformer';
 import { transformFile } from 'ts-transformer-testing-library';
-import { CONSTANTS } from './constants';
 
 const INDEX = '__dg';
 const LIB = '__dgLib';
@@ -79,8 +78,8 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(structReducesToNever).toBe(
             singleLine(`
             __dg.struct({
-                property1: __dgLib.string(),
-                property2: __dg.constant(undefined)
+                "property1": __dgLib.string(),
+                "property2": __dg.constant(undefined)
             });
             `)
         );
@@ -107,8 +106,8 @@ describe('Data Generators Compiler: Transformer', () => {
             singleLine(`
             ${INDEX}.array(
                 ${INDEX}.struct({
-                    a: ${LIB}.string(),
-                    b: ${LIB}.int()
+                    "a": ${LIB}.string(),
+                    "b": ${LIB}.int()
                 })
             );
             `)
@@ -141,12 +140,12 @@ describe('Data Generators Compiler: Transformer', () => {
                 singleLine(`
                 ${INDEX}.anyOf(
                     ${INDEX}.struct({
-                        type: ${INDEX}.constant("member1"),
-                        property1: ${LIB}.int()
+                        "type": ${INDEX}.constant("member1"),
+                        "property1": ${LIB}.int()
                     }),
                     ${INDEX}.struct({
-                        type: ${INDEX}.constant("member2"),
-                        property2: ${LIB}.string()
+                        "type": ${INDEX}.constant("member2"),
+                        "property2": ${LIB}.string()
                     })
                 );
                 `)
@@ -158,7 +157,7 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(transform('build<{ str: string }>()')).toBe(
             singleLine(`
         ${INDEX}.struct({
-            str: ${LIB}.string()
+            "str": ${LIB}.string()
         });
         `)
         );
@@ -180,11 +179,11 @@ describe('Data Generators Compiler: Transformer', () => {
             result.includes(
                 singleLine(`
             ${INDEX}.struct({
-                str: ${LIB}.string(),
-                num: ${LIB}.int(),
-                bool: ${LIB}.bool(),
-                date: ${LIB}.date(),
-                arr: ${INDEX}.array(${LIB}.string())
+                "str": ${LIB}.string(),
+                "num": ${LIB}.int(),
+                "bool": ${LIB}.bool(),
+                "date": ${LIB}.date(),
+                "arr": ${INDEX}.array(${LIB}.string())
             });
             `)
             )
@@ -220,7 +219,7 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(result).toBe(
             singleLine(`
             ;${INDEX}.struct({
-                bool_Hello: ${INDEX}.constant("Hello_Hello_!")
+                "bool_Hello": ${INDEX}.constant("Hello_Hello_!")
             });
             `)
         );
@@ -235,9 +234,9 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(result).toBe(
             singleLine(`
             ${INDEX}.struct({
-                t: ${LIB}.string(),
-                u: ${LIB}.int(),
-                v: ${INDEX}.array(${LIB}.bool())
+                "t": ${LIB}.string(),
+                "u": ${LIB}.int(),
+                "v": ${INDEX}.array(${LIB}.bool())
             });
             `)
         );
@@ -252,7 +251,7 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(result).toBe(
             singleLine(`
             ${INDEX}.struct({
-                t: ${LIB}.string()
+                "t": ${LIB}.string()
             });
             `)
         );
@@ -267,7 +266,7 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(result).toBe(
             singleLine(`
             ${INDEX}.struct({
-                t: ${INDEX}.anyOf(${LIB}.string(), ${LIB}.int())
+                "t": ${INDEX}.anyOf(${LIB}.string(), ${LIB}.int())
             });
             `)
         );
@@ -282,7 +281,70 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(result).toBe(
             singleLine(`
             ${INDEX}.struct({
-                t: ${INDEX}.constant("test")
+                "t": ${INDEX}.constant("test")
+            });
+            `)
+        );
+    });
+
+    it('should map type from union', () => {
+        const result = transform(`
+            interface Tester { key1: string; key2: boolean; key3: number[]; }
+            type Q = { [Z in keyof Tester]: Tester[Z] & { prop: string } };
+            build<Q>();
+        `);
+
+        // key2 is anyOf because boolean is evaluated as the union of true and false, which distributes over the intersection
+        expect(result).toBe(
+            singleLine(`
+            ${INDEX}.struct({
+                "key1": ${INDEX}.struct({
+                    "prop": ${LIB}.string()
+                }),
+                "key2": ${INDEX}.anyOf(
+                    ${INDEX}.struct({
+                        "prop": ${LIB}.string()
+                    }),
+                    ${INDEX}.struct({
+                        "prop": ${LIB}.string()
+                    })
+                ),
+                "key3": ${INDEX}.struct({
+                    "prop": ${LIB}.string()
+                })
+            });
+            `)
+        );
+    });
+
+    it('should map type from literal', () => {
+        const result = transform(`
+        type Q = { [Z in 'key1']: boolean };
+        build<Q>();
+        `);
+
+        expect(result).toBe(singleLine(`${INDEX}.struct({ "key1": ${LIB}.bool() });`));
+    });
+
+    it('should build structs with special characters in keys', () => {
+        const result = transform(`
+        type Part1 = string;
+        type Part2 = 'Case' | 'Arrest';
+        type Part3 = '*' | 'Create' | 'Approve';
+        type Keys = \`\${Part1}-\${Part2}:\${Part3}\`;
+        type Obj = { [K in Keys]: boolean };
+        build<Obj>();
+        `);
+
+        expect(result).toBe(
+            singleLine(`
+            ${INDEX}.struct({
+                [${INDEX}.interpolate(["", "-Case:*"],[${LIB}.string()])]: ${LIB}.bool(),
+                [${INDEX}.interpolate(["", "-Case:Create"],[${LIB}.string()])]: ${LIB}.bool(),
+                [${INDEX}.interpolate(["", "-Case:Approve"],[${LIB}.string()])]: ${LIB}.bool(),
+                [${INDEX}.interpolate(["", "-Arrest:*"],[${LIB}.string()])]: ${LIB}.bool(),
+                [${INDEX}.interpolate(["", "-Arrest:Create"],[${LIB}.string()])]: ${LIB}.bool(),
+                [${INDEX}.interpolate(["", "-Arrest:Approve"],[${LIB}.string()])]: ${LIB}.bool()
             });
             `)
         );

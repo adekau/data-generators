@@ -11,6 +11,7 @@ export { createGenerator } from './internal/creation/data-generator';
 export { either } from './internal/creation/either';
 export { iif as dgIf, iif } from './internal/creation/iif';
 export { infinite } from './internal/creation/infinite';
+export { interpolate } from './internal/creation/interpolate';
 export { constantSequence, sequence } from './internal/creation/sequence';
 export { partialStruct, struct } from './internal/creation/struct';
 export { tuple } from './internal/creation/tuple';

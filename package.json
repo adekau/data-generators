@@ -75,7 +75,7 @@
     "homepage": "https://github.com/tyler-technologies/data-generators#readme",
     "dependencies": {
         "ts-toolbelt": "^9.6.0",
-        "tslib": "^2.3.1",
+        "tslib": "^2.4.0",
         "uuid": "^8.3.2"
     },
     "devDependencies": {
@@ -85,16 +85,16 @@
         "fs-extra": "^10.0.0",
         "glob": "^7.1.7",
         "jasmine-core": "^3.8.0",
-        "karma": "^6.3.4",
-        "karma-chrome-launcher": "^3.1.0",
+        "karma": "^6.4.1",
+        "karma-chrome-launcher": "^3.1.1",
         "karma-jasmine": "^4.0.1",
         "karma-jasmine-html-reporter": "^1.7.0",
-        "karma-typescript": "^5.5.1",
+        "karma-typescript": "^5.5.3",
         "prettier": "2.3.2",
         "shx": "^0.3.3",
         "ts-transformer-testing-library": "^1.0.0-alpha.7",
-        "typedoc": "^0.21.5",
+        "typedoc": "^0.23.17",
         "typedoc-plugin-pages": "^1.1.0",
-        "typescript": "^4.3.5"
+        "typescript": "^4.8.4"
     }
 }

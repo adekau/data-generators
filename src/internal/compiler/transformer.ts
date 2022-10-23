@@ -32,6 +32,8 @@ interface MappedSymbol extends ts.Symbol {
  */
 interface MappedType extends ts.ObjectType {
     members: Map<string, MappedSymbol>;
+    declaration?: ts.Declaration;
+    typeParameter?: ts.TypeParameter;
 }
 
 /**
@@ -144,6 +146,7 @@ function transformType(
 
         const cached = transformationCache.get(type);
         if (cached) {
+            debugTypeResolution(`resolved from cache (kind : ${ts.SyntaxKind[cached.kind]})`);
             resolutionStack.pop();
             return cached;
         }
@@ -207,6 +210,11 @@ function transformType(
             debugTypeResolution('is literal');
             return createConstantCallExpression(type as ts.LiteralType);
 
+            /** Template Literal */
+        } else if (flags & ts.TypeFlags.TemplateLiteral) {
+            debugTypeResolution('is template literal');
+            return createTemplateLiteralExpression(type as ts.TemplateLiteralType);
+
             /* String or `${StringLike}` */
         } else if (flags & (ts.TypeFlags.String | ts.TypeFlags.StringMapping)) {
             debugTypeResolution('is string');
@@ -248,7 +256,7 @@ function transformType(
         /* Anything else */
         // fall through default of constant undefined.
         else {
-            debugTypeResolution('is undefined (base resolve fallthrough)');
+            debugTypeResolution('is undefined (base resolve fallthrough)', `flags: ${flags}`);
             return createConstantUndefinedExpression();
         }
     }
@@ -317,7 +325,7 @@ function transformType(
         }
         // As far as I know Array<T> is the only type that resolves with ObjectFlags.Reference | ObjectFlags.Interface,
         // but to be safe also check that the symbol name is array
-        else if (flags & ts.ObjectFlags.Interface && type.symbol?.name.toLowerCase() === 'array') {
+        else if (type.symbol.escapedName.toString().toLowerCase() === 'array') {
             debugTypeResolution('is array');
             return createArrayExpression(type);
         } else {
@@ -346,7 +354,9 @@ function transformType(
      */
     function transformIntersectionType(type: ts.IntersectionType): ts.Expression {
         // Filters primitive types out. `string` is a javascript object, but is not an object type.
-        const types = type.types.filter((t) => t.flags & ts.TypeFlags.Object);
+        const types = type.types.filter(
+            (t) => t.flags & ts.TypeFlags.Object && !((t as ts.ObjectType).objectFlags & ts.ObjectFlags.Reference)
+        );
         // Object symbols have members for their properties, will be using a new map to overwrite the original symbol's map.
         const propertyMap = new Map<string, ts.Symbol>();
         // map is faster than forEach
@@ -366,12 +376,36 @@ function transformType(
         });
     }
 
+    function transformMappedType(type: MappedType): ts.Expression {
+        if (type.getProperties().length) {
+            debugTypeResolution('is mapped type with properties');
+            return transformMappedTypeWithMembers(type);
+        } else if (typeChecker.getIndexInfosOfType(type).length) {
+            debugTypeResolution('is index mapped type');
+            return transformIndexMappedType(type);
+        } else {
+            debugTypeResolution('mapped type fall-through (undefined)');
+            return createConstantUndefinedExpression();
+        }
+    }
+
+    function transformIndexMappedType(type: MappedType): ts.Expression {
+        const exprs = typeChecker
+            .getIndexInfosOfType(type)
+            .map((info) => [_transformType(info.keyType), _transformType(info.type)]);
+        const propertyAssignments = exprs.map(([key, base]) =>
+            factory.createPropertyAssignment(factory.createComputedPropertyName(key), base)
+        );
+
+        return createIndexCallExpression('struct', [factory.createObjectLiteralExpression(propertyAssignments, false)]);
+    }
+
     /**
      * Mapped types are a bit weird as they have members defined at the type level rather than the symbol level.
      * Their symbols also have extra properties that keep track of the original type, name type, key type, etc.
      * Otherwise, the process for transforming these is almost identical to transforming an intersection type.
      */
-    function transformMappedType(type: MappedType): ts.Expression {
+    function transformMappedTypeWithMembers(type: MappedType): ts.Expression {
         const propertyMap = new Map<string, ts.Symbol>();
 
         type.members.forEach((sym) => {
@@ -433,8 +467,10 @@ function transformType(
         // ts.SymbolTable has no map method. Use forEach and push to an array instead.
         type.symbol.members?.forEach((member) => {
             const typeOfMember = typeChecker.getTypeOfSymbolAtLocation(member, node);
-            // Create syntax of the form "x: y" using the interface property name for x and the transformation of its type as y
-            structMembers.push(factory.createPropertyAssignment(member.name, _transformType(typeOfMember)));
+            // Create syntax of the form '"x": y' using the interface property name for x and the transformation of its type as y
+            structMembers.push(
+                factory.createPropertyAssignment(factory.createStringLiteral(member.name), _transformType(typeOfMember))
+            );
         });
 
         return factory.createObjectLiteralExpression(structMembers, false);
@@ -477,6 +513,18 @@ function transformType(
             // constant(undefined) as a fall through case
             return createConstantUndefinedExpression();
         }
+    }
+
+    function createTemplateLiteralExpression(type: ts.TemplateLiteralType): ts.Expression {
+        const { texts, types } = type;
+
+        const textExpressions = texts.map((t) => factory.createStringLiteral(t));
+        const transformedTypes = types.map((t) => _transformType(t));
+
+        return createIndexCallExpression('interpolate', [
+            factory.createArrayLiteralExpression(textExpressions),
+            factory.createArrayLiteralExpression(transformedTypes)
+        ]);
     }
 
     /***********************************************************
