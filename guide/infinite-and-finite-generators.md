@@ -1,5 +1,3 @@
-# Infinite and Finite Generators
-
 Data Generators can be broken down into two distinct types: **infinite** and **finite**.
 
 ## Finite

@@ -1,5 +1,3 @@
-# Getting Started
-
 ## Installation
 
 Installation instructions can be found in the [readme](../../index.html), located at the repository root.
@@ -32,8 +30,8 @@ it('should handle invalid first name values', () => {
 });
 ```
 
-1. [[`withS`]] takes a property on the generator and overwrites it with a new one (can be anything that is iterable).
-    - **Note** the name [[`withS`]] has the `S` on the end due to it operating on a struct (introduced below), there is also [[`withT`]] for tuples. Also, `with` is a JavaScript reserved word so some creativity was necessary.
+1. {@link transformer.withS | `withS`} takes a property on the generator and overwrites it with a new one (can be anything that is iterable).
+    - **Note** the name {@link transformer.withS | `withS`} has the `S` on the end due to it operating on a struct (introduced below), there is also [[`withT`]] for tuples. Also, `with` is a JavaScript reserved word so some creativity was necessary.
 2. Here, [[`createAll`]] will return an array of 3 persons, the first having `firstName: undefined`, second `firstName: null` and third `firstName: ''`.
    It only creates 3 because the replacement generator provided for firstName in [[`withS`]] can only output at most 3 values.
 

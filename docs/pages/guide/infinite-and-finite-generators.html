@@ -1,0 +1,79 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>Infinite and Finite Generators | @nwps/data-generators</title><meta name="description" content="Documentation for @nwps/data-generators"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../../assets/style.css"/><link rel="stylesheet" href="../../assets/highlight.css"/><script async src="../../assets/search.js" id="search-script"></script><link rel="stylesheet" href="../../assets/pages.css"/></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base="../..">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="" class="title">@nwps/data-generators</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-8 col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb">
+<li><a href="../../modules.html">@nwps/data-generators</a></li>
+<li><a href="infinite-and-finite-generators.html">Infinite and Finite Generators</a></li></ul>
+<h1> Infinite and Finite Generators</h1></div>
+<div class="tsd-panel tsd-typography"><p>Data Generators can be broken down into two distinct types: <strong>infinite</strong> and <strong>finite</strong>.</p>
+
+<a href="#finite" id="finite" style="color: inherit; text-decoration: none;">
+  <h2>Finite</h2>
+</a>
+<p>A <strong>finite</strong> Data Generator can only produce a set amount of values. If you try to create more values than it can produce, it will produce only the amount it can and then terminate.</p>
+<pre><code class="language-ts"><span class="hl-10">import</span><span class="hl-0"> { </span><span class="hl-4">createGenerator</span><span class="hl-0"> } </span><span class="hl-10">from</span><span class="hl-0"> </span><span class="hl-5">&#39;@nwps/data-generators&#39;</span><span class="hl-0">;</span><br/><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">gen</span><span class="hl-0"> = </span><span class="hl-1">createGenerator</span><span class="hl-0">(</span><span class="hl-6">function*</span><span class="hl-0"> () {</span><br/><span class="hl-0">    </span><span class="hl-10">yield</span><span class="hl-0"> </span><span class="hl-5">&#39;Hello&#39;</span><span class="hl-0">;</span><br/><span class="hl-0">    </span><span class="hl-10">yield</span><span class="hl-0"> </span><span class="hl-5">&#39;world&#39;</span><span class="hl-0">;</span><br/><span class="hl-0">});</span><br/><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">results</span><span class="hl-0"> = </span><span class="hl-4">gen</span><span class="hl-0">.</span><span class="hl-1">createMany</span><span class="hl-0">(</span><span class="hl-2">5</span><span class="hl-0">); </span><span class="hl-3">// (*) [&#39;Hello&#39;, &#39;world&#39;]</span>
+</code></pre>
+<ul>
+<li>Since the generator only yields two values, calling <code>createMany(5)</code> terminates early.</li>
+</ul>
+<p>Transformers such as [[<code>take</code>]] and [[<code>one</code>]] also result in a finite Data Generator. The difference between the aforementioned and
+[[<code>createMany</code>]] is that [[<code>take</code>]] and [[<code>one</code>]] result in a new finite Data Generator that can never generate more than it&#39;s capable of
+and [[<code>createMany</code>]] is just generating some values from a potentially infinite data generator.</p>
+<pre><code class="language-ts"><span class="hl-10">import</span><span class="hl-0"> { </span><span class="hl-4">int</span><span class="hl-0"> } </span><span class="hl-10">from</span><span class="hl-0"> </span><span class="hl-5">&#39;@nwps/data-generators/library&#39;</span><span class="hl-0">;</span><br/><span class="hl-10">import</span><span class="hl-0"> { </span><span class="hl-4">take</span><span class="hl-0"> } </span><span class="hl-10">from</span><span class="hl-0"> </span><span class="hl-5">&#39;@nwps/data-generators/transformer&#39;</span><span class="hl-0">;</span><br/><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">gen1</span><span class="hl-0"> = </span><span class="hl-1">int</span><span class="hl-0">();</span><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">gen2</span><span class="hl-0"> = </span><span class="hl-1">int</span><span class="hl-0">().</span><span class="hl-1">pipe</span><span class="hl-0">(</span><span class="hl-1">take</span><span class="hl-0">(</span><span class="hl-2">5</span><span class="hl-0">));</span><br/><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">results1</span><span class="hl-0"> = </span><span class="hl-4">gen1</span><span class="hl-0">.</span><span class="hl-1">createMany</span><span class="hl-0">(</span><span class="hl-2">5</span><span class="hl-0">);</span><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">results2</span><span class="hl-0"> = </span><span class="hl-4">gen2</span><span class="hl-0">.</span><span class="hl-1">createMany</span><span class="hl-0">(</span><span class="hl-2">5</span><span class="hl-0">);</span>
+</code></pre>
+<p>In the above, <code>results1</code> and <code>results2</code> will both be length 5. The difference can be seen in the following,</p>
+<pre><code class="language-ts"><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">results1</span><span class="hl-0"> = </span><span class="hl-4">gen1</span><span class="hl-0">.</span><span class="hl-1">createMany</span><span class="hl-0">(</span><span class="hl-2">10</span><span class="hl-0">);</span><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">results2</span><span class="hl-0"> = </span><span class="hl-4">gen2</span><span class="hl-0">.</span><span class="hl-1">createMany</span><span class="hl-0">(</span><span class="hl-2">10</span><span class="hl-0">);</span>
+</code></pre>
+<p>Since <code>gen1</code> is infinite (as all Data Generators from [[<code>library</code>]] are), it can produce 10 integers. However, <code>gen2</code> is a finite generator
+due to the [[<code>take</code>]] transformer and can only generate 5 integers at maximum. Here <code>results1</code> is length 10, and <code>results2</code> is length 5.</p>
+
+<a href="#infinite" id="infinite" style="color: inherit; text-decoration: none;">
+  <h2>Infinite</h2>
+</a>
+<p>An <strong>infinite</strong> Data Generator will never run out of values it can produce. All Data Generators in [[library | <code>@nwps/data-generators/library</code>]] are infinite.</p>
+<p>An infinite Data Generator is just a <code>while (true)</code> infinite loop that yields the next value.</p>
+<pre><code class="language-ts"><span class="hl-10">import</span><span class="hl-0"> { </span><span class="hl-4">createGenerator</span><span class="hl-0"> } </span><span class="hl-10">from</span><span class="hl-0"> </span><span class="hl-5">&#39;@nwps/data-generators&#39;</span><span class="hl-0">;</span><br/><br/><span class="hl-6">const</span><span class="hl-0"> </span><span class="hl-8">number</span><span class="hl-0"> = </span><span class="hl-1">createGenerator</span><span class="hl-0">(</span><span class="hl-6">function*</span><span class="hl-0"> () {</span><br/><span class="hl-0">    </span><span class="hl-10">while</span><span class="hl-0"> (</span><span class="hl-6">true</span><span class="hl-0">) {</span><br/><span class="hl-0">        </span><span class="hl-10">yield</span><span class="hl-0"> </span><span class="hl-4">Math</span><span class="hl-0">.</span><span class="hl-1">random</span><span class="hl-0">();</span><br/><span class="hl-0">    }</span><br/><span class="hl-0">});</span>
+</code></pre>
+</div></div>
+<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<nav class="tsd-navigation primary">
+<details class="tsd-index-accordion" open><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)"></path></svg> Modules</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li class="current"><a href="../../modules.html">@nwps/data-<wbr/>generators</a>
+<ul>
+<li class="pages-entry pages-entry-page pages-entry-depth-1"><a href="getting-started.html">Getting <wbr/>Started</a></li>
+<li class="current selected pages-entry pages-entry-page pages-entry-depth-1"><a href="infinite-and-finite-generators.html">Infinite and <wbr/>Finite <wbr/>Generators</a></li>
+<li class="tsd-kind-module"><a href="../../modules/compiler.html">compiler</a></li>
+<li class="tsd-kind-module"><a href="../../modules/index.html">index</a></li>
+<li class="tsd-kind-module"><a href="../../modules/interfaces.html">interfaces</a></li>
+<li class="tsd-kind-module"><a href="../../modules/library.html">library</a></li>
+<li class="tsd-kind-module"><a href="../../modules/transformer.html">transformer</a></li></ul></li></ul></div></details></nav>
+<nav class="tsd-navigation secondary menu-sticky"></nav></div></div>
+<div class="container tsd-generator">
+<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
+<div class="overlay"></div><script src="../../assets/main.js"></script></body></html>
