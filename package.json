@@ -1,6 +1,6 @@
 {
     "name": "@nwps/data-generators",
-    "version": "1.0.0-rc.5",
+    "version": "1.0.0-rc.6",
     "description": "Mock unit test data generation",
     "main": "dist/cjs/index.js",
     "module": "dist/esm5/index.js",
