@@ -1,4 +1,4 @@
-# Data Generators
+# Semble-TS
 
 This library is intended to provide an abstraction over [ES6 Generator Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*) for use in Data Generation.
 
@@ -8,23 +8,20 @@ It's API is modeled after both RxJS and the fluent API of AutoFixture, so that i
 
 ## Documentation
 
-Documentation can be found at https://tyler-technologies.github.io/data-generators
+TODO: host docs on GH-pages.
 
-## Installing
-
-```bash
-npm install --save-dev @nwps/data-generators
-```
-
-_Note_: Needs the NWPS NPM package source from Artifactory set up in `.npmrc`.
-
-## Documentation
-
-Currently documentation is not hosted anywhere, but the compiled docs can be found under the repo's `docs` folder. To build the most recent docs yourself,
+Can build docs locally by running,
 
 ```bash
 npm run build:docs
 ```
+
+and then view locally.
+
+## Installing
+
+TODO. No package published yet.
+
 
 ## Building
 
