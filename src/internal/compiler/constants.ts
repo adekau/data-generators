@@ -26,9 +26,9 @@ export const CONSTANTS = {
      * expression easier
      */
     INDEX: '__dg' as const,
-    INDEX_LOCATION: '@nwps/data-generators' as const,
+    INDEX_LOCATION: 'semble-ts' as const,
     LIBRARY: '__dgLib' as const,
-    LIBRARY_LOCATION: '@nwps/data-generators/library' as const,
+    LIBRARY_LOCATION: 'semble-ts/library' as const,
     /**
      * TypeScript doesn't expose a lot of information about function types without the `FunctionTypeNode`
      * `TypeNode` being present

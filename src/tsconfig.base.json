@@ -4,8 +4,8 @@
         "noEmit": false,
         "baseUrl": ".",
         "paths": {
-            "@nwps/data-generators": ["./"],
-            "@nwps/data-generators/*": ["./*"]
+            "semble-ts": ["./"],
+            "semble-ts/*": ["./*"]
         }
     },
     "include": ["./**/*.ts"]

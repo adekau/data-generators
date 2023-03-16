@@ -14,7 +14,7 @@ aliases
 
 aliases.forEach((alias) => {
     const pkgManifest = {
-        name: `@nwps/data-generators/${alias}`,
+        name: `semble-ts/${alias}`,
         types: `../dist/types/${alias}/index.d.ts`,
         main: `../dist/cjs/${alias}/index.js`,
         module: `../dist/esm5/${alias}/index.js`,

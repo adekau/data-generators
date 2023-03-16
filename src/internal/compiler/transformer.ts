@@ -625,7 +625,7 @@ function createConstantUndefinedExpression(): ts.Expression {
 }
 
 /**
- * Creates a function call expression on the index data generator package (e.g. '@nwps/data-generators').
+ * Creates a function call expression on the index data generator package (e.g. 'semble-ts').
  * @param access the index package function to call
  * @param args arguments to call the function with
  */
@@ -634,7 +634,7 @@ function createIndexCallExpression(access: keyof typeof Index, args: ts.Expressi
 }
 
 /**
- * Creates a function call expression on the library data generator package (e.g. '@nwps/data-generators/library').
+ * Creates a function call expression on the library data generator package (e.g. 'semble-ts/library').
  * @param access the library package function to call
  * @param args arguments to call the function with
  */

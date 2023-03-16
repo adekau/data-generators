@@ -23,8 +23,8 @@
         "skipLibCheck": true /* Skip type checking of declaration files. */,
         "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
         "paths": {
-            "@nwps/data-generators": ["./src/index"],
-            "@nwps/data-generators/library": ["./src/library/index"]
+            "semble-ts": ["./src/index"],
+            "semble-ts/library": ["./src/library/index"]
         }
     }
 }

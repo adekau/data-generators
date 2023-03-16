@@ -1,5 +1,5 @@
 {
-    "name": "@nwps/data-generators",
+    "name": "semble-ts",
     "version": "1.0.0-rc.6",
     "description": "Mock unit test data generation",
     "main": "dist/cjs/index.js",
