@@ -1,7 +1,0 @@
-[AllowList]
-  Files = []
-Paths = []
-Regexes = [
-  "TokenSet;s\\.node\\.edges\\[\"\\*\"\\]=u\\}if\\(0==s\\.str\\.length&&\\(u\\.final=!0\\),n\\.push\\(\\{node:u,editsRemaining:s\\.editsRemaining-1,str:s\\.str\\}\\),1<",
-  "keydown\",s=\\>\\{i=!0,s\\.key==\"Enter\"\\?Ve\\(e,n\\):s.key==\"Escape\"\\?n\\.blur\\(\\):s\\.key==\"ArrowUp\"\\?fe\\(e,-1\\):s\\.key===\"ArrowDown\""
-]
