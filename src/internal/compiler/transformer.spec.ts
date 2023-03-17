@@ -348,16 +348,14 @@ describe('Data Generators Compiler: Transformer', () => {
         `);
 
         expect(result).toBe(
-            fixComputedProperties(
-                INDEX.STRUCT({
-                    [INDEX.INTERPOLATE_PROPERTY(['', '-Case:*'], LIB.STRING)]: LIB.BOOLEAN,
-                    [INDEX.INTERPOLATE_PROPERTY(['', '-Case:Create'], LIB.STRING)]: LIB.BOOLEAN,
-                    [INDEX.INTERPOLATE_PROPERTY(['', '-Case:Approve'], LIB.STRING)]: LIB.BOOLEAN,
-                    [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:*'], LIB.STRING)]: LIB.BOOLEAN,
-                    [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:Create'], LIB.STRING)]: LIB.BOOLEAN,
-                    [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:Approve'], LIB.STRING)]: LIB.BOOLEAN
-                })
-            )
+            INDEX.STRUCT({
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Case:*'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Case:Create'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Case:Approve'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:*'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:Create'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:Approve'], LIB.STRING)]: LIB.BOOLEAN
+            })
         );
     });
 

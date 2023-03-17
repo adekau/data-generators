@@ -27,7 +27,7 @@ export const INDEX = {
         const arg = `{${Object.entries(memberMap)
             .map(([k, v]) => `"${k}":${v}`)
             .join(',')}}` as StructString<T>;
-        return createIndexCall('STRUCT', arg);
+        return fixComputedProperties(createIndexCall('STRUCT', arg));
     },
     TUPLE: <T extends string[]>(...args: T) => {
         return createIndexCall('TUPLE', ...args);
