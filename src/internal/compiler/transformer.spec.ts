@@ -360,13 +360,15 @@ describe('Data Generators Compiler: Transformer', () => {
         build<Comment<string>>();
         `);
 
-        expect(result).toBe(singleLine(`
+        expect(result).toBe(
+            singleLine(`
         ${INDEX}.struct({
             "body": ${LIB}.string(),
             "authorId": ${LIB}.string(),
             "attributes": ${LIB}.string()
         });
-        `));
+        `)
+        );
     });
 
     it('should build a generic interface with multiple generic params', () => {
@@ -383,7 +385,8 @@ describe('Data Generators Compiler: Transformer', () => {
         build<Comment<CommentAttributes<string[]>>>();
         `);
 
-        expect(result).toBe(singleLine(`
+        expect(result).toBe(
+            singleLine(`
         ${INDEX}.struct({
             "body": ${LIB}.string(),
             "authorId": ${LIB}.string(),
@@ -392,6 +395,7 @@ describe('Data Generators Compiler: Transformer', () => {
                 "additionalInfo": ${INDEX}.array(${LIB}.string())
             })
         });
-        `));
+        `)
+        );
     });
 });

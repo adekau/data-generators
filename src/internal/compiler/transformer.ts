@@ -54,31 +54,31 @@ const transformer =
         program: ts.Program,
         config: IDataGeneratorCompilerConfig = defaultDataGeneratorCompilerConfig
     ): ts.TransformerFactory<ts.SourceFile> =>
-        (context) => {
-            return (sourceFile) => {
-                const typeChecker = program.getTypeChecker();
-                const defaultedConfig = Object.assign({}, defaultDataGeneratorCompilerConfig, config);
+    (context) => {
+        return (sourceFile) => {
+            const typeChecker = program.getTypeChecker();
+            const defaultedConfig = Object.assign({}, defaultDataGeneratorCompilerConfig, config);
 
-                // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
-                // imports to each file checked.
-                let hasAppendedDefaultImports = false;
+            // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
+            // imports to each file checked.
+            let hasAppendedDefaultImports = false;
 
-                const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
-                    if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
-                        hasAppendedDefaultImports = true;
-                        return appendDefaultImports(node);
-                    }
+            const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
+                if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
+                    hasAppendedDefaultImports = true;
+                    return appendDefaultImports(node);
+                }
 
-                    if (isBuildNode(node, typeChecker)) {
-                        return transformBuildNode(node, sourceFile, typeChecker, defaultedConfig);
-                    }
+                if (isBuildNode(node, typeChecker)) {
+                    return transformBuildNode(node, sourceFile, typeChecker, defaultedConfig);
+                }
 
-                    return ts.visitEachChild(node, visitor, context);
-                };
-
-                return ts.visitNode(sourceFile, visitor);
+                return ts.visitEachChild(node, visitor, context);
             };
+
+            return ts.visitNode(sourceFile, visitor);
         };
+    };
 
 /**
  * Takes a found build node and resolves the type argument and invokes transformation of the
@@ -485,7 +485,9 @@ function transformType(
     function createStructObjectLiteralExpression(type: ts.Type): ts.Expression {
         const symbolMembers: ts.Symbol[] = type.symbol.members ? Array.from(type.symbol.members.values() as any) : [];
         // filter out type parameters, e.g. "T"
-        const symbolMembersToTransform = symbolMembers.filter((member) => !(member.flags & ts.SymbolFlags.TypeParameter));
+        const symbolMembersToTransform = symbolMembers.filter(
+            (member) => !(member.flags & ts.SymbolFlags.TypeParameter)
+        );
 
         debugTypeResolution('symbol members to transform:', symbolMembersToTransform);
 
@@ -493,7 +495,10 @@ function transformType(
         const structMembers: ts.ObjectLiteralElementLike[] = symbolMembersToTransform.map((member) => {
             const typeOfMember = typeChecker.getTypeOfSymbolAtLocation(member, node);
             // Create syntax of the form '"x": y' using the interface property name for x and the transformation of its type as y
-            return factory.createPropertyAssignment(factory.createStringLiteral(member.name), _transformType(typeOfMember))
+            return factory.createPropertyAssignment(
+                factory.createStringLiteral(member.name),
+                _transformType(typeOfMember)
+            );
         });
 
         return factory.createObjectLiteralExpression(structMembers, false);
