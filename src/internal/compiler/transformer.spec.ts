@@ -49,6 +49,13 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(result).toBe(`${LIB_NAME}.bool()`);
     });
 
+    it('should transform a function', () => {
+        const result = transform('build<(a: string) => number>()');
+        expect(result).toBe(
+            LIB.FUNC(LIB.NUMBER)
+        );
+    });
+
     it('should transform any and unknown', () => {
         const result = transform('build<any>()');
         const result2 = transform('build<unknown>()');
@@ -392,16 +399,14 @@ describe('Data Generators Compiler: Transformer', () => {
         `);
 
         expect(result).toBe(
-            singleLine(`
-        ${INDEX_NAME}.struct({
-            "body": ${LIB_NAME}.string(),
-            "authorId": ${LIB_NAME}.string(),
-            "attributes": ${INDEX_NAME}.struct({
-                "authorType": ${LIB_NAME}.int(),
-                "additionalInfo": ${INDEX_NAME}.array(${LIB_NAME}.string())
+            INDEX.STRUCT({
+                body: LIB.STRING,
+                authorId: LIB.STRING,
+                attributes: INDEX.STRUCT({
+                    authorType: LIB.NUMBER,
+                    additionalInfo: INDEX.ARRAY(LIB.STRING)
+                })
             })
-        })
-        `)
         );
     });
 });
