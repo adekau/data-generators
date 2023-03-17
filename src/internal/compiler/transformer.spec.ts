@@ -51,9 +51,7 @@ describe('Data Generators Compiler: Transformer', () => {
 
     it('should transform a function', () => {
         const result = transform('build<(a: string) => number>()');
-        expect(result).toBe(
-            LIB.FUNC(LIB.NUMBER)
-        );
+        expect(result).toBe(LIB.FUNC(LIB.NUMBER));
     });
 
     it('should transform any and unknown', () => {
