@@ -48,7 +48,7 @@ export const INDEX = {
             `[${args.join(',')}]` as InterpolateString<T, ''>
         );
     },
-    INTERPOLATE_PROPERTY: function <S extends string[], T extends string[]>(strings: [...S], ...args: T) {
+    INTERPOLATE_PROPERTY: <S extends string[], T extends string[]>(strings: [...S], ...args: T) => {
         const interp = createIndexCall(
             'INTERPOLATE',
             JSON.stringify(strings) as InterpolateString<S>,
