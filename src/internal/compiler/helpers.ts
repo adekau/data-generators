@@ -4,11 +4,11 @@ import { Literal } from 'ts-toolbelt/out/String/_Internal';
 import { ListOf } from 'ts-toolbelt/out/Union/ListOf';
 import { CONSTANTS } from './constants';
 
-export type StructString<T extends any[]> = `{${Join<
+export type StructString<T extends { [k: string]: string }> = `{${Join<
     ListOf<
         {
-            [K in T[number] as Join<K>]: `"${K[0]}":${K[1]}`;
-        }[Join<T[number]>]
+            [K in keyof T]: `"${K & string}":${T[K]}`;
+        }[keyof T]
     >,
     ','
 >}}`;
@@ -19,11 +19,9 @@ export const INDEX_NAME = CONSTANTS.INDEX;
 export const createIndexCall = createCall('INDEX');
 export const INDEX = {
     STRUCT: <T extends { [k: string]: string }>(memberMap: { [k in keyof T]: T[k] }) => {
-        type keys = ListOf<keyof T>;
-        type values = ListOf<T[keyof T]>;
         const arg = `{${Object.entries(memberMap)
             .map(([k, v]) => `"${k}":${v}`)
-            .join(',')}}` as StructString<Zip<keys, values>>;
+            .join(',')}}` as StructString<T>;
         return createIndexCall('STRUCT', arg);
     },
     TUPLE: <T extends string[]>(...args: T) => {
@@ -48,6 +46,11 @@ export const LIB = {
     BOOLEAN: createLibCall('BOOLEAN'),
     DATE: createLibCall('DATE'),
     FUNC: <T extends string>(output: T) => createLibCall('FUNCTION', output)
+};
+
+const q = {
+    test: LIB.FUNC(LIB.NUMBER),
+    authorId: LIB.STRING
 };
 
 export function createCall<T extends 'INDEX' | 'LIBRARY'>(where: T) {
