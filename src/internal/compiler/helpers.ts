@@ -7,7 +7,7 @@ import { CONSTANTS } from './constants';
 export type StructString<T extends any[]> = `{${Join<
     ListOf<
         {
-            [K in T[number]as Join<K>]: `"${K[0]}":${K[1]}`;
+            [K in T[number] as Join<K>]: `"${K[0]}":${K[1]}`;
         }[Join<T[number]>]
     >,
     ','
@@ -26,7 +26,7 @@ export const INDEX = {
             .join(',')}}` as StructString<Zip<keys, values>>;
         return createIndexCall('STRUCT', arg);
     },
-    TUPLE: <T extends string[]>(...args: T) => { 
+    TUPLE: <T extends string[]>(...args: T) => {
         return createIndexCall('TUPLE', ...args);
     },
     ARRAY: <T extends string>(arg: T) => {
@@ -52,7 +52,8 @@ export const LIB = {
 
 export function createCall<T extends 'INDEX' | 'LIBRARY'>(where: T) {
     return <Call extends keyof typeof CONSTANTS, Args extends [...string[]]>(call: Call, ...args: Args) => {
-        return `${(CONSTANTS as Pick<typeof CONSTANTS, T>)[where]}.${CONSTANTS[call]}(${(args ? args.join(',') : '') as Join<Args, ','>
-            })` as const;
+        return `${(CONSTANTS as Pick<typeof CONSTANTS, T>)[where]}.${CONSTANTS[call]}(${
+            (args ? args.join(',') : '') as Join<Args, ','>
+        })` as const;
     };
 }
