@@ -18,7 +18,7 @@ export type ConstantString<T extends Literal | undefined | null> = `${T}`;
 export const INDEX_NAME = CONSTANTS.INDEX;
 export const createIndexCall = createCall('INDEX');
 export const INDEX = {
-    STRUCT: <T extends { [k: string]: string }>(memberMap: { [k in keyof T]: T[k] }) => {
+    STRUCT: <T extends { [k: string]: string }>(memberMap: T) => {
         const arg = `{${Object.entries(memberMap)
             .map(([k, v]) => `"${k}":${v}`)
             .join(',')}}` as StructString<T>;
@@ -46,11 +46,6 @@ export const LIB = {
     BOOLEAN: createLibCall('BOOLEAN'),
     DATE: createLibCall('DATE'),
     FUNC: <T extends string>(output: T) => createLibCall('FUNCTION', output)
-};
-
-const q = {
-    test: LIB.FUNC(LIB.NUMBER),
-    authorId: LIB.STRING
 };
 
 export function createCall<T extends 'INDEX' | 'LIBRARY'>(where: T) {
