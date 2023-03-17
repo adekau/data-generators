@@ -1,8 +1,9 @@
 import transformer from './transformer';
 import { transformFile } from 'ts-transformer-testing-library';
+import { INDEX, LIB } from './helpers';
 
-const INDEX = '__dg';
-const LIB = '__dgLib';
+const INDEX_NAME = '__dg';
+const LIB_NAME = '__dgLib';
 
 function singleLine(code: string) {
     return code.split(/\r?\n/).join('').replace(/\s/g, '').trim();
@@ -31,21 +32,21 @@ function transform(code: string) {
             .split(/\r?\n/)
             .slice(3)
             .join('')
-    );
+    ).replace(/;$/, '');
 }
 describe('Data Generators Compiler: Transformer', () => {
     it('should transform a string', () => {
-        expect(transform('build<string>()')).toBe(`${LIB}.string();`);
+        expect(transform('build<string>()')).toBe(`${LIB_NAME}.string()`);
     });
 
     it('should transform a number', () => {
         const result = transform('build<number>()');
-        expect(result).toBe(`${LIB}.int();`);
+        expect(result).toBe(`${LIB_NAME}.int()`);
     });
 
     it('should transform a boolean', () => {
         const result = transform('build<boolean>()');
-        expect(result).toBe(`${LIB}.bool();`);
+        expect(result).toBe(`${LIB_NAME}.bool()`);
     });
 
     it('should transform any and unknown', () => {
@@ -54,14 +55,14 @@ describe('Data Generators Compiler: Transformer', () => {
         // Can't resonably determine a correct value to assign any/unknown, use undefined.
         // Could do something like anyOf(string(), number(), boolean(), ...etc) but without further feedback
         // I believe undefined is a safer default
-        expect(result).toBe(`${INDEX}.constant(undefined);`);
-        expect(result2).toBe(`${INDEX}.constant(undefined);`);
+        expect(result).toBe(`${INDEX_NAME}.constant(undefined)`);
+        expect(result2).toBe(`${INDEX_NAME}.constant(undefined)`);
     });
 
     it('should throw when transforming never', () => {
         const never = transform('build<never>()');
 
-        expect(never).toBe('__dg.constant(undefined);');
+        expect(never).toBe('__dg.constant(undefined)');
     });
 
     it('should throw when calling build with no type argument', () => {
@@ -80,49 +81,54 @@ describe('Data Generators Compiler: Transformer', () => {
             __dg.struct({
                 "property1": __dgLib.string(),
                 "property2": __dg.constant(undefined)
-            });
+            })
             `)
         );
     });
 
     it('should transform a date', () => {
         const result = transform('build<Date>()');
-        expect(result).toBe(`${LIB}.date();`);
+        expect(result).toBe(`${LIB_NAME}.date()`);
     });
 
     it('should transform an empty array', () => {
         const result = transform('build<[]>()');
-        expect(result).toBe(`${INDEX}.tuple();`);
+        expect(result).toBe(`${INDEX_NAME}.tuple()`);
+    });
+
+    it('should transform a tuple', () => {
+        const result = transform('build<[number, string, boolean]>()');
+        expect(result).toBe(INDEX.TUPLE(LIB.NUMBER, LIB.STRING, LIB.BOOLEAN));
     });
 
     it('should transform an array', () => {
         const result = transform('build<string[]>()');
-        expect(result).toBe(`${INDEX}.array(${LIB}.string());`);
+        expect(result).toBe(`${INDEX_NAME}.array(${LIB_NAME}.string())`);
     });
 
     it('should transform an array of a more complex type', () => {
         const result = transform('build<({ a: string, b: number })[]>()');
         expect(result).toBe(
             singleLine(`
-            ${INDEX}.array(
-                ${INDEX}.struct({
-                    "a": ${LIB}.string(),
-                    "b": ${LIB}.int()
+            ${INDEX_NAME}.array(
+                ${INDEX_NAME}.struct({
+                    "a": ${LIB_NAME}.string(),
+                    "b": ${LIB_NAME}.int()
                 })
-            );
+            )
             `)
         );
     });
 
     it('should transform an array using the alias', () => {
         const result = transform('build<Array<string>>()');
-        expect(result).toBe(`${INDEX}.array(${LIB}.string());`);
+        expect(result).toBe(`${INDEX_NAME}.array(${LIB_NAME}.string())`);
     });
 
     it('should throw when transforming an array of never', () => {
         const neverArr = transform('build<never[]>()');
 
-        expect(neverArr).toBe('__dg.array(__dg.constant(undefined));');
+        expect(neverArr).toBe('__dg.array(__dg.constant(undefined))');
     });
 
     it('should transform a union disjoint on an enum property', () => {
@@ -138,16 +144,16 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(
             result.includes(
                 singleLine(`
-                ${INDEX}.anyOf(
-                    ${INDEX}.struct({
-                        "type": ${INDEX}.constant("member1"),
-                        "property1": ${LIB}.int()
+                ${INDEX_NAME}.anyOf(
+                    ${INDEX_NAME}.struct({
+                        "type": ${INDEX_NAME}.constant("member1"),
+                        "property1": ${LIB_NAME}.int()
                     }),
-                    ${INDEX}.struct({
-                        "type": ${INDEX}.constant("member2"),
-                        "property2": ${LIB}.string()
+                    ${INDEX_NAME}.struct({
+                        "type": ${INDEX_NAME}.constant("member2"),
+                        "property2": ${LIB_NAME}.string()
                     })
-                );
+                )
                 `)
             )
         ).toBeTrue();
@@ -156,9 +162,9 @@ describe('Data Generators Compiler: Transformer', () => {
     it('should transform a simple struct', () => {
         expect(transform('build<{ str: string }>()')).toBe(
             singleLine(`
-        ${INDEX}.struct({
-            "str": ${LIB}.string()
-        });
+        ${INDEX_NAME}.struct({
+            "str": ${LIB_NAME}.string()
+        })
         `)
         );
     });
@@ -178,13 +184,13 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(
             result.includes(
                 singleLine(`
-            ${INDEX}.struct({
-                "str": ${LIB}.string(),
-                "num": ${LIB}.int(),
-                "bool": ${LIB}.bool(),
-                "date": ${LIB}.date(),
-                "arr": ${INDEX}.array(${LIB}.string())
-            });
+            ${INDEX_NAME}.struct({
+                "str": ${LIB_NAME}.string(),
+                "num": ${LIB_NAME}.int(),
+                "bool": ${LIB_NAME}.bool(),
+                "date": ${LIB_NAME}.date(),
+                "arr": ${INDEX_NAME}.array(${LIB_NAME}.string())
+            })
             `)
             )
         ).toBeTrue();
@@ -199,13 +205,13 @@ describe('Data Generators Compiler: Transformer', () => {
         expect(
             result.includes(
                 singleLine(`
-                ${INDEX}.anyOf(
-                    ${LIB}.string(),
-                    ${LIB}.int(),
-                    ${INDEX}.constant(false),
-                    ${INDEX}.constant(true),
-                    ${INDEX}.array(${INDEX}.constant(undefined))
-                );
+                ${INDEX_NAME}.anyOf(
+                    ${LIB_NAME}.string(),
+                    ${LIB_NAME}.int(),
+                    ${INDEX_NAME}.constant(false),
+                    ${INDEX_NAME}.constant(true),
+                    ${INDEX_NAME}.array(${INDEX_NAME}.constant(undefined))
+                )
                 `)
             )
         ).toBeTrue();
@@ -218,9 +224,9 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            ;${INDEX}.struct({
-                "bool_Hello": ${INDEX}.constant("Hello_Hello_!")
-            });
+            ;${INDEX_NAME}.struct({
+                "bool_Hello": ${INDEX_NAME}.constant("Hello_Hello_!")
+            })
             `)
         );
     });
@@ -233,11 +239,11 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            ${INDEX}.struct({
-                "t": ${LIB}.string(),
-                "u": ${LIB}.int(),
-                "v": ${INDEX}.array(${LIB}.bool())
-            });
+            ${INDEX_NAME}.struct({
+                "t": ${LIB_NAME}.string(),
+                "u": ${LIB_NAME}.int(),
+                "v": ${INDEX_NAME}.array(${LIB_NAME}.bool())
+            })
             `)
         );
     });
@@ -250,9 +256,9 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            ${INDEX}.struct({
-                "t": ${LIB}.string()
-            });
+            ${INDEX_NAME}.struct({
+                "t": ${LIB_NAME}.string()
+            })
             `)
         );
     });
@@ -265,9 +271,9 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            ${INDEX}.struct({
-                "t": ${INDEX}.anyOf(${LIB}.string(), ${LIB}.int())
-            });
+            ${INDEX_NAME}.struct({
+                "t": ${INDEX_NAME}.anyOf(${LIB_NAME}.string(), ${LIB_NAME}.int())
+            })
             `)
         );
     });
@@ -280,9 +286,9 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            ${INDEX}.struct({
-                "t": ${INDEX}.constant("test")
-            });
+            ${INDEX_NAME}.struct({
+                "t": ${INDEX_NAME}.constant("test")
+            })
             `)
         );
     });
@@ -297,22 +303,22 @@ describe('Data Generators Compiler: Transformer', () => {
         // key2 is anyOf because boolean is evaluated as the union of true and false, which distributes over the intersection
         expect(result).toBe(
             singleLine(`
-            ${INDEX}.struct({
-                "key1": ${INDEX}.struct({
-                    "prop": ${LIB}.string()
+            ${INDEX_NAME}.struct({
+                "key1": ${INDEX_NAME}.struct({
+                    "prop": ${LIB_NAME}.string()
                 }),
-                "key2": ${INDEX}.anyOf(
-                    ${INDEX}.struct({
-                        "prop": ${LIB}.string()
+                "key2": ${INDEX_NAME}.anyOf(
+                    ${INDEX_NAME}.struct({
+                        "prop": ${LIB_NAME}.string()
                     }),
-                    ${INDEX}.struct({
-                        "prop": ${LIB}.string()
+                    ${INDEX_NAME}.struct({
+                        "prop": ${LIB_NAME}.string()
                     })
                 ),
-                "key3": ${INDEX}.struct({
-                    "prop": ${LIB}.string()
+                "key3": ${INDEX_NAME}.struct({
+                    "prop": ${LIB_NAME}.string()
                 })
-            });
+            })
             `)
         );
     });
@@ -323,7 +329,7 @@ describe('Data Generators Compiler: Transformer', () => {
         build<Q>();
         `);
 
-        expect(result).toBe(singleLine(`${INDEX}.struct({ "key1": ${LIB}.bool() });`));
+        expect(result).toBe(singleLine(`${INDEX_NAME}.struct({ "key1": ${LIB_NAME}.bool() })`));
     });
 
     it('should build structs with special characters in keys', () => {
@@ -338,14 +344,14 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-            ${INDEX}.struct({
-                [${INDEX}.interpolate(["", "-Case:*"],[${LIB}.string()])]: ${LIB}.bool(),
-                [${INDEX}.interpolate(["", "-Case:Create"],[${LIB}.string()])]: ${LIB}.bool(),
-                [${INDEX}.interpolate(["", "-Case:Approve"],[${LIB}.string()])]: ${LIB}.bool(),
-                [${INDEX}.interpolate(["", "-Arrest:*"],[${LIB}.string()])]: ${LIB}.bool(),
-                [${INDEX}.interpolate(["", "-Arrest:Create"],[${LIB}.string()])]: ${LIB}.bool(),
-                [${INDEX}.interpolate(["", "-Arrest:Approve"],[${LIB}.string()])]: ${LIB}.bool()
-            });
+            ${INDEX_NAME}.struct({
+                [${INDEX_NAME}.interpolate(["", "-Case:*"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
+                [${INDEX_NAME}.interpolate(["", "-Case:Create"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
+                [${INDEX_NAME}.interpolate(["", "-Case:Approve"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
+                [${INDEX_NAME}.interpolate(["", "-Arrest:*"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
+                [${INDEX_NAME}.interpolate(["", "-Arrest:Create"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
+                [${INDEX_NAME}.interpolate(["", "-Arrest:Approve"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool()
+            })
             `)
         );
     });
@@ -362,11 +368,11 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-        ${INDEX}.struct({
-            "body": ${LIB}.string(),
-            "authorId": ${LIB}.string(),
-            "attributes": ${LIB}.string()
-        });
+        ${INDEX_NAME}.struct({
+            "body": ${LIB_NAME}.string(),
+            "authorId": ${LIB_NAME}.string(),
+            "attributes": ${LIB_NAME}.string()
+        })
         `)
         );
     });
@@ -387,14 +393,14 @@ describe('Data Generators Compiler: Transformer', () => {
 
         expect(result).toBe(
             singleLine(`
-        ${INDEX}.struct({
-            "body": ${LIB}.string(),
-            "authorId": ${LIB}.string(),
-            "attributes": ${INDEX}.struct({
-                "authorType": ${LIB}.int(),
-                "additionalInfo": ${INDEX}.array(${LIB}.string())
+        ${INDEX_NAME}.struct({
+            "body": ${LIB_NAME}.string(),
+            "authorId": ${LIB_NAME}.string(),
+            "attributes": ${INDEX_NAME}.struct({
+                "authorType": ${LIB_NAME}.int(),
+                "additionalInfo": ${INDEX_NAME}.array(${LIB_NAME}.string())
             })
-        });
+        })
         `)
         );
     });
