@@ -54,31 +54,31 @@ const transformer =
         program: ts.Program,
         config: IDataGeneratorCompilerConfig = defaultDataGeneratorCompilerConfig
     ): ts.TransformerFactory<ts.SourceFile> =>
-    (context) => {
-        return (sourceFile) => {
-            const typeChecker = program.getTypeChecker();
-            const defaultedConfig = Object.assign({}, defaultDataGeneratorCompilerConfig, config);
+        (context) => {
+            return (sourceFile) => {
+                const typeChecker = program.getTypeChecker();
+                const defaultedConfig = Object.assign({}, defaultDataGeneratorCompilerConfig, config);
 
-            // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
-            // imports to each file checked.
-            let hasAppendedDefaultImports = false;
+                // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
+                // imports to each file checked.
+                let hasAppendedDefaultImports = false;
 
-            const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
-                if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
-                    hasAppendedDefaultImports = true;
-                    return appendDefaultImports(node);
-                }
+                const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
+                    if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
+                        hasAppendedDefaultImports = true;
+                        return appendDefaultImports(node);
+                    }
 
-                if (isBuildNode(node, typeChecker)) {
-                    return transformBuildNode(node, sourceFile, typeChecker, defaultedConfig);
-                }
+                    if (isBuildNode(node, typeChecker)) {
+                        return transformBuildNode(node, sourceFile, typeChecker, defaultedConfig);
+                    }
 
-                return ts.visitEachChild(node, visitor, context);
+                    return ts.visitEachChild(node, visitor, context);
+                };
+
+                return ts.visitNode(sourceFile, visitor);
             };
-
-            return ts.visitNode(sourceFile, visitor);
         };
-    };
 
 /**
  * Takes a found build node and resolves the type argument and invokes transformation of the
@@ -305,7 +305,7 @@ function transformType(
         } else {
             // If none of the above, create an empty "struct({})"" generator. One such type that will reach this branch
             // is "{}".
-            debugTypeResolution('is {} (object fallthrough)');
+            debugTypeResolution('is {} (object fallthrough)', `flags: ${flags}`);
             return createIndexCallExpression(CONSTANTS.STRUCT, [factory.createObjectLiteralExpression([], false)]);
         }
     }
@@ -324,14 +324,18 @@ function transformType(
             debugTypeResolution('is tuple');
             return createIndexCallExpression(CONSTANTS.TUPLE, createTupleArguments(type as ts.TupleType));
         }
-
         // special case for Array<T>, which is a reference type (to class Array). Like Map, but has a syntax literal (`[]`)
         else if (type.symbol.escapedName.toString().toLowerCase() === 'array') {
             debugTypeResolution('is array');
             return createArrayExpression(type);
+
+            /* Interface or Class */
+        } else if (flags & (ts.ObjectFlags.Interface | ts.ObjectFlags.Class)) {
+            debugTypeResolution('is interface/class');
+            return createStructExpression(type);
         } else {
             // Fall through case of creating a constant undefined generator.
-            debugTypeResolution('is undefined (reference fallthrough)');
+            debugTypeResolution('is undefined (reference fallthrough)', `flags: ${flags}`);
             return createConstantUndefinedExpression();
         }
     }
@@ -449,14 +453,16 @@ function transformType(
     function transformGenericArguments(typeArguments: readonly ts.Type[] | undefined, symbol: ts.Symbol | undefined) {
         if (typeArguments && symbol) {
             const decl: ts.Node | undefined = symbol.declarations?.[0];
-            if (decl && ts.isTypeAliasDeclaration(decl)) {
-                const paramSymbols = typeChecker.getSymbolsInScope(decl, ts.SymbolFlags.TypeParameter);
-                debugTypeResolution(`Transforming type parameters (${symbol?.name ?? 'no name'})`);
-                const params = typeArguments.map((arg) => _transformType(arg));
-                for (let i = 0; i < params.length; i++) {
-                    if (paramSymbols?.[i]) {
-                        genericMap.set(paramSymbols[i], params[i]);
-                    }
+            if (!decl) {
+                debugTypeResolution(`No type parameters to transform for ${symbol?.name ?? 'no name'}`);
+                return;
+            }
+            const paramSymbols = typeChecker.getSymbolsInScope(decl, ts.SymbolFlags.TypeParameter);
+            debugTypeResolution(`Transforming type parameters (${symbol?.name ?? 'no name'})`);
+            const params = typeArguments.map((arg) => _transformType(arg));
+            for (let i = 0; i < params.length; i++) {
+                if (paramSymbols?.[i]) {
+                    genericMap.set(paramSymbols[i], params[i]);
                 }
             }
         }
@@ -477,15 +483,17 @@ function transformType(
      * Creates the argument to pass to struct().
      */
     function createStructObjectLiteralExpression(type: ts.Type): ts.Expression {
-        const structMembers: ts.ObjectLiteralElementLike[] = [];
+        const symbolMembers: ts.Symbol[] = type.symbol.members ? Array.from(type.symbol.members.values() as any) : [];
+        // filter out type parameters, e.g. "T"
+        const symbolMembersToTransform = symbolMembers.filter((member) => !(member.flags & ts.SymbolFlags.TypeParameter));
 
-        // ts.SymbolTable has no map method. Use forEach and push to an array instead.
-        type.symbol.members?.forEach((member) => {
+        debugTypeResolution('symbol members to transform:', symbolMembersToTransform);
+
+        // create property nodes for filtered symbols
+        const structMembers: ts.ObjectLiteralElementLike[] = symbolMembersToTransform.map((member) => {
             const typeOfMember = typeChecker.getTypeOfSymbolAtLocation(member, node);
             // Create syntax of the form '"x": y' using the interface property name for x and the transformation of its type as y
-            structMembers.push(
-                factory.createPropertyAssignment(factory.createStringLiteral(member.name), _transformType(typeOfMember))
-            );
+            return factory.createPropertyAssignment(factory.createStringLiteral(member.name), _transformType(typeOfMember))
         });
 
         return factory.createObjectLiteralExpression(structMembers, false);

@@ -349,4 +349,49 @@ describe('Data Generators Compiler: Transformer', () => {
             `)
         );
     });
+
+    it('should build a generic interface with multiple generic params', () => {
+        const result = transform(`
+        interface Comment<T = never> {
+            body: string;
+            authorId: string;
+            attributes: T;
+        }
+        build<Comment<string>>();
+        `);
+
+        expect(result).toBe(singleLine(`
+        ${INDEX}.struct({
+            "body": ${LIB}.string(),
+            "authorId": ${LIB}.string(),
+            "attributes": ${LIB}.string()
+        });
+        `));
+    });
+
+    it('should build a generic interface with multiple generic params', () => {
+        const result = transform(`
+        interface Comment<T = never> {
+            body: string;
+            authorId: string;
+            attributes: T;
+        }
+        interface CommentAttributes<T = never> {
+            authorType: number;
+            additionalInfo: T;
+        }
+        build<Comment<CommentAttributes<string[]>>>();
+        `);
+
+        expect(result).toBe(singleLine(`
+        ${INDEX}.struct({
+            "body": ${LIB}.string(),
+            "authorId": ${LIB}.string(),
+            "attributes": ${INDEX}.struct({
+                "authorType": ${LIB}.int(),
+                "additionalInfo": ${INDEX}.array(${LIB}.string())
+            })
+        });
+        `));
+    });
 });
