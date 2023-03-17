@@ -1,4 +1,5 @@
 import { Join } from 'ts-toolbelt/out/String/Join';
+import { Replace } from 'ts-toolbelt/out/String/Replace';
 import { Literal } from 'ts-toolbelt/out/String/_Internal';
 import { ListOf } from 'ts-toolbelt/out/Union/ListOf';
 import { CONSTANTS } from './constants';
@@ -11,8 +12,13 @@ export type StructString<T extends { [k: string]: string }> = `{${Join<
     >,
     ','
 >}}`;
-
 export type ConstantString<T extends Literal | undefined | null> = `${T}`;
+type InterpolateString<S extends string[], Quote extends string = '"'> = `[${Join<
+    {
+        [K in keyof S]: `${Quote}${S[K]}${Quote}`;
+    },
+    ','
+>}]`;
 
 export const INDEX_NAME = CONSTANTS.INDEX;
 export const createIndexCall = createCall('INDEX');
@@ -34,6 +40,21 @@ export const INDEX = {
     },
     ANY_OF: <T extends string[]>(...args: T) => {
         return createIndexCall('ANY_OF', ...args);
+    },
+    INTERPOLATE: <S extends string[], T extends string[]>(strings: [...S], ...args: T) => {
+        return createIndexCall(
+            'INTERPOLATE',
+            JSON.stringify(strings) as InterpolateString<S>,
+            `[${args.join(',')}]` as InterpolateString<T, ''>
+        );
+    },
+    INTERPOLATE_PROPERTY: function <S extends string[], T extends string[]>(strings: [...S], ...args: T) {
+        const interp = createIndexCall(
+            'INTERPOLATE',
+            JSON.stringify(strings) as InterpolateString<S>,
+            `[${args.join(',')}]` as InterpolateString<T, ''>
+        );
+        return `[${interp}]` as const;
     }
 };
 
@@ -46,6 +67,10 @@ export const LIB = {
     DATE: createLibCall('DATE'),
     FUNC: <T extends string>(output: T) => createLibCall('FUNCTION', output)
 };
+
+export function fixComputedProperties<S extends string>(s: S): Replace<Replace<S, '"[', '['>, ']":', ']:'> {
+    return s.replaceAll(/"(\[.+?\])":/g, '$1:') as any;
+}
 
 export function createCall<T extends 'INDEX' | 'LIBRARY'>(where: T) {
     return <Call extends keyof typeof CONSTANTS, Args extends [...string[]]>(call: Call, ...args: Args) => {

@@ -1,7 +1,7 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { infinite } from './infinite';
 
-type StringLike = { toString: () => string };
+export type StringLike = { toString: () => string };
 
 /**
  * Tag function that generates an interpolated string using other data generators.

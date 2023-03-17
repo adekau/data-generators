@@ -1,6 +1,6 @@
 import transformer from './transformer';
 import { transformFile } from 'ts-transformer-testing-library';
-import { INDEX, LIB } from './helpers';
+import { fixComputedProperties, INDEX, LIB } from './helpers';
 
 const INDEX_NAME = '__dg';
 const LIB_NAME = '__dgLib';
@@ -348,16 +348,14 @@ describe('Data Generators Compiler: Transformer', () => {
         `);
 
         expect(result).toBe(
-            singleLine(`
-            ${INDEX_NAME}.struct({
-                [${INDEX_NAME}.interpolate(["", "-Case:*"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
-                [${INDEX_NAME}.interpolate(["", "-Case:Create"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
-                [${INDEX_NAME}.interpolate(["", "-Case:Approve"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
-                [${INDEX_NAME}.interpolate(["", "-Arrest:*"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
-                [${INDEX_NAME}.interpolate(["", "-Arrest:Create"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool(),
-                [${INDEX_NAME}.interpolate(["", "-Arrest:Approve"],[${LIB_NAME}.string()])]: ${LIB_NAME}.bool()
-            })
-            `)
+            fixComputedProperties(INDEX.STRUCT({
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Case:*'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Case:Create'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Case:Approve'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:*'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:Create'], LIB.STRING)]: LIB.BOOLEAN,
+                [INDEX.INTERPOLATE_PROPERTY(['', '-Arrest:Approve'], LIB.STRING)]: LIB.BOOLEAN
+            }))
         );
     });
 
@@ -372,13 +370,11 @@ describe('Data Generators Compiler: Transformer', () => {
         `);
 
         expect(result).toBe(
-            singleLine(`
-        ${INDEX_NAME}.struct({
-            "body": ${LIB_NAME}.string(),
-            "authorId": ${LIB_NAME}.string(),
-            "attributes": ${LIB_NAME}.string()
-        })
-        `)
+            INDEX.STRUCT({
+                body: LIB.STRING,
+                authorId: LIB.STRING,
+                attributes: LIB.STRING
+            })
         );
     });
 

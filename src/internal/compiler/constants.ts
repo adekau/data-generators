@@ -50,6 +50,7 @@ export const CONSTANTS = {
     CONSTANT: nameOf('constant'),
     ARRAY: nameOf('array'),
     ANY_OF: nameOf('anyOf'),
+    INTERPOLATE: nameOf('interpolate'),
     NUMBER: nameOf('int'),
     STRING: nameOf('string'),
     BOOLEAN: nameOf('bool'),

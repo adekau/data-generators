@@ -558,7 +558,7 @@ function transformType(
         const textExpressions = texts.map((t) => factory.createStringLiteral(t));
         const transformedTypes = types.map((t) => _transformType(t));
 
-        return createIndexCallExpression('interpolate', [
+        return createIndexCallExpression(CONSTANTS.INTERPOLATE, [
             factory.createArrayLiteralExpression(textExpressions),
             factory.createArrayLiteralExpression(transformedTypes)
         ]);

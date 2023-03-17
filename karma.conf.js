@@ -30,7 +30,8 @@ module.exports = function (config) {
         karmaTypescriptConfig: {
             compilerOptions: {
                 downlevelIteration: true,
-                esModuleInterop: true
+                esModuleInterop: true,
+                lib: ["ESNext"]
             },
             bundlerOptions: {
                 resolve: {
