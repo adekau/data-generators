@@ -31,7 +31,7 @@ module.exports = function (config) {
             compilerOptions: {
                 downlevelIteration: true,
                 esModuleInterop: true,
-                lib: ["ESNext"]
+                lib: ['ESNext']
             },
             bundlerOptions: {
                 resolve: {
