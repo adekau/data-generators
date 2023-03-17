@@ -1,4 +1,3 @@
-import { Zip } from 'ts-toolbelt/out/List/Zip';
 import { Join } from 'ts-toolbelt/out/String/Join';
 import { Literal } from 'ts-toolbelt/out/String/_Internal';
 import { ListOf } from 'ts-toolbelt/out/Union/ListOf';
