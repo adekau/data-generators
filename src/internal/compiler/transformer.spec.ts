@@ -1,6 +1,6 @@
-import transformer from './transformer';
 import { transformFile } from 'ts-transformer-testing-library';
-import { fixComputedProperties, INDEX, LIB } from './helpers';
+import { INDEX, LIB } from './helpers';
+import transformer from './transformer';
 
 const INDEX_NAME = '__dg';
 const LIB_NAME = '__dgLib';

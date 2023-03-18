@@ -6,7 +6,7 @@ Installation instructions can be found in the [readme](../../index.html), locate
 
 This library's primary purpose is to generate randomized mock data for JavaScript/TypeScript unit testing.
 
-Both NWPS projects I have been on have used Jasmine for JavaScript unit testing on the front end, and xUnit + AutoFixture for C# unit testing on the back end. This library also aims to be familiar to both front end and back end developers. For those reasons the API is modeled after RxJS and AutoFixture.
+Projects I have been on have typically used Jasmine for JavaScript unit testing on the front end, and xUnit + AutoFixture for C#.NET unit testing on the back end. This library also aims to be familiar to both front end and back end developers. For those reasons the API is modeled after RxJS and AutoFixture.
 
 An example may better explain what this library is for: say you have a generator for a large interface called `Person`. You're writing multiple unit tests for a function that formats the person's name. So the only fields on `Person` that you care about fixing to some hard coded values for these tests are `firstName`, `middleInitial`, and `lastName`.
 Everything else on that contract you don't care about and can be filled randomly.
