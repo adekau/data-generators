@@ -4,6 +4,7 @@
     "compilerOptions": {
         /* Visit https://aka.ms/tsconfig.json to read more about this file */
         "target": "ESNext" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', 'ES2021', or 'ESNEXT'. */,
+        "lib": ["ES2021.String"],
         "declaration": false /* Generates corresponding '.d.ts' file. */,
         "sourceMap": true,
         "removeComments": true,

@@ -20,7 +20,7 @@
         "prettier": "prettier --write .",
         "clean:docs": "shx rm -rf ./docs",
         "build:clean": "shx rm -rf ./dist",
-        "build:all": "npm run build:clean && tsc -b ./src/tsconfig.cjs.json ./src/tsconfig.esm.json ./src/tsconfig.esm5.json ./src/tsconfig.types.json",
+        "build:all": "npm run build:clean && echo \"compiling...\" && tsc -b ./src/tsconfig.cjs.json ./src/tsconfig.esm.json ./src/tsconfig.esm5.json ./src/tsconfig.types.json && echo done",
         "build": "npm run prettier && npm run build:all && node ./scripts/alias",
         "build:docs": "npm run clean:docs && typedoc",
         "fix-typedoc-pages": "shx cp ./node_modules/typedoc-default-themes/bin/default/partials/type.hbs ./node_modules/typedoc-plugin-pages/dist/theme/v2/partials/type.hbs"
@@ -60,41 +60,42 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/tyler-technologies/data-generators.git"
+        "url": "git+https://github.com/adekau/semble-ts.git"
     },
     "keywords": [
         "mock",
         "data",
         "generation"
     ],
-    "author": "alex.dekau@tylertech.com",
+    "author": "Alex Dekau",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/tyler-technologies/data-generators/issues"
+        "url": "https://github.com/adekau/semble-ts/issues"
     },
-    "homepage": "https://github.com/tyler-technologies/data-generators#readme",
+    "homepage": "https://github.com/adekau/semble-ts#readme",
     "dependencies": {
         "ts-toolbelt": "^9.6.0",
-        "tslib": "^2.4.0",
+        "tslib": "^2.5.0",
         "uuid": "^8.3.2"
     },
     "devDependencies": {
-        "@types/glob": "^7.1.4",
-        "@types/jasmine": "^3.8.2",
-        "@types/uuid": "^8.3.1",
-        "fs-extra": "^10.0.0",
-        "glob": "^7.1.7",
-        "jasmine-core": "^3.8.0",
+        "@knodes/typedoc-plugin-pages": "^0.23.1",
+        "@ts-morph/bootstrap": "^0.3.0",
+        "@types/glob": "^8.1.0",
+        "@types/jasmine": "^4.3.1",
+        "@types/uuid": "^9.0.1",
+        "fs-extra": "^11.1.0",
+        "glob": "^8.1.0",
+        "jasmine-core": "^4.6.0",
         "karma": "^6.4.1",
         "karma-chrome-launcher": "^3.1.1",
-        "karma-jasmine": "^4.0.1",
-        "karma-jasmine-html-reporter": "^1.7.0",
+        "karma-jasmine": "^5.1.0",
+        "karma-jasmine-html-reporter": "^2.0.0",
         "karma-typescript": "^5.5.3",
         "prettier": "2.3.2",
-        "shx": "^0.3.3",
+        "shx": "^0.3.4",
         "ts-transformer-testing-library": "^1.0.0-alpha.7",
-        "typedoc": "^0.23.17",
-        "@knodes/typedoc-plugin-pages": "^0.23.1",
-        "typescript": "^4.8.4"
+        "typedoc": "^0.23.27",
+        "typescript": "^5.0.2"
     }
 }

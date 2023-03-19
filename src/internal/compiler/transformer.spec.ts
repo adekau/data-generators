@@ -1,6 +1,7 @@
-import { transformFile } from 'ts-transformer-testing-library';
+import { getCompilerOptions, transformFile } from 'ts-transformer-testing-library';
 import { INDEX, LIB } from './helpers';
 import transformer from './transformer';
+import { Project } from '@ts-morph/bootstrap';
 
 const INDEX_NAME = '__dg';
 const LIB_NAME = '__dgLib';
@@ -14,6 +15,12 @@ function transform(code: string) {
         transformFile(
             { path: 'index.ts', contents: `import { build } from "./build"; ${code}` },
             {
+                project: new Project({
+                    useInMemoryFileSystem: true,
+                    compilerOptions: getCompilerOptions({
+                        ignoreDeprecations: '5.0'
+                    })
+                }),
                 sources: [
                     {
                         path: './build.ts',
@@ -21,11 +28,13 @@ function transform(code: string) {
                     }
                 ],
                 transforms: [
-                    (program) =>
-                        transformer(program, {
+                    // temporary casts to any due to TS version difference (v5 here vs v4 there)
+                    // casts can be removed once ts-transformer-testing-library supports TypeScript v5
+                    (program) => (context) =>
+                        transformer(program as any, {
                             DG_DEBUG_ENABLED: false,
                             DG_DEBUG_WIDTH: 4
-                        })
+                        })(context as any).transformSourceFile as any
                 ]
             }
         )

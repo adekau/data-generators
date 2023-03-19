@@ -1,5 +1,4 @@
-import { B, L, N, T, U } from 'ts-toolbelt';
-import { createGenerator } from '../creation/data-generator';
+import { B, L, N, U } from 'ts-toolbelt';
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
 import { map } from './map';

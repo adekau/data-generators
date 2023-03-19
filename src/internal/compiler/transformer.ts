@@ -1,9 +1,8 @@
-import * as ts from 'typescript';
-import { defaultDataGeneratorCompilerConfig, IDataGeneratorCompilerConfig } from './configure';
-import { CONSTANTS } from './constants';
-import factory = ts.factory;
+import ts from 'typescript';
 import * as Index from '../../index';
 import * as Library from '../../library';
+import { defaultDataGeneratorCompilerConfig, IDataGeneratorCompilerConfig } from './configure';
+import { CONSTANTS } from './constants';
 
 /**
  * Any type that can be coerced to a string. Used for debugging in the [[debug]] function.
@@ -43,40 +42,64 @@ interface MappedType extends ts.ObjectType {
 const transformationCache = new WeakMap<ts.Type, ts.Expression>();
 
 /**
+ * Returns a function that will transform a source file based on the context and config.
+ *
+ * @param program The TypeScript program reference provided by a compiler. Gives the transformer access to type information.
+ * @param context the typescript transformation context
+ * @param config semble-ts specific configuration
+ * @returns
+ */
+const getTransformSourceFileFunction: (
+    program: ts.Program,
+    context: ts.TransformationContext,
+    config: IDataGeneratorCompilerConfig
+) => ts.Transformer<ts.SourceFile> = (program, context, config) => (sourceFile: ts.SourceFile) => {
+    const typeChecker = program.getTypeChecker();
+    const defaultedConfig = Object.assign({}, defaultDataGeneratorCompilerConfig, config);
+
+    // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
+    // imports to each file checked.
+    let hasAppendedDefaultImports = false;
+
+    const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
+        if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
+            hasAppendedDefaultImports = true;
+            return appendDefaultImports(context.factory, node);
+        }
+
+        if (isBuildNode(node, typeChecker)) {
+            return transformBuildNode(node, sourceFile, typeChecker, context, defaultedConfig);
+        }
+
+        return ts.visitEachChild(node, visitor, context);
+    };
+
+    return ts.visitNode(sourceFile, visitor) as ts.SourceFile;
+};
+
+/**
  * Transforms the TypeScript AST to search for the [[`build`]] method exported by the [[`index`]] module and
  * recursively transform the Type Parameter of [[`build`]] into a callable Data Generator.
  *
  * @param program The TypeScript program reference provided by a compiler. Gives the transformer access to type information.
+ * @param config semble-ts specific configuration
  * @returns a transformed Abstract Syntax Tree (AST)
  */
 const transformer =
     (
         program: ts.Program,
         config: IDataGeneratorCompilerConfig = defaultDataGeneratorCompilerConfig
-    ): ts.TransformerFactory<ts.SourceFile> =>
+    ): ts.CustomTransformerFactory =>
     (context) => {
-        return (sourceFile) => {
-            const typeChecker = program.getTypeChecker();
-            const defaultedConfig = Object.assign({}, defaultDataGeneratorCompilerConfig, config);
-
-            // Don't have a lookahead in the AST for whether there are BuildNodes, need to append default
-            // imports to each file checked.
-            let hasAppendedDefaultImports = false;
-
-            const visitor = (node: ts.Node): ts.VisitResult<ts.Node> => {
-                if (ts.isImportDeclaration(node) && !hasAppendedDefaultImports) {
-                    hasAppendedDefaultImports = true;
-                    return appendDefaultImports(node);
-                }
-
-                if (isBuildNode(node, typeChecker)) {
-                    return transformBuildNode(node, sourceFile, typeChecker, defaultedConfig);
-                }
-
-                return ts.visitEachChild(node, visitor, context);
-            };
-
-            return ts.visitNode(sourceFile, visitor);
+        return {
+            transformSourceFile: getTransformSourceFileFunction(program, context, config),
+            transformBundle(bundleNode) {
+                const files = bundleNode.sourceFiles;
+                return context.factory.updateBundle(
+                    bundleNode,
+                    files.map((sourceFile) => this.transformSourceFile(sourceFile))
+                );
+            }
         };
     };
 
@@ -88,6 +111,7 @@ function transformBuildNode(
     node: BuildNode,
     sourceFile: ts.SourceFile,
     typeChecker: ts.TypeChecker,
+    context: ts.TransformationContext,
     config: Required<IDataGeneratorCompilerConfig>
 ): ts.Node {
     const typeArgument = node.typeArguments?.[0];
@@ -102,7 +126,7 @@ function transformBuildNode(
         );
     }
 
-    return transformType(type, node, sourceFile, typeChecker, config);
+    return transformType(type, node, sourceFile, typeChecker, context, config);
 }
 
 /**
@@ -113,8 +137,10 @@ function transformType(
     node: BuildNode,
     sourceFile: ts.SourceFile,
     typeChecker: ts.TypeChecker,
+    context: ts.TransformationContext,
     config: Required<IDataGeneratorCompilerConfig>
 ): ts.Expression {
+    const factory = context.factory;
     /**
      * Keeps track of a stack of resolved types to enable detection of recursive or self-referencing types.
      */
@@ -140,7 +166,7 @@ function transformType(
                     type
                 )
             );
-            return createConstantUndefinedExpression();
+            return createConstantUndefinedExpression(factory);
         }
         resolutionStack.push(type);
 
@@ -157,7 +183,7 @@ function transformType(
         // If there are signatures, it's a function type.
         if (signatures.length) {
             debugTypeResolution('is function');
-            expression = createLibraryCallExpression(CONSTANTS.FUNCTION, [
+            expression = createLibraryCallExpression(factory, CONSTANTS.FUNCTION, [
                 _transformType(typeChecker.getReturnTypeOfSignature(signatures[0]))
             ]);
         } else {
@@ -193,17 +219,17 @@ function transformType(
                 )
             );
 
-            return createConstantUndefinedExpression();
+            return createConstantUndefinedExpression(factory);
 
             /* Void / Undefined */
         } else if (flags & ts.TypeFlags.VoidLike) {
             debugTypeResolution('is voidlike');
-            return createConstantUndefinedExpression();
+            return createConstantUndefinedExpression(factory);
 
             /* Null */
         } else if (flags & ts.TypeFlags.Null) {
             debugTypeResolution('is null');
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createNull()]);
+            return createIndexCallExpression(factory, CONSTANTS.CONSTANT, [factory.createNull()]);
 
             /* Literal types, e.g. 'Hello', 5, true, etc */
         } else if (flags & ts.TypeFlags.Literal) {
@@ -218,17 +244,17 @@ function transformType(
             /* String or `${StringLike}` */
         } else if (flags & (ts.TypeFlags.String | ts.TypeFlags.StringMapping)) {
             debugTypeResolution('is string');
-            return createLibraryCallExpression(CONSTANTS.STRING);
+            return createLibraryCallExpression(factory, CONSTANTS.STRING);
 
             /* Number */
         } else if (flags & ts.TypeFlags.Number) {
             debugTypeResolution('is number');
-            return createLibraryCallExpression(CONSTANTS.NUMBER);
+            return createLibraryCallExpression(factory, CONSTANTS.NUMBER);
 
             /* Boolean */
         } else if (flags & ts.TypeFlags.Boolean) {
             debugTypeResolution('is boolean');
-            return createLibraryCallExpression(CONSTANTS.BOOLEAN);
+            return createLibraryCallExpression(factory, CONSTANTS.BOOLEAN);
 
             /* Unions, e.g. `string | number` */
         } else if (flags & ts.TypeFlags.Union) {
@@ -257,7 +283,7 @@ function transformType(
         // fall through default of constant undefined.
         else {
             debugTypeResolution('is undefined (base resolve fallthrough)', `flags: ${flags}`);
-            return createConstantUndefinedExpression();
+            return createConstantUndefinedExpression(factory);
         }
     }
 
@@ -276,7 +302,7 @@ function transformType(
             type.symbol.name.toLowerCase() === CONSTANTS.DATE
         ) {
             debugTypeResolution('is date');
-            return createLibraryCallExpression(CONSTANTS.DATE);
+            return createLibraryCallExpression(factory, CONSTANTS.DATE);
         }
 
         transformGenericArguments(type.aliasTypeArguments, type.aliasSymbol);
@@ -306,7 +332,7 @@ function transformType(
             // If none of the above, create an empty "struct({})"" generator. One such type that will reach this branch
             // is "{}".
             debugTypeResolution('is {} (object fallthrough)', `flags: ${flags}`);
-            return createIndexCallExpression(CONSTANTS.STRUCT, [factory.createObjectLiteralExpression([], false)]);
+            return createIndexCallExpression(factory, CONSTANTS.STRUCT, [factory.createObjectLiteralExpression([], false)]);
         }
     }
 
@@ -322,7 +348,7 @@ function transformType(
         // Tuple type, e.g. [number, 'hello', 5, false]
         if (flags & ts.ObjectFlags.Tuple) {
             debugTypeResolution('is tuple');
-            return createIndexCallExpression(CONSTANTS.TUPLE, createTupleArguments(type as ts.TupleType));
+            return createIndexCallExpression(factory, CONSTANTS.TUPLE, createTupleArguments(type as ts.TupleType));
         }
         // special case for Array<T>, which is a reference type (to class Array). Like Map, but has a syntax literal (`[]`)
         else if (type.symbol.escapedName.toString().toLowerCase() === 'array') {
@@ -336,7 +362,7 @@ function transformType(
         } else {
             // Fall through case of creating a constant undefined generator.
             debugTypeResolution('is undefined (reference fallthrough)', `flags: ${flags}`);
-            return createConstantUndefinedExpression();
+            return createConstantUndefinedExpression(factory);
         }
     }
 
@@ -345,7 +371,7 @@ function transformType(
      */
     function transformUnionType(type: ts.UnionType): ts.Expression {
         const expressions = type.types.map((unionType) => _transformType(unionType));
-        return createIndexCallExpression(CONSTANTS.ANY_OF, expressions);
+        return createIndexCallExpression(factory, CONSTANTS.ANY_OF, expressions);
     }
 
     /**
@@ -399,7 +425,7 @@ function transformType(
             /** Fall-through case, generate `constant(undefined)`. */
         } else {
             debugTypeResolution('mapped type fall-through (undefined)');
-            return createConstantUndefinedExpression();
+            return createConstantUndefinedExpression(factory);
         }
     }
 
@@ -416,7 +442,7 @@ function transformType(
             factory.createPropertyAssignment(factory.createComputedPropertyName(key), base)
         );
 
-        return createIndexCallExpression('struct', [factory.createObjectLiteralExpression(propertyAssignments, false)]);
+        return createIndexCallExpression(factory, 'struct', [factory.createObjectLiteralExpression(propertyAssignments, false)]);
     }
 
     /**
@@ -476,7 +502,7 @@ function transformType(
      * Creates a struct() expression for an object type.
      */
     function createStructExpression(type: ts.Type): ts.Expression {
-        return createIndexCallExpression(CONSTANTS.STRUCT, [createStructObjectLiteralExpression(type)]);
+        return createIndexCallExpression(factory, CONSTANTS.STRUCT, [createStructObjectLiteralExpression(type)]);
     }
 
     /**
@@ -511,11 +537,11 @@ function transformType(
         const typeArg = type.typeArguments?.[0];
         // in the case of an empty tuple type (`[]`).
         if (!typeArg) {
-            return createIndexCallExpression(CONSTANTS.TUPLE);
+            return createIndexCallExpression(factory, CONSTANTS.TUPLE);
         }
         // transform the type argument to a data generator to pass to the `array` creation function
         const transformed = _transformType(typeArg);
-        return createIndexCallExpression(CONSTANTS.ARRAY, [transformed]);
+        return createIndexCallExpression(factory, CONSTANTS.ARRAY, [transformed]);
     }
 
     /**
@@ -533,17 +559,21 @@ function transformType(
         const { flags } = type;
 
         if (flags & ts.TypeFlags.NumberLiteral) {
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createNumericLiteral(type.value as number)]);
+            return createIndexCallExpression(factory, CONSTANTS.CONSTANT, [
+                factory.createNumericLiteral(type.value as number)
+            ]);
         } else if (flags & ts.TypeFlags.StringLiteral) {
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createStringLiteral(type.value as string)]);
+            return createIndexCallExpression(factory, CONSTANTS.CONSTANT, [
+                factory.createStringLiteral(type.value as string)
+            ]);
         } else if (flags & ts.TypeFlags.BooleanLiteral) {
             // Boolean literal does not have a value, so instead need to go off the intrinsicName.
-            return createIndexCallExpression(CONSTANTS.CONSTANT, [
+            return createIndexCallExpression(factory, CONSTANTS.CONSTANT, [
                 (type as any).intrinsicName === 'true' ? factory.createTrue() : factory.createFalse()
             ]);
         } else {
             // constant(undefined) as a fall through case
-            return createConstantUndefinedExpression();
+            return createConstantUndefinedExpression(factory);
         }
     }
 
@@ -558,7 +588,7 @@ function transformType(
         const textExpressions = texts.map((t) => factory.createStringLiteral(t));
         const transformedTypes = types.map((t) => _transformType(t));
 
-        return createIndexCallExpression(CONSTANTS.INTERPOLATE, [
+        return createIndexCallExpression(factory, CONSTANTS.INTERPOLATE, [
             factory.createArrayLiteralExpression(textExpressions),
             factory.createArrayLiteralExpression(transformedTypes)
         ]);
@@ -633,8 +663,8 @@ function transformType(
 /**
  * Creates constant(undefined)
  */
-function createConstantUndefinedExpression(): ts.Expression {
-    return createIndexCallExpression(CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
+function createConstantUndefinedExpression(factory: ts.NodeFactory): ts.Expression {
+    return createIndexCallExpression(factory, CONSTANTS.CONSTANT, [factory.createIdentifier('undefined')]);
 }
 
 /**
@@ -642,8 +672,12 @@ function createConstantUndefinedExpression(): ts.Expression {
  * @param access the index package function to call
  * @param args arguments to call the function with
  */
-function createIndexCallExpression(access: keyof typeof Index, args: ts.Expression[] = []): ts.Expression {
-    return createSingleAccessCallExpression(CONSTANTS.INDEX, access, args);
+function createIndexCallExpression(
+    factory: ts.NodeFactory,
+    access: keyof typeof Index,
+    args: ts.Expression[] = []
+): ts.Expression {
+    return createSingleAccessCallExpression(factory, CONSTANTS.INDEX, access, args);
 }
 
 /**
@@ -651,8 +685,12 @@ function createIndexCallExpression(access: keyof typeof Index, args: ts.Expressi
  * @param access the library package function to call
  * @param args arguments to call the function with
  */
-function createLibraryCallExpression(access: keyof typeof Library, args: ts.Expression[] = []): ts.Expression {
-    return createSingleAccessCallExpression(CONSTANTS.LIBRARY, access, args);
+function createLibraryCallExpression(
+    factory: ts.NodeFactory,
+    access: keyof typeof Library,
+    args: ts.Expression[] = []
+): ts.Expression {
+    return createSingleAccessCallExpression(factory, CONSTANTS.LIBRARY, access, args);
 }
 
 /**
@@ -661,7 +699,12 @@ function createLibraryCallExpression(access: keyof typeof Library, args: ts.Expr
  * @param access the function to call from the namespace
  * @param args arguments to call the function with
  */
-function createSingleAccessCallExpression(base: string, access: string, args: ts.Expression[] = []): ts.Expression {
+function createSingleAccessCallExpression(
+    factory: ts.NodeFactory,
+    base: string,
+    access: string,
+    args: ts.Expression[] = []
+): ts.Expression {
     return factory.createCallExpression(
         factory.createPropertyAccessExpression(factory.createIdentifier(base), factory.createIdentifier(access)),
         undefined,
@@ -672,9 +715,10 @@ function createSingleAccessCallExpression(base: string, access: string, args: ts
 /**
  * Append "import *" declarations for every needed Data Generator module.
  */
-function appendDefaultImports(host: ts.ImportDeclaration): ts.ImportDeclaration[] {
+function appendDefaultImports(factory: ts.NodeFactory, host: ts.ImportDeclaration): ts.ImportDeclaration[] {
     return appendNamedImportNode(
-        appendNamedImportNode(host, CONSTANTS.LIBRARY, CONSTANTS.LIBRARY_LOCATION),
+        factory,
+        appendNamedImportNode(factory, host, CONSTANTS.LIBRARY, CONSTANTS.LIBRARY_LOCATION),
         CONSTANTS.INDEX,
         CONSTANTS.INDEX_LOCATION
     );
@@ -684,6 +728,7 @@ function appendDefaultImports(host: ts.ImportDeclaration): ts.ImportDeclaration[
  * Transform an ImportDeclaration into an array of import declarations to tack on an extra import to an existing node.
  */
 function appendNamedImportNode(
+    factory: ts.NodeFactory,
     host: ts.ImportDeclaration | ts.ImportDeclaration[],
     namespace: string,
     from: string
@@ -692,7 +737,6 @@ function appendNamedImportNode(
         // If the host is an existing array of import declarations, append the new one to the end.
         ...(Array.isArray(host) ? host : [host]),
         factory.createImportDeclaration(
-            undefined,
             undefined,
             factory.createImportClause(
                 false,
