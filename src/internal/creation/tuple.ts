@@ -1,5 +1,5 @@
 import { IterableTuple } from 'semble-ts/types';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { DataGenerator } from 'semble-ts/interfaces';
 import { createGenerator } from './data-generator';
 
 /**

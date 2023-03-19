@@ -1,6 +1,6 @@
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { DataGenerator } from 'semble-ts/interfaces';
 import { map } from './map';
 import { pipe } from './pipe';
 

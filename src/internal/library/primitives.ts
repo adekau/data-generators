@@ -1,5 +1,5 @@
 import { infinite } from '../creation/infinite';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { DataGenerator } from 'semble-ts/interfaces';
 import { many } from 'semble-ts/transformer';
 
 /**

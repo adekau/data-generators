@@ -1,5 +1,5 @@
 import { getBrand } from './brand';
-import { DataGenerator } from './interfaces/data-generator.interface';
+import { DataGenerator } from 'semble-ts/interfaces';
 
 /**
  * Test a value to see if it is a Data Generator. Also acts as a type guard.

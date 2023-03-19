@@ -1,5 +1,5 @@
 import { constant } from '../creation/constant';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { DataGenerator } from 'semble-ts/interfaces';
 import { either, _either } from '../creation/either';
 
 /**

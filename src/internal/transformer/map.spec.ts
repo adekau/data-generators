@@ -1,5 +1,5 @@
 import { createGenerator } from '../creation/data-generator';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { DataGenerator } from 'semble-ts/interfaces';
 import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { withDefault } from './default';
 import { many } from './many';
