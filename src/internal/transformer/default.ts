@@ -1,6 +1,4 @@
-import { constant } from '../creation/constant';
-import { DataGenerator } from '../interfaces/data-generator.interface';
-import { flatMap, flatMapShallow } from './map';
+import { flatMapShallow } from './map';
 import { one } from './one';
 import { pipe } from './pipe';
 

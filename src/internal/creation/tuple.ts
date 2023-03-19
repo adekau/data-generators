@@ -1,12 +1,6 @@
-import { List } from 'ts-toolbelt';
+import { IterableTuple } from 'semble-ts/types';
 import { DataGenerator } from '../interfaces/data-generator.interface';
-import { Tail } from '../types/flat.type';
 import { createGenerator } from './data-generator';
-
-type IterableTuple<T extends Iterable<unknown>[], Final extends unknown[] = []> = {
-    0: List.Head<T> extends Iterable<infer U> ? IterableTuple<Tail<T>, [...Final, U]> : Final;
-    1: Final;
-}[T['length'] extends 0 ? 1 : 0];
 
 /**
  * Similar to struct, but in a fixed length array format.

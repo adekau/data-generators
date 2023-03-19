@@ -1,4 +1,4 @@
-import { PFst, UFn } from '../types/pipe.type';
+import { PFst, UFn } from 'semble-ts/types';
 
 /**
  * Provides the ability to pipeline [[`transformer`]]s together.

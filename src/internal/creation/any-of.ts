@@ -1,5 +1,5 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
-import { Inner } from '../types/inner.type';
+import { Inner } from 'semble-ts/types';
 import { constant } from './constant';
 import { either } from './either';
 

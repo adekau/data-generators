@@ -1,6 +1,6 @@
 import { infinite } from '../creation/infinite';
 import { DataGenerator } from '../interfaces/data-generator.interface';
-import { many } from '../transformer/many';
+import { many } from 'semble-ts/transformer';
 
 /**
  * Creates a random number generator with optional bounds.

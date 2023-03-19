@@ -28,15 +28,17 @@ module.exports = function (config) {
         },
 
         karmaTypescriptConfig: {
-            compilerOptions: {
-                downlevelIteration: true,
-                esModuleInterop: true,
-                lib: ['ESNext']
-            },
+            tsconfig: './tsconfig.spec.json',
             bundlerOptions: {
                 resolve: {
                     alias: {
-                        perf_hooks: './node_modules/@types/node/perf_hooks.d.ts'
+                        perf_hooks: './node_modules/@types/node/perf_hooks.d.ts',
+                        'semble-ts': './src/index.ts',
+                        'semble-ts/types': './src/types/index.ts',
+                        'semble-ts/transformer': './src/transformer/index.ts',
+                        'semble-ts/library': './src/library/index.ts',
+                        'semble-ts/compiler': './src/compiler/index.ts',
+                        'semble-ts/interfaces': './src/interfaces/index.ts'
                     }
                 }
             }

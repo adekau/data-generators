@@ -1,5 +1,4 @@
 import { createGenerator } from '../creation/data-generator';
-import { infinite } from '../creation/infinite';
 
 /**
  * Creates a generator that increments on each output from 0 by default, unless `startWith` is specified.

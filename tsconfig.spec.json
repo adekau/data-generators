@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.paths.json",
+    "include": ["src", "**/*.spec.ts"],
+    "exclude": ["node_modules"],
+    "compilerOptions": {
+        "target": "ES5",
+        "moduleResolution": "node",
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "lib": ["ESNext"]
+    }
+}

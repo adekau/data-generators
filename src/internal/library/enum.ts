@@ -1,4 +1,3 @@
-import { createGenerator } from '../creation/data-generator';
 import { infinite } from '../creation/infinite';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { integerGenerator } from './primitives';

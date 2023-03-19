@@ -6,4 +6,6 @@ dist
 /transformer/
 /interfaces/
 /compiler/
+/types/
 .DS_STORE
+semble-ts-*.tgz

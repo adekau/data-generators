@@ -1,12 +1,12 @@
 {
     "name": "semble-ts",
-    "version": "1.0.0-rc.6",
+    "version": "0.1.0",
     "description": "Mock unit test data generation",
     "main": "dist/cjs/index.js",
     "module": "dist/esm5/index.js",
     "es2015": "./dist/esm/index.js",
     "esnext": "./dist/esm5/index.js",
-    "types": "index.d.ts",
+    "types": "./dist/types/index.d.ts",
     "typesVersions": {
         ">=4.1": {
             "*": [
@@ -31,31 +31,42 @@
         "dist/esm5/**/*",
         "dist/types/**/*",
         "library",
-        "interface",
+        "interfaces",
         "transformer",
         "compiler",
+        "types",
         "tsconfig.json"
     ],
     "exports": {
         ".": {
             "node": "./dist/cjs/index.js",
-            "default": "./dist/esm5/index.js"
+            "default": "./dist/esm5/index.js",
+            "types": "./dist/types/index.d.ts"
         },
         "./library": {
             "node": "./dist/cjs/library/index.js",
-            "default": "./dist/esm5/library/index.js"
+            "default": "./dist/esm5/library/index.js",
+            "types": "./dist/types/library/index.d.ts"
         },
         "./transformer": {
             "node": "./dist/cjs/transformer/index.js",
-            "default": "./dist/esm5/transformer/index.js"
+            "default": "./dist/esm5/transformer/index.js",
+            "types": "./dist/types/transformer/index.d.ts"
         },
-        "./interface": {
-            "node": "./dist/cjs/interface/index.js",
-            "default": "./dist/esm5/interface/index.js"
+        "./interfaces": {
+            "node": "./dist/cjs/interfaces/index.js",
+            "default": "./dist/esm5/interfaces/index.js",
+            "types": "./dist/types/interfaces/index.d.ts"
         },
         "./compiler": {
             "node": "./dist/cjs/compiler/index.js",
-            "default": "./dist/esm5/compiler/index.js"
+            "default": "./dist/esm5/compiler/index.js",
+            "types": "./dist/types/compiler/index.d.ts"
+        },
+        "./types": {
+            "node": "./dist/cjs/types/index.js",
+            "default": "./dist/esm5/types/index.js",
+            "types": "./dist/types/types/index.d.ts"
         }
     },
     "repository": {

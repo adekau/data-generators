@@ -5,7 +5,9 @@
         "./src/index.ts",
         "./src/transformer/index.ts",
         "./src/library/index.ts",
-        "./src/compiler/index.ts"
+        "./src/compiler/index.ts",
+        "./src/types/index.ts",
+        "./src/internal/brand.ts"
     ],
     "out": "docs",
     "githubPages": true,

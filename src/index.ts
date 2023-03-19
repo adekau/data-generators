@@ -1,6 +1,7 @@
 /// <reference path="library/index.ts" />
 /// <reference path="transformer/index.ts" />
 /// <reference path="interfaces/index.ts" />
+/// <reference path="types/index.ts" />
 
 /** Creation */
 export { anyOf } from './internal/creation/any-of';

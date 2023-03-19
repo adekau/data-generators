@@ -6,7 +6,7 @@
 <div id="tsd-toolbar-links"></div></div>
 <ul class="results">
 <li class="state loading">Preparing search index...</li>
-<li class="state failure">The search index is not available</li></ul><a href="" class="title">semble-ts</a></div>
+<li class="state failure">The search index is not available</li></ul><a href="../index.html" class="title">semble-ts</a></div>
 <div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
 <div class="container container-main">
 <div class="col-8 col-content">
@@ -18,7 +18,7 @@
 <h1>Function default</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-<li class="tsd-signature tsd-anchor-link" id="default">default<span class="tsd-signature-symbol">(</span>program<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Program</span>, config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/compiler.IDataGeneratorCompilerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">IDataGeneratorCompilerConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TransformerFactory</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SourceFile</span><span class="tsd-signature-symbol">&gt;</span><a href="#default" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="default">default<span class="tsd-signature-symbol">(</span>program<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Program</span>, config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/compiler.IDataGeneratorCompilerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">IDataGeneratorCompilerConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">CustomTransformerFactory</span><a href="#default" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Transforms the TypeScript AST to search for the [[<code>build</code>]] method exported by the [[<code>index</code>]] module and
 recursively transform the Type Parameter of [[<code>build</code>]] into a callable Data Generator.</p>
@@ -33,10 +33,12 @@ recursively transform the Type Parameter of [[<code>build</code>]] into a callab
 <div class="tsd-comment tsd-typography"><p>The TypeScript program reference provided by a compiler. Gives the transformer access to type information.</p>
 </div></li>
 <li>
-<h5>config: <a href="../interfaces/compiler.IDataGeneratorCompilerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">IDataGeneratorCompilerConfig</a><span class="tsd-signature-symbol"> = defaultDataGeneratorCompilerConfig</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">TransformerFactory</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SourceFile</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<h5>config: <a href="../interfaces/compiler.IDataGeneratorCompilerConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">IDataGeneratorCompilerConfig</a><span class="tsd-signature-symbol"> = defaultDataGeneratorCompilerConfig</span></h5>
+<div class="tsd-comment tsd-typography"><p>semble-ts specific configuration</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">CustomTransformerFactory</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/adekau/semble-ts/blob/8b25ab1/src/internal/compiler/transformer.ts#L53">src/internal/compiler/transformer.ts:53</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/adekau/semble-ts/blob/74b899b/src/internal/compiler/transformer.ts#L89">src/internal/compiler/transformer.ts:89</a></li></ul></aside></li></ul></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -63,8 +65,10 @@ recursively transform the Type Parameter of [[<code>build</code>]] into a callab
 <li class="current tsd-kind-module"><a href="../modules/compiler.html">compiler</a></li>
 <li class="tsd-kind-module"><a href="../modules/index.html">index</a></li>
 <li class="tsd-kind-module"><a href="../modules/interfaces.html">interfaces</a></li>
+<li class="tsd-kind-module"><a href="../modules/internal_brand.html">internal/brand</a></li>
 <li class="tsd-kind-module"><a href="../modules/library.html">library</a></li>
-<li class="tsd-kind-module"><a href="../modules/transformer.html">transformer</a></li></ul></li></ul></div></details></nav>
+<li class="tsd-kind-module"><a href="../modules/transformer.html">transformer</a></li>
+<li class="tsd-kind-module"><a href="../modules/types.html">types</a></li></ul></li></ul></div></details></nav>
 <nav class="tsd-navigation secondary menu-sticky">
 <ul>
 <li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/compiler.IDataGeneratorCompilerConfig.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-256-path"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)" id="icon-256-text"></path></svg>IData<wbr/>Generator<wbr/>Compiler<wbr/>Config</a></li>

@@ -1,4 +1,4 @@
-import { Flat } from '../types/flat.type';
+import { Flat } from 'semble-ts/types';
 
 function isIterable(x: any): x is Iterable<unknown> {
     return typeof x?.[Symbol.iterator] === 'function';

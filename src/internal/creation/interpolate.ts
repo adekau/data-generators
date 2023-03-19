@@ -1,7 +1,6 @@
 import { DataGenerator } from '../interfaces/data-generator.interface';
+import { StringLike } from 'semble-ts/types';
 import { infinite } from './infinite';
-
-export type StringLike = { toString: () => string };
 
 /**
  * Tag function that generates an interpolated string using other data generators.

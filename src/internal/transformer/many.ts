@@ -1,5 +1,4 @@
 import { _tuple } from '../creation/tuple';
-import { take } from './take';
 
 /**
  * Creates a generator that returns an array of length `length` of outputs from `baseGenerator`.

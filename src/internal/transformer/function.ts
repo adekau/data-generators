@@ -1,5 +1,6 @@
 import { map } from './map';
 import { pipe } from './pipe';
+import { functionGenerator } from 'semble-ts/library';
 
 /**
  * Pipe operator to convert a DataGenerator to a DataGenerator that generates a function returning the piped generator's output

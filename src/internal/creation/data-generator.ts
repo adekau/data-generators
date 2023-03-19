@@ -1,5 +1,5 @@
 import { getBrand } from '../brand';
-import { DataGenerator } from '../interfaces/data-generator.interface';
+import { DataGenerator } from 'semble-ts/interfaces';
 import { isDataGenerator } from '../is-data-generator';
 import { ap } from '../transformer/apply';
 import { flatMap, map } from '../transformer/map';
