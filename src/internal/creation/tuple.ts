@@ -1,10 +1,10 @@
-import { Head } from 'ts-toolbelt/out/List/Head';
+import { List } from 'ts-toolbelt';
 import { DataGenerator } from '../interfaces/data-generator.interface';
 import { Tail } from '../types/flat.type';
 import { createGenerator } from './data-generator';
 
 type IterableTuple<T extends Iterable<unknown>[], Final extends unknown[] = []> = {
-    0: Head<T> extends Iterable<infer U> ? IterableTuple<Tail<T>, [...Final, U]> : Final;
+    0: List.Head<T> extends Iterable<infer U> ? IterableTuple<Tail<T>, [...Final, U]> : Final;
     1: Final;
 }[T['length'] extends 0 ? 1 : 0];
 

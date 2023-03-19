@@ -1,11 +1,9 @@
-import { Join } from 'ts-toolbelt/out/String/Join';
-import { Replace } from 'ts-toolbelt/out/String/Replace';
-import { Literal } from 'ts-toolbelt/out/String/_Internal';
-import { ListOf } from 'ts-toolbelt/out/Union/ListOf';
+import { String, Union } from 'ts-toolbelt';
 import { CONSTANTS } from './constants';
 
-export type StructString<T extends { [k: string]: string }> = `{${Join<
-    ListOf<
+type Literal = string | number | boolean;
+export type StructString<T extends { [k: string]: string }> = `{${String.Join<
+    Union.ListOf<
         {
             [K in keyof T]: `"${K & string}":${T[K]}`;
         }[keyof T]
@@ -13,7 +11,7 @@ export type StructString<T extends { [k: string]: string }> = `{${Join<
     ','
 >}}`;
 export type ConstantString<T extends Literal | undefined | null> = `${T}`;
-type InterpolateString<S extends string[], Quote extends string = '"'> = `[${Join<
+type InterpolateString<S extends string[], Quote extends string = '"'> = `[${String.Join<
     {
         [K in keyof S]: `${Quote}${S[K]}${Quote}`;
     },
@@ -68,14 +66,16 @@ export const LIB = {
     FUNC: <T extends string>(output: T) => createLibCall('FUNCTION', output)
 };
 
-export function fixComputedProperties<S extends string>(s: S): Replace<Replace<S, '"[', '['>, ']":', ']:'> {
+export function fixComputedProperties<S extends string>(
+    s: S
+): String.Replace<String.Replace<S, '"[', '['>, ']":', ']:'> {
     return s.replaceAll(/"(\[.+?\])":/g, '$1:') as any;
 }
 
 export function createCall<T extends 'INDEX' | 'LIBRARY'>(where: T) {
     return <Call extends keyof typeof CONSTANTS, Args extends [...string[]]>(call: Call, ...args: Args) => {
         return `${(CONSTANTS as Pick<typeof CONSTANTS, T>)[where]}.${CONSTANTS[call]}(${
-            (args ? args.join(',') : '') as Join<Args, ','>
+            (args ? args.join(',') : '') as String.Join<Args, ','>
         })` as const;
     };
 }

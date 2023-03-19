@@ -12,7 +12,8 @@ const CJS_CONFIG: ts.CompilerOptions = {
     noUnusedParameters: true,
     stripInternal: true,
     target: ts.ScriptTarget.ES2015,
-    strict: true
+    strict: true,
+    ignoreDeprecations: '5.0'
 };
 
 export default function compile(input: string, options: ts.CompilerOptions = CJS_CONFIG) {
