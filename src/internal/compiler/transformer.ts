@@ -332,7 +332,9 @@ function transformType(
             // If none of the above, create an empty "struct({})"" generator. One such type that will reach this branch
             // is "{}".
             debugTypeResolution('is {} (object fallthrough)', `flags: ${flags}`);
-            return createIndexCallExpression(factory, CONSTANTS.STRUCT, [factory.createObjectLiteralExpression([], false)]);
+            return createIndexCallExpression(factory, CONSTANTS.STRUCT, [
+                factory.createObjectLiteralExpression([], false)
+            ]);
         }
     }
 
@@ -442,7 +444,9 @@ function transformType(
             factory.createPropertyAssignment(factory.createComputedPropertyName(key), base)
         );
 
-        return createIndexCallExpression(factory, 'struct', [factory.createObjectLiteralExpression(propertyAssignments, false)]);
+        return createIndexCallExpression(factory, 'struct', [
+            factory.createObjectLiteralExpression(propertyAssignments, false)
+        ]);
     }
 
     /**

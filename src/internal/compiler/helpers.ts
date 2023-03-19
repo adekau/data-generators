@@ -66,7 +66,9 @@ export const LIB = {
     FUNC: <T extends string>(output: T) => createLibCall('FUNCTION', output)
 };
 
-export function fixComputedProperties<S extends string>(s: S): String.Replace<String.Replace<S, '"[', '['>, ']":', ']:'> {
+export function fixComputedProperties<S extends string>(
+    s: S
+): String.Replace<String.Replace<S, '"[', '['>, ']":', ']:'> {
     return s.replaceAll(/"(\[.+?\])":/g, '$1:') as any;
 }
 
