@@ -67,11 +67,9 @@ export const bindS =
                     one()
                 )()
             )
-        ) as () => Iterable<
-            {
-                [K in keyof A | TName]: K extends keyof A ? A[K] : T;
-            }
-        >;
+        ) as () => Iterable<{
+            [K in keyof A | TName]: K extends keyof A ? A[K] : T;
+        }>;
     };
 
 /**
