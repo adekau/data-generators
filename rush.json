@@ -328,15 +328,18 @@
     "projects": [
         {
             "packageName": "compiler",
-            "projectFolder": "packages/compiler"
+            "projectFolder": "packages/compiler",
+            "publishFolder": "lib"
         },
         {
             "packageName": "core",
-            "projectFolder": "packages/core"
+            "projectFolder": "packages/core",
+            "publishFolder": "lib"
         },
         {
             "packageName": "library",
-            "projectFolder": "packages/library"
+            "projectFolder": "packages/library",
+            "publishFolder": "lib"
         }
         // {
         //   /**
