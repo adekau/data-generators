@@ -1,4 +1,4 @@
-import { createGenerator } from "semble-ts/core";
+import { createGenerator } from 'semble-ts/core';
 
 /**
  * Creates a generator that increments on each output from 0 by default, unless `startWith` is specified.

@@ -1,4 +1,4 @@
-import { DataGenerator } from "../data-generator.interface";
+import { DataGenerator } from '../data-generator.interface';
 
 interface DataGeneratorBuilder {
     readonly _dataGeneratorBuilderBrand: unique symbol;

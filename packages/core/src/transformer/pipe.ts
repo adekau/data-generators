@@ -1,4 +1,4 @@
-import { PFst, UFn } from "../pipe.type";
+import { PFst, UFn } from '../pipe.type';
 
 /**
  * Provides the ability to pipeline [[`transformer`]]s together.

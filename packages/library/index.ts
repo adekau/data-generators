@@ -15,4 +15,3 @@ export {
     stringGenerator
 } from './src/primitives';
 export { uuidGenerator as uuid, uuidGenerator } from './src/uuid-generator';
-

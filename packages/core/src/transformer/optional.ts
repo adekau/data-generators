@@ -1,6 +1,6 @@
-import { constant } from "../creation/constant";
-import { either, _either } from "../creation/either";
-import { DataGenerator } from "../data-generator.interface";
+import { constant } from '../creation/constant';
+import { either, _either } from '../creation/either';
+import { DataGenerator } from '../data-generator.interface';
 
 /**
  * Creates a generator that modifies the input generator to have a chance of returning `undefined`.
