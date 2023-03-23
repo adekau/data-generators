@@ -1,11 +1,11 @@
 {
     "compilerOptions": {
         "paths": {
-            "semble-ts/interfaces": ["./src/interfaces/index"],
-            "semble-ts/library": ["./src/library/index"],
-            "semble-ts/transformer": ["./src/transformer/index"],
-            "semble-ts/types": ["./src/types/index"],
-            "semble-ts/compiler": ["./src/compiler/index"]
+            "semble-ts/compiler": ["./packages/compiler/index"],
+            "semble-ts/core": ["./packages/core/index"],
+            "semble-ts/creation": ["./packages/creation/index"],
+            "semble-ts/library": ["./packages/library/index"],
+            "semble-ts/transformer": ["./packages/transformer/index"]
         }
     }
 }

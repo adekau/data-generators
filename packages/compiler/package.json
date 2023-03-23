@@ -1,0 +1,17 @@
+{
+    "name": "compiler",
+    "version": "0.1.0",
+    "dependencies": {
+        "library": "workspace:^",
+        "core": "workspace:^"
+    },
+    "devDependencies": {
+        "typescript": "^5.0.2",
+        "@types/glob": "^8.1.0",
+        "glob": "^8.1.0",
+        "ts-toolbelt": "^9.6.0",
+        "ts-transformer-testing-library": "^1.0.0-alpha.7",
+        "@ts-morph/bootstrap": "^0.3.0",
+        "esbuild": "~0.17.12"
+    }
+}

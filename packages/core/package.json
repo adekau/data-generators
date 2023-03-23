@@ -1,0 +1,15 @@
+{
+    "name": "core",
+    "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "clean": "rimraf lib",
+        "build": "npm run clean && node esbuild.js"
+    },
+    "devDependencies": {
+        "typescript": "^5.0.2",
+        "ts-toolbelt": "^9.6.0",
+        "esbuild": "~0.17.12",
+        "rimraf": "~4.4.1"
+    }
+}
