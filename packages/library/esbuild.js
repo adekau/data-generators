@@ -23,4 +23,4 @@ async function build(project, additionalOpts) {
     }
 }
 
-build('core');
+build('library');

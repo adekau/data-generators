@@ -1,6 +1,11 @@
 {
     "name": "compiler",
     "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "clean": "rimraf lib",
+        "build": "npm run clean && node esbuild.js"
+    },
     "dependencies": {
         "library": "workspace:^",
         "core": "workspace:^"
@@ -12,6 +17,7 @@
         "ts-toolbelt": "^9.6.0",
         "ts-transformer-testing-library": "^1.0.0-alpha.7",
         "@ts-morph/bootstrap": "^0.3.0",
-        "esbuild": "~0.17.12"
+        "esbuild": "~0.17.12",
+        "rimraf": "~4.4.1"
     }
 }
