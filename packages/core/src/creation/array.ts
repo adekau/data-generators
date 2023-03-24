@@ -1,4 +1,5 @@
-import { DataGenerator, many } from 'semble-ts/core';
+import { DataGenerator } from '../data-generator.interface';
+import { many } from '../transformer/many';
 
 /**
  * A generator that takes a base generator and generates arrays of the base type.

@@ -1,13 +1,6 @@
-dist
 coverage
 node_modules
 docs
-/library/
-/creation/
-/transformer/
-/interfaces/
-/compiler/
-/types/
 
 # Rush files
 common/changes/
@@ -24,6 +17,7 @@ shrinkwrap.json
 # Build outputs
 dist
 lib
+lib-commonjs
 
 # Prettier reformats code blocks inside Markdown, which affects rendered output
 *.md

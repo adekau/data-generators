@@ -1,12 +1,6 @@
 {
     "extends": "./tsconfig.paths.json",
-    "include": [
-        "src",
-        "packages/compiler",
-        "packages/creation/index.ts",
-        "packages/transformer/index.ts",
-        "packages/core/src/brand.ts"
-    ],
+    "include": ["packages/compiler/index.ts", "packages/core/index.ts", "packages/library/index.ts"],
     "exclude": ["node_modules"],
     "compilerOptions": {
         /* Visit https://aka.ms/tsconfig.json to read more about this file */

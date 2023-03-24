@@ -14,6 +14,8 @@
         "@types/uuid": "^9.0.1",
         "typescript": "^5.0.2",
         "esbuild": "~0.17.12",
-        "rimraf": "~4.4.1"
+        "rimraf": "~4.4.1",
+        "@rushstack/heft-node-rig": "~1.12.5",
+        "@rushstack/heft": "~0.50.0"
     }
 }

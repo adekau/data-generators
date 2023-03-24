@@ -3,9 +3,7 @@
         "paths": {
             "semble-ts/compiler": ["./packages/compiler/index"],
             "semble-ts/core": ["./packages/core/index"],
-            "semble-ts/creation": ["./packages/creation/index"],
-            "semble-ts/library": ["./packages/library/index"],
-            "semble-ts/transformer": ["./packages/transformer/index"]
+            "semble-ts/library": ["./packages/library/index"]
         }
     }
 }

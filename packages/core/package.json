@@ -10,6 +10,11 @@
         "typescript": "^5.0.2",
         "ts-toolbelt": "^9.6.0",
         "esbuild": "~0.17.12",
-        "rimraf": "~4.4.1"
+        "rimraf": "~4.4.1",
+        "@rushstack/heft-node-rig": "~1.12.5",
+        "@rushstack/heft": "~0.50.0",
+        "@rushstack/heft-jest-plugin": "~0.5.5",
+        "@types/heft-jest": "1.0.3",
+        "@types/node": "18.15.7"
     }
 }

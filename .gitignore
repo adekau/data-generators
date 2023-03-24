@@ -72,13 +72,7 @@ common/autoinstallers/*/.npmrc
 # Heft temporary files
 .heft
 
-dist
-/library/
-/creation/
-/transformer/
-/interfaces/
-/compiler/
-/types/
 .DS_STORE
 semble-ts-*.tgz
 packages/**/lib
+packages/**/lib-commonjs
