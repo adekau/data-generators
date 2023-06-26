@@ -170,7 +170,7 @@ describe('Data Generators Compiler: Transformer', () => {
                 )
                 `)
             )
-        ).toBeTrue();
+        ).toBe(true);
     });
 
     it('should transform a simple struct', () => {
@@ -207,7 +207,7 @@ describe('Data Generators Compiler: Transformer', () => {
             })
             `)
             )
-        ).toBeTrue();
+        ).toBe(true);
     });
 
     it('should transform a self referencing type and convert the circular type to constant undefined', () => {
@@ -228,7 +228,7 @@ describe('Data Generators Compiler: Transformer', () => {
                 )
                 `)
             )
-        ).toBeTrue();
+        ).toBe(true);
     });
 
     it('should transform a mapped generic type', () => {

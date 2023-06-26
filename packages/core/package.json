@@ -1,12 +1,17 @@
 {
-    "name": "core",
+    "name": "@semble-ts/core",
     "version": "0.1.0",
     "type": "module",
     "scripts": {
         "clean": "rimraf lib",
-        "build": "npm run clean && node esbuild.js"
+        "build": "npm run clean && node esbuild.js",
+        "test": "heft test"
+    },
+    "dependencies": {
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
+        "@types/uuid": "^9.0.1",
         "typescript": "^5.0.2",
         "ts-toolbelt": "^9.6.0",
         "esbuild": "~0.17.12",

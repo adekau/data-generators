@@ -18,6 +18,12 @@
             "safeForSimultaneousRushProcesses": true,
             "autoinstallerName": "rush-prettier",
             "shellCommand": "pretty-quick --staged"
+        },
+        {
+            "name": "test",
+            "commandKind": "bulk",
+            "summary": "Run unit tests in all projects",
+            "enableParallelism": true
         }
         // {
         //   /**

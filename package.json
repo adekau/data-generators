@@ -16,7 +16,7 @@
     },
     "sideEffects": false,
     "scripts": {
-        "test": "karma start",
+        "test": "rush test",
         "prettier": "prettier --write .",
         "clean:docs": "shx rm -rf ./docs",
         "build:clean": "shx rm -rf ./dist",

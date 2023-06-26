@@ -327,18 +327,13 @@
      */
     "projects": [
         {
-            "packageName": "compiler",
+            "packageName": "@semble-ts/compiler",
             "projectFolder": "packages/compiler",
             "publishFolder": "lib"
         },
         {
-            "packageName": "core",
+            "packageName": "@semble-ts/core",
             "projectFolder": "packages/core",
-            "publishFolder": "lib"
-        },
-        {
-            "packageName": "library",
-            "projectFolder": "packages/library",
             "publishFolder": "lib"
         }
         // {

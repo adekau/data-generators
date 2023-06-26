@@ -1,9 +1,9 @@
 {
     "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
-    "exclude": ["src/**/*.spec.ts"],
+    "exclude": ["node_modules", "lib"],
     "compilerOptions": {
         "moduleResolution": "node",
         "module": "ESNext",
-        "types": ["heft-jest", "node"]
+        "types": ["heft-jest", "node", "uuid"]
     }
 }

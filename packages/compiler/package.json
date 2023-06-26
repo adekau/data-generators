@@ -1,14 +1,14 @@
 {
-    "name": "compiler",
+    "name": "@semble-ts/compiler",
     "version": "0.1.0",
     "type": "module",
     "scripts": {
         "clean": "rimraf lib",
-        "build": "npm run clean && node esbuild.js"
+        "build": "npm run clean && node esbuild.js",
+        "test": "exit 0"
     },
     "dependencies": {
-        "library": "workspace:^",
-        "core": "workspace:^"
+        "@semble-ts/core": "workspace:^"
     },
     "devDependencies": {
         "typescript": "^5.0.2",
