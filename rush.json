@@ -17,7 +17,6 @@
      * correct error-underlining and tab-completion for editors such as VS Code.
      */
     "rushVersion": "5.93.2",
-
     /**
      * The next field selects which package manager should be installed and determines its version.
      * Rush installs its own local copy of the package manager to ensure that your build process

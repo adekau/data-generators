@@ -6,7 +6,7 @@ const CJS_CONFIG: ts.CompilerOptions = {
     experimentalDecorators: true,
     jsx: ts.JsxEmit.React,
     module: ts.ModuleKind.CommonJS,
-    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    moduleResolution: ts.ModuleResolutionKind.Node10,
     noEmitOnError: false,
     noUnusedLocals: true,
     noUnusedParameters: true,

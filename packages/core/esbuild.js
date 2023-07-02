@@ -12,7 +12,7 @@ async function build(project, additionalOpts) {
             packages: 'external',
             target: 'node16',
             treeShaking: true,
-            tsconfig: '../../tsconfig.json',
+            tsconfig: './tsconfig.json',
             ...additionalOpts
         });
 

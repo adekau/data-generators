@@ -1,11 +1,10 @@
-import * as dg from 'semble-ts/core';
-import * as lib from 'semble-ts/library';
+import * as dg from '@semble-ts/core';
 
 /**
  * Mimic the behavior of C# nameof so if anything changes in the future it's a type error here
  * and won't accidentally break things.
  */
-function nameOf<TName extends keyof typeof lib | keyof typeof dg>(name: TName) {
+function nameOf<TName extends keyof typeof dg>(name: TName) {
     return name;
 }
 

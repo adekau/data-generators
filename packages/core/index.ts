@@ -33,3 +33,22 @@ export { optional } from './src/transformer/optional';
 export { take as dgTake, take } from './src/transformer/take';
 export { withoutS, withoutT, withS, withT } from './src/transformer/with';
 export { pipe } from './src/transformer/pipe';
+
+/* Library */
+export { dateGenerator as date, dateGenerator } from './src/library/date';
+export { enumValueGenerator as enumValue, enumValueGenerator } from './src/library/enum';
+export { functionGenerator as func, functionGenerator, toFunctionGenerator } from './src/library/function';
+export { incrementGenerator as incr, incrementGenerator } from './src/library/increment';
+export {
+    booleanGenerator as bool,
+    booleanGenerator,
+    charGenerator as char,
+    charGenerator,
+    integerGenerator as int,
+    integerGenerator,
+    numberGenerator as number,
+    numberGenerator,
+    stringGenerator as string,
+    stringGenerator
+} from './src/library/primitives';
+export { uuidGenerator as uuid, uuidGenerator } from './src/library/uuid-generator';
