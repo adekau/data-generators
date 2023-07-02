@@ -1,0 +1,10 @@
+{
+    "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
+    "exclude": ["node_modules", "lib"],
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "module": "ESNext",
+        "types": ["heft-jest", "glob"],
+        "lib": ["ES2021.String"]
+    }
+}

@@ -1,0 +1,3 @@
+[submodule "packages/compiler/test/ts-transformer-testing-library"]
+	path = packages/compiler/src/testlib/ts-transformer-testing-library
+	url = https://github.com/adekau/ts-transformer-testing-library.git
