@@ -9,6 +9,9 @@ common/config/
 common/temp
 CHANGELOG.*
 
+# Submodules
+packages/compiler/src/testlib/
+
 # Package manager files
 pnpm-lock.yaml
 yarn.lock
