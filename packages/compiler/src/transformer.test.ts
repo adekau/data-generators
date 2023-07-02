@@ -1,7 +1,10 @@
-import { getCompilerOptions, transformFile } from 'ts-transformer-testing-library';
+import {
+    getCompilerOptions,
+    transformFile
+} from './testlib/ts-transformer-testing-library/src/ts-transform-testing-library';
 import { INDEX, LIB } from './helpers';
 import transformer from './transformer';
-import { Project } from '@ts-morph/bootstrap';
+import { createProjectSync } from '@ts-morph/bootstrap';
 
 const INDEX_NAME = '__dg';
 const LIB_NAME = '__dgLib';
@@ -15,7 +18,7 @@ function transform(code: string) {
         transformFile(
             { path: 'index.ts', contents: `import { build } from "./build"; ${code}` },
             {
-                project: new Project({
+                project: createProjectSync({
                     useInMemoryFileSystem: true,
                     compilerOptions: getCompilerOptions({
                         ignoreDeprecations: '5.0'
@@ -43,6 +46,7 @@ function transform(code: string) {
             .join('')
     ).replace(/;$/, '');
 }
+
 describe('Data Generators Compiler: Transformer', () => {
     it('should transform a string', () => {
         expect(transform('build<string>()')).toBe(`${LIB_NAME}.string()`);
