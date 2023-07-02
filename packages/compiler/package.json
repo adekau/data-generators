@@ -23,6 +23,7 @@
         "@rushstack/heft-node-rig": "~1.12.5",
         "@rushstack/heft": "~0.50.0",
         "@rushstack/heft-jest-plugin": "~0.5.5",
-        "@types/heft-jest": "1.0.3"
+        "@types/heft-jest": "1.0.3",
+        "shx": "~0.3.4"
     }
 }
