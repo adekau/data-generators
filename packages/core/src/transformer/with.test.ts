@@ -5,7 +5,7 @@ import { booleanGenerator, charGenerator, integerGenerator, stringGenerator } fr
 import { apT } from './apply';
 import { bindS, bindT } from './bind';
 import { optional } from './optional';
-import { withoutS, withoutT, withS, withT } from './with';
+import { withS, withT, withoutS, withoutT } from './with';
 
 describe('Data Generators: With', () => {
     it("should replace a struct key's generator", () => {

@@ -1,5 +1,4 @@
 import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
-import { withoutT } from '../transformer/with';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
 import { struct } from './struct';
