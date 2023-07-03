@@ -1,9 +1,16 @@
 import { Flat } from './flat.type';
 import { IterableResult, PFst, UFn } from './pipe.type';
+import { WithoutT } from './transformer/with';
 
 export interface DataGenerator<T> extends Iterable<T> {
     /** @internal */
     readonly brand: unique symbol;
+    /**
+     * @internal
+     *
+     * If the data generator produces a struct or a tuple.
+     */
+    readonly type?: 'struct' | 'tuple';
     /**
      * Generate a single output
      *
@@ -200,4 +207,11 @@ export interface DataGenerator<T> extends Iterable<T> {
         fn11: UFn<T10, T11>,
         fn12: UFn<T11, T12>
     ): DataGenerator<IterableResult<T12>>;
+
+    with<U extends keyof T>(name: U, using: Iterable<T[U]>): DataGenerator<T>;
+    without: T extends unknown[]
+        ? <TIndex extends number>(index: TIndex) => DataGenerator<WithoutT<TIndex, T>>
+        : T extends object
+        ? <TName extends keyof T>(name: TName) => DataGenerator<{ [K in keyof T as K extends TName ? never : K]: T[K] }>
+        : never;
 }

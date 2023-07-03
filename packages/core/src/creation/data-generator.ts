@@ -6,6 +6,7 @@ import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
 import { pipe } from '../transformer/pipe';
 import { take } from '../transformer/take';
+import { withS, withT, withoutS, withoutT } from '../transformer/with';
 
 /**
  * Lifts an iterable into a data generator allowing use of data transformation operators.
@@ -14,9 +15,10 @@ import { take } from '../transformer/take';
  * @param gen A function that returns an iterable
  * @returns A new Data Generator that outputs based on the input `Iterable`.
  */
-export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
+export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tuple'): DataGenerator<T> {
     return Object.assign(gen(), <DataGenerator<T>>{
         brand: Symbol.for(getBrand()),
+        type,
         create() {
             return [...take(1)(gen)()][0];
         },
@@ -44,6 +46,26 @@ export function createGenerator<T>(gen: () => Iterable<T>): DataGenerator<T> {
         pipe(...fns: any[]): any {
             const piped = pipe(gen, ...(fns as [any]));
             return isDataGenerator(piped) ? piped : createGenerator(piped as any);
+        },
+        with<U extends keyof T>(name: U, using: Iterable<T[U]>) {
+            switch (this.type) {
+                case 'struct':
+                    return createGenerator((withS as any)(name, using)(gen), 'struct');
+                case 'tuple':
+                    return createGenerator((withT as any)(name, using)(gen), 'tuple');
+                default:
+                    throw new Error();
+            }
+        },
+        without<U extends keyof T>(without: U) {
+            switch (this.type) {
+                case 'struct':
+                    return createGenerator((withoutS as any)(without)(gen), 'struct');
+                case 'tuple':
+                    return createGenerator((withoutT as any)(without)(gen), 'tuple');
+                default:
+                    throw new Error();
+            }
         },
         [Symbol.iterator]() {
             return gen()[Symbol.iterator]();

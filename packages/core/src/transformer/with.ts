@@ -82,6 +82,13 @@ export const withoutS =
         ) as any;
     };
 
+export type WithoutT<TIndex extends number, T extends unknown[]> = B.Or<
+    N.IsNegative<TIndex>,
+    U.Has<N.Lower<TIndex, T['length']>, 0>
+> extends 1
+    ? T
+    : L.Omit<T, TIndex>;
+
 /**
  * Omits a member of a tuple Data Generator from the output.
  *
@@ -97,11 +104,7 @@ export const withoutS =
  */
 export const withoutT =
     <TIndex extends number, T extends unknown[]>(index: TIndex) =>
-    (
-        dgT: () => Iterable<T>
-    ): B.Or<N.IsNegative<TIndex>, U.Has<N.Lower<TIndex, T['length']>, 0>> extends 1
-        ? () => Iterable<T>
-        : () => Iterable<L.Omit<T, TIndex>> => {
+    (dgT: () => Iterable<T>): (() => Iterable<WithoutT<TIndex, T>>) => {
         return pipe(
             dgT,
             map((t) => t.filter((_, i) => i !== index))

@@ -18,7 +18,7 @@ import { createGenerator } from './data-generator';
  * ```
  */
 export function struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }) {
-    return createGenerator(_struct(gens));
+    return createGenerator(_struct(gens), 'struct');
 }
 
 export function _struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }) {
@@ -51,7 +51,7 @@ export function _struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]>
  * @returns a generator that creates a partial object using the provided generators
  */
 export function partialStruct<T extends object>(gens: { [K in keyof T]+?: Iterable<T[K]> }) {
-    return createGenerator(_partialStruct(gens));
+    return createGenerator(_partialStruct(gens), 'struct');
 }
 
 export function _partialStruct<T extends object>(gens: { [K in keyof T]+?: Iterable<T[K]> }) {

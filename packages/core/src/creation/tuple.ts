@@ -16,7 +16,7 @@ import { createGenerator } from './data-generator';
  * ```
  */
 export function tuple<T extends Iterable<unknown>[]>(...gens: T): DataGenerator<IterableTuple<T>> {
-    return createGenerator(_tuple(...gens));
+    return createGenerator(_tuple(...gens), 'tuple');
 }
 
 export function _tuple<T extends Iterable<unknown>[]>(...generators: T): () => Iterable<IterableTuple<T>> {

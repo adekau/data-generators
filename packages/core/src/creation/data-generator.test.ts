@@ -1,5 +1,9 @@
-import { booleanGenerator, integerGenerator, numberGenerator } from '../library/primitives';
+import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
+import { withoutT } from '../transformer/with';
+import { constant } from './constant';
 import { createGenerator } from './data-generator';
+import { struct } from './struct';
+import { tuple } from './tuple';
 
 describe('Data Generators: Data Generator', () => {
     it('should create a data generator', () => {
@@ -33,5 +37,37 @@ describe('Data Generators: Data Generator', () => {
 
         expect(results.length).toBe(3);
         expect(results.every((x) => typeof x === 'boolean')).toBe(true);
+    });
+
+    it('should with on a struct', () => {
+        const gen = struct({ test: numberGenerator() });
+        const result = gen.with('test', constant(50)).create();
+
+        expect(result).toEqual({ test: 50 });
+    });
+
+    it('should with on a tuple', () => {
+        const gen = tuple(numberGenerator());
+        const result = gen.with(0, constant(60)).create();
+
+        expect(result).toEqual([60]);
+    });
+
+    it('should without on a struct', () => {
+        const gen = struct({
+            a: numberGenerator(),
+            b: stringGenerator(),
+            c: booleanGenerator()
+        }).without('b');
+        const result = gen.create();
+
+        expect(result).toEqual({ a: expect.any(Number), c: expect.any(Boolean) });
+    });
+
+    it('should without on a tuple', () => {
+        const gen = tuple(numberGenerator(), stringGenerator()).without(1);
+        const result = gen.create();
+
+        expect(result).toEqual([expect.any(Number)]);
     });
 });
