@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import * as Index from '@semble-ts/core';
 import * as Library from '@semble-ts/core';
+import ts from 'typescript';
 import { defaultDataGeneratorCompilerConfig, IDataGeneratorCompilerConfig } from './configure';
 import { CONSTANTS } from './constants';
 
