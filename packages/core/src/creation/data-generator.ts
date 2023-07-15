@@ -54,7 +54,7 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
                 case 'tuple':
                     return createGenerator((withT as any)(name, using)(gen), 'tuple');
                 default:
-                    throw new Error();
+                    throw new Error('DataGenerator must be either a struct or tuple generator.');
             }
         },
         without<U extends keyof T>(without: U) {
@@ -64,7 +64,7 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
                 case 'tuple':
                     return createGenerator((withoutT as any)(without)(gen), 'tuple');
                 default:
-                    throw new Error();
+                    throw new Error('DataGenerator must be either a struct or tuple generator.');
             }
         },
         [Symbol.iterator]() {

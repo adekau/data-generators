@@ -1,3 +1,4 @@
+import { functionGenerator } from '../library/function';
 import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
@@ -68,5 +69,23 @@ describe('Data Generators: Data Generator', () => {
         const result = gen.create();
 
         expect(result).toEqual([expect.any(Number)]);
+    });
+
+    it('should error calling with on non-tuple/struct', () => {
+        function testCreation() {
+            const gen = numberGenerator().with('toString', functionGenerator(stringGenerator()));
+        }
+        const error = 'DataGenerator must be either a struct or tuple generator.';
+
+        expect(testCreation).toThrowError(error);
+    });
+
+    it('should error calling without on non-tuple/struct', () => {
+        function testCreation() {
+            (numberGenerator() as any).without('toString');
+        }
+        const error = 'DataGenerator must be either a struct or tuple generator.';
+
+        expect(testCreation).toThrowError(error);
     });
 });
