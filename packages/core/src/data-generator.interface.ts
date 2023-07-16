@@ -1,6 +1,5 @@
 import { Flat } from './flat.type';
 import { IterableResult, PFst, UFn } from './pipe.type';
-import { bindS } from './transformer/bind';
 import { WithoutT } from './transformer/with';
 
 export interface DataGenerator<T> extends Iterable<T> {
