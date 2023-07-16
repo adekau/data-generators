@@ -220,13 +220,25 @@ export interface DataGenerator<T> extends Iterable<T> {
         fn12: UFn<T11, T12>
     ): DataGenerator<IterableResult<T12>>;
 
+    /**
+     * Uses {@link transformer.withS} on structs and {@link transformer.withT} on tuples.
+     * Cannot be used on non-struct and non-tuple (i.e. primitive) values.
+     */
     with<U extends keyof T>(name: U, using: Iterable<T[U]>): DataGenerator<T>;
 
+    /**
+     * Uses {@link transformer.withoutS} on structs and {@link transformer.withoutT} on tuples.
+     * Cannot be used on non-struct and non-tuple (i.e. primitive) values.
+     */
     without: T extends unknown[]
         ? <TIndex extends number>(index: TIndex) => DataGenerator<WithoutT<TIndex, T>>
         : T extends Record<any, any>
         ? <TName extends keyof T>(name: TName) => DataGenerator<{ [K in keyof T as K extends TName ? never : K]: T[K] }>
         : never;
 
+    /**
+     * Uses {@link transformer.bindS} on structs and {@link transformer.bindT} on tuples.
+     * Cannot be used on non-struct and non-tuple (i.e. primitive) values.
+     */
     bind: <U, TName extends string>(...args: BindArgs<T, U, TName>) => BindReturn<T, U, TName>;
 }
