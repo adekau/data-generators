@@ -19,7 +19,7 @@ import { pipe } from './pipe';
  * ).create(); // { int: 5 }
  * ```
  */
-export function withS<TName extends keyof A, A extends object>(name: TName, using: Iterable<A[TName]>) {
+export function withS<TName extends keyof A, A extends Record<any, any>>(name: TName, using: Iterable<A[TName]>) {
     return function (gen: () => Iterable<A>): () => Iterable<A> {
         return pipe(
             _struct({ out: gen(), replace: using }),
@@ -74,7 +74,7 @@ export const withT =
  * ```
  */
 export const withoutS =
-    <TName extends keyof A, A extends object>(name: TName) =>
+    <TName extends keyof A, A extends Record<any, any>>(name: TName) =>
     (gen: () => Iterable<A>): (() => Iterable<{ [K in keyof A as K extends TName ? never : K]: A[K] }>) => {
         return pipe(
             gen,

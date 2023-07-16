@@ -2,6 +2,18 @@ import { Flat } from './flat.type';
 import { IterableResult, PFst, UFn } from './pipe.type';
 import { WithoutT } from './transformer/with';
 
+export type BindArgs<T, U, TName extends string> = T extends unknown[]
+    ? [(f: T) => Iterable<U>]
+    : T extends Record<any, any>
+    ? [name: Exclude<TName, keyof T>, f: (a: T) => Iterable<U>]
+    : never;
+
+export type BindReturn<T, U, TName extends string> = T extends unknown[]
+    ? DataGenerator<[...T, U]>
+    : T extends Record<any, any>
+    ? DataGenerator<{ [K in keyof T | TName]: K extends keyof T ? T[K] : U }>
+    : never;
+
 export interface DataGenerator<T> extends Iterable<T> {
     /** @internal */
     readonly brand: unique symbol;
@@ -209,20 +221,12 @@ export interface DataGenerator<T> extends Iterable<T> {
     ): DataGenerator<IterableResult<T12>>;
 
     with<U extends keyof T>(name: U, using: Iterable<T[U]>): DataGenerator<T>;
+
     without: T extends unknown[]
         ? <TIndex extends number>(index: TIndex) => DataGenerator<WithoutT<TIndex, T>>
-        : T extends object
+        : T extends Record<any, any>
         ? <TName extends keyof T>(name: TName) => DataGenerator<{ [K in keyof T as K extends TName ? never : K]: T[K] }>
         : never;
-    bind: <U, TName extends string>(
-        ...args: T extends unknown[]
-            ? [(f: T) => Iterable<U>]
-            : T extends object
-            ? [name: Exclude<TName, keyof T>, f: (a: T) => Iterable<U>]
-            : never
-    ) => T extends unknown[]
-        ? DataGenerator<[...T, U]>
-        : T extends object
-        ? DataGenerator<{ [K in keyof T | TName]: K extends keyof T ? T[K] : U }>
-        : never;
+
+    bind: <U, TName extends string>(...args: BindArgs<T, U, TName>) => BindReturn<T, U, TName>;
 }
