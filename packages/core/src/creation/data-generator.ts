@@ -2,6 +2,7 @@ import { getBrand } from '../brand';
 import { DataGenerator } from '../data-generator.interface';
 import { isDataGenerator } from '../is-data-generator';
 import { ap } from '../transformer/apply';
+import { bindS, bindT } from '../transformer/bind';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
 import { pipe } from '../transformer/pipe';
@@ -63,6 +64,26 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
                     return createGenerator((withoutS as any)(without)(gen), 'struct');
                 case 'tuple':
                     return createGenerator((withoutT as any)(without)(gen), 'tuple');
+                default:
+                    throw new Error('DataGenerator must be either a struct or tuple generator.');
+            }
+        },
+        bind<U, TName extends string>(
+            ...args: T extends unknown[]
+                ? [(f: T) => Iterable<U>]
+                : T extends object
+                ? [name: Exclude<TName, keyof T>, f: (a: T) => Iterable<U>]
+                : never
+        ): T extends unknown[]
+            ? DataGenerator<[...T, U]>
+            : T extends object
+            ? DataGenerator<{ [K in keyof T | TName]: K extends keyof T ? T[K] : U }>
+            : never {
+            switch (this.type) {
+                case 'struct':
+                    return createGenerator((bindS as any)(...args)(gen), 'struct') as any;
+                case 'tuple':
+                    return createGenerator((bindT as any)(...args)(gen), 'tuple') as any;
                 default:
                     throw new Error('DataGenerator must be either a struct or tuple generator.');
             }

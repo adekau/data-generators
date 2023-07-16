@@ -2,6 +2,7 @@ import { functionGenerator } from '../library/function';
 import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
+import { interpolate } from './interpolate';
 import { struct } from './struct';
 import { tuple } from './tuple';
 
@@ -73,7 +74,7 @@ describe('Data Generators: Data Generator', () => {
 
     it('should error calling with on non-tuple/struct', () => {
         function testCreation() {
-            const gen = numberGenerator().with('toString', functionGenerator(stringGenerator()));
+            numberGenerator().with('toString', functionGenerator(stringGenerator()));
         }
         const error = 'DataGenerator must be either a struct or tuple generator.';
 
@@ -87,5 +88,27 @@ describe('Data Generators: Data Generator', () => {
         const error = 'DataGenerator must be either a struct or tuple generator.';
 
         expect(testCreation).toThrowError(error);
+    });
+
+    it('should bind on a tuple', () => {
+        const gen = tuple(numberGenerator(20, 99));
+        const gen2 = gen.bind((a) => interpolate`you are ${constant(a[0])}`);
+        const result = gen2.create();
+
+        expect(result[0]).toEqual(expect.any(Number));
+        expect(result[1]).toBe(`you are ${result[0]}`);
+    });
+
+    it('should bind on a struct', () => {
+        const gen = struct({
+            n: numberGenerator()
+        });
+        const gen2 = gen.bind('b', (a) => interpolate`you are ${constant(a.n)}`);
+        const gen3 = gen2.bind('c', (a) => interpolate`woo! ${constant(a.b)}`);
+        const result = gen3.create();
+
+        expect(result.n).toEqual(expect.any(Number));
+        expect(result.b).toBe(`you are ${result.n}`);
+        expect(result.c).toBe(`woo! you are ${result.n}`);
     });
 });
