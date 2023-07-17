@@ -243,7 +243,13 @@ export interface DataGenerator<T> extends Iterable<T> {
      */
     bind<U, TName extends string>(...args: BindArgs<T, U, TName>): BindReturn<T, U, TName>;
 
+    /**
+     * Uses {@link transformer.bindToS} to bind the caller DataGenerator to a struct.
+     */
     bindToStruct<TName extends string>(name: TName): DataGenerator<{ [K in TName]: T }>;
 
+    /**
+     * Uses {@link transformer.bindToT} to bind the caller DataGenerator to a tuple.
+     */
     bindToTuple(): DataGenerator<[T]>;
 }
