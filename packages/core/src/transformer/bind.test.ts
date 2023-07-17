@@ -10,6 +10,7 @@ describe('Data Generators: Bind', () => {
     it('should bind an existing data generator', () => {
         const gen = stringGenerator().pipe(bindToS('a'));
 
+        expect(gen.type).toBe('struct');
         expect(gen.create()).toEqual({
             a: expect.stringMatching(/.{10}/)
         });
@@ -70,6 +71,7 @@ describe('Data Generators: Bind', () => {
         it('should bind to a tuple', () => {
             const gen = integerGenerator().pipe(bindToT());
 
+            expect(gen.type).toBe('tuple');
             expect(gen.create()).toEqual([expect.any(Number)]);
         });
 

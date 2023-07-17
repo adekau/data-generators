@@ -2,7 +2,7 @@ import { getBrand } from '../brand';
 import { BindArgs, BindReturn, DataGenerator } from '../data-generator.interface';
 import { isDataGenerator } from '../is-data-generator';
 import { ap } from '../transformer/apply';
-import { bindS, bindT } from '../transformer/bind';
+import { bindS, bindT, bindToS, bindToT } from '../transformer/bind';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
 import { pipe } from '../transformer/pipe';
@@ -77,6 +77,12 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
                 default:
                     throw new Error('DataGenerator must be either a struct or tuple generator.');
             }
+        },
+        bindToStruct<TName extends string>(name: TName): DataGenerator<{ [K in TName]: T }> {
+            return createGenerator(bindToS<TName, T>(name)(gen), 'struct');
+        },
+        bindToTuple(): DataGenerator<[T]> {
+            return createGenerator(bindToT<T>()(gen), 'tuple');
         },
         [Symbol.iterator]() {
             return gen()[Symbol.iterator]();

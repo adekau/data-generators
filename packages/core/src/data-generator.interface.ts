@@ -1,5 +1,6 @@
 import { Flat } from './flat.type';
 import { IterableResult, PFst, UFn } from './pipe.type';
+import { bindToS, bindToT } from './transformer/bind';
 import { WithoutT } from './transformer/with';
 
 export type BindArgs<T, U, TName extends string> = T extends unknown[]
@@ -240,5 +241,9 @@ export interface DataGenerator<T> extends Iterable<T> {
      * Uses {@link transformer.bindS} on structs and {@link transformer.bindT} on tuples.
      * Cannot be used on non-struct and non-tuple (i.e. primitive) values.
      */
-    bind: <U, TName extends string>(...args: BindArgs<T, U, TName>) => BindReturn<T, U, TName>;
+    bind<U, TName extends string>(...args: BindArgs<T, U, TName>): BindReturn<T, U, TName>;
+
+    bindToStruct<TName extends string>(name: TName): DataGenerator<{ [K in TName]: T }>;
+
+    bindToTuple(): DataGenerator<[T]>;
 }

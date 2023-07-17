@@ -111,4 +111,22 @@ describe('Data Generators: Data Generator', () => {
         expect(result.b).toBe(`you are ${result.n}`);
         expect(result.c).toBe(`woo! you are ${result.n}`);
     });
+
+    it('should bind to a struct', () => {
+        const gen = numberGenerator(20, 99).bindToStruct('num');
+        const result = gen.create();
+
+        expect(gen.type).toBe('struct');
+        expect(result).toEqual({
+            num: expect.any(Number)
+        });
+    });
+
+    it('should bind to a tuple', () => {
+        const gen = numberGenerator(20, 99).bindToTuple();
+        const result = gen.create();
+
+        expect(gen.type).toBe('tuple');
+        expect(result).toEqual([expect.any(Number)]);
+    });
 });
