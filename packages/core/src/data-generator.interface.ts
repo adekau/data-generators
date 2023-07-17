@@ -1,6 +1,5 @@
 import { Flat } from './flat.type';
 import { IterableResult, PFst, UFn } from './pipe.type';
-import { bindToS, bindToT } from './transformer/bind';
 import { WithoutT } from './transformer/with';
 
 export type BindArgs<T, U, TName extends string> = T extends unknown[]
