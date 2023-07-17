@@ -76,18 +76,16 @@ describe('Data Generators: Data Generator', () => {
         function testCreation() {
             numberGenerator().with('toString', functionGenerator(stringGenerator()));
         }
-        const error = 'DataGenerator must be either a struct or tuple generator.';
 
-        expect(testCreation).toThrowError(error);
+        expect(testCreation).toThrowError('DataGenerator must be either a struct or tuple generator.');
     });
 
     it('should error calling without on non-tuple/struct', () => {
         function testCreation() {
             (numberGenerator() as any).without('toString');
         }
-        const error = 'DataGenerator must be either a struct or tuple generator.';
 
-        expect(testCreation).toThrowError(error);
+        expect(testCreation).toThrowError('DataGenerator must be either a struct or tuple generator.');
     });
 
     it('should bind on a tuple', () => {
@@ -112,6 +110,14 @@ describe('Data Generators: Data Generator', () => {
         expect(result.c).toBe(`woo! you are ${result.n}`);
     });
 
+    it('should error calling bind on non-tuple/struct', () => {
+        function testCreation() {
+            (numberGenerator() as any).bind('a', (n: number) => constant(n + 1));
+        }
+
+        expect(testCreation).toThrowError('DataGenerator must be either a struct or tuple generator.');
+    });
+
     it('should bind to a struct', () => {
         const gen = numberGenerator(20, 99).bindToStruct('num');
         const result = gen.create();
@@ -128,5 +134,24 @@ describe('Data Generators: Data Generator', () => {
 
         expect(gen.type).toBe('tuple');
         expect(result).toEqual([expect.any(Number)]);
+    });
+
+    it('should apply to a struct', () => {
+        const gen = struct({
+            n: numberGenerator()
+        }).apply('s', stringGenerator(5));
+        const result = gen.create();
+
+        expect(result).toEqual({
+            n: expect.any(Number),
+            s: expect.stringMatching(/.{5}/)
+        });
+    });
+
+    it('should apply to a tuple', () => {
+        const gen = tuple(numberGenerator()).apply(stringGenerator(5));
+        const result = gen.create();
+
+        expect(result).toEqual([expect.any(Number), expect.stringMatching(/.{5}/)]);
     });
 });

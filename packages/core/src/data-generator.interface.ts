@@ -14,6 +14,14 @@ export type BindReturn<T, U, TName extends string> = T extends unknown[]
     ? DataGenerator<{ [K in keyof T | TName]: K extends keyof T ? T[K] : U }>
     : never;
 
+export type ApplyArgs<T, U, TName extends string> = T extends unknown[]
+    ? [gen: Iterable<U>]
+    : T extends Record<any, any>
+    ? [name: Exclude<TName, keyof T>, gen: Iterable<U>]
+    : never;
+
+export type ApplyReturn<T, U, TName extends string> = BindReturn<T, U, TName>;
+
 export interface DataGenerator<T> extends Iterable<T> {
     /** @internal */
     readonly brand: unique symbol;
@@ -251,4 +259,10 @@ export interface DataGenerator<T> extends Iterable<T> {
      * Uses {@link transformer.bindToT} to bind the caller DataGenerator to a tuple.
      */
     bindToTuple(): DataGenerator<[T]>;
+
+    /**
+     * Uses {@link transformer.apS} on structs and {@link transformer.apT} on tuples.
+     * Cannot be used on non-struct and non-tuple (i.e. primitive) values.
+     */
+    apply<U, TName extends string>(...args: ApplyArgs<T, U, TName>): ApplyReturn<T, U, TName>;
 }

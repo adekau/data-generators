@@ -1,7 +1,7 @@
 import { getBrand } from '../brand';
-import { BindArgs, BindReturn, DataGenerator } from '../data-generator.interface';
+import { ApplyArgs, ApplyReturn, BindArgs, BindReturn, DataGenerator } from '../data-generator.interface';
 import { isDataGenerator } from '../is-data-generator';
-import { ap } from '../transformer/apply';
+import { ap, apS, apT } from '../transformer/apply';
 import { bindS, bindT, bindToS, bindToT } from '../transformer/bind';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
@@ -83,6 +83,16 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
         },
         bindToTuple(): DataGenerator<[T]> {
             return createGenerator(bindToT<T>()(gen), 'tuple');
+        },
+        apply<U, TName extends string>(...args: ApplyArgs<T, U, TName>): ApplyReturn<T, U, TName> {
+            switch (this.type) {
+                case 'struct':
+                    return createGenerator((apS as any)(...args)(gen), 'struct') as any;
+                case 'tuple':
+                    return createGenerator((apT as any)(...args)(gen), 'tuple') as any;
+                default:
+                    throw new Error('DataGenerator must be either a struct or tuple generator.');
+            }
         },
         [Symbol.iterator]() {
             return gen()[Symbol.iterator]();
