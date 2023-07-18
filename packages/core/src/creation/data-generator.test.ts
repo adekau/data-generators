@@ -160,7 +160,6 @@ describe('Data Generators: Data Generator', () => {
         const result = gen.createAll();
 
         expect(result).toEqual([1, 2, 3, 4, 'a', 'b', 5]);
-    })
     });
 
     it('should no-op when using flat on non-iterable', () => {
@@ -168,6 +167,5 @@ describe('Data Generators: Data Generator', () => {
         const result = gen.create();
 
         expect(result).toBe(false);
-    })
     });
 });
