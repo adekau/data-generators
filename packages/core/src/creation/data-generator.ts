@@ -30,19 +30,19 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
             return [...this];
         },
         map<U>(project: (t: T) => U) {
-            return createGenerator(map(project)(gen));
+            return createGenerator(map(project)(gen), this.type);
         },
         flatMap<U>(project: (t: T) => DataGenerator<U>) {
-            return createGenerator(flatMap(project)(gen));
+            return createGenerator(flatMap(project)(gen), this.type);
         },
         ap<U>(projectGenerator: DataGenerator<(t: T) => U>) {
-            return createGenerator(ap(projectGenerator)(gen));
+            return createGenerator(ap(projectGenerator)(gen), this.type);
         },
         one() {
-            return createGenerator(one<T>()(gen));
+            return createGenerator(one<T>()(gen), this.type);
         },
         take(n: number) {
-            return createGenerator(take(n)(gen));
+            return createGenerator(take(n)(gen), this.type);
         },
         pipe(...fns: any[]): any {
             const piped = pipe(gen, ...(fns as [any]));
