@@ -1,8 +1,10 @@
 import { getBrand } from '../brand';
 import { ApplyArgs, ApplyReturn, BindArgs, BindReturn, DataGenerator } from '../data-generator.interface';
+import { Flat } from '../flat.type';
 import { isDataGenerator } from '../is-data-generator';
 import { ap, apS, apT } from '../transformer/apply';
 import { bindS, bindT, bindToS, bindToT } from '../transformer/bind';
+import { flat } from '../transformer/flat';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
 import { pipe } from '../transformer/pipe';
@@ -92,6 +94,13 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
                     return createGenerator((apT as any)(...args)(gen), 'tuple') as any;
                 default:
                     throw new Error('DataGenerator must be either a struct or tuple generator.');
+            }
+        },
+        flat(): DataGenerator<Flat<Iterable<T>>> {
+            if (typeof gen()[Symbol.iterator] === 'function') {
+                return createGenerator((flat as any)()(gen), this.type);
+            } else {
+                return this as any;
             }
         },
         [Symbol.iterator]() {

@@ -265,4 +265,10 @@ export interface DataGenerator<T> extends Iterable<T> {
      * Cannot be used on non-struct and non-tuple (i.e. primitive) values.
      */
     apply<U, TName extends string>(...args: ApplyArgs<T, U, TName>): ApplyReturn<T, U, TName>;
+
+    /**
+     * Uses {@link transformer.flat} to flatten nested iterators into a single iterator.
+     * For non-flattenable iterators (iterators that contain no nested iterables), this function is a no-op.
+     */
+    flat(): DataGenerator<Flat<Iterable<T>>>;
 }

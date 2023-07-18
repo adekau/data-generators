@@ -1,5 +1,6 @@
 import { functionGenerator } from '../library/function';
 import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
+import { flat } from '../transformer/flat';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
 import { interpolate } from './interpolate';
@@ -153,5 +154,20 @@ describe('Data Generators: Data Generator', () => {
         const result = gen.create();
 
         expect(result).toEqual([expect.any(Number), expect.stringMatching(/.{5}/)]);
+    });
+    it('should flat an iterable', () => {
+        const gen = createGenerator(() => [[1, 2], [3, 4], ['a', 'b'], 5]).flat();
+        const result = gen.createAll();
+
+        expect(result).toEqual([1, 2, 3, 4, 'a', 'b', 5]);
+    })
+    });
+
+    it('should no-op when using flat on non-iterable', () => {
+        const gen = constant(false).flat();
+        const result = gen.create();
+
+        expect(result).toBe(false);
+    })
     });
 });
