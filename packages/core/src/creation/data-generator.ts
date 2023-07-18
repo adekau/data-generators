@@ -8,6 +8,7 @@ import { withDefault } from '../transformer/default';
 import { flat } from '../transformer/flat';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
+import { optional } from '../transformer/optional';
 import { pipe } from '../transformer/pipe';
 import { take } from '../transformer/take';
 import { withS, withT, withoutS, withoutT } from '../transformer/with';
@@ -99,6 +100,9 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
         },
         withDefault(defaultGenerator: Iterable<T>): DataGenerator<Exclude<T, undefined>> {
             return createGenerator(withDefault(defaultGenerator)(gen), this.type) as any;
+        },
+        optional(undefinedProbability?: number): DataGenerator<T | undefined> {
+            return createGenerator(optional<T>(undefinedProbability)(gen), this.type);
         },
         flat(): DataGenerator<Flat<Iterable<T>>> {
             if (typeof gen()[Symbol.iterator] === 'function') {

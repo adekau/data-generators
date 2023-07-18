@@ -272,6 +272,11 @@ export interface DataGenerator<T> extends Iterable<T> {
     withDefault(defaultGenerator: Iterable<T>): DataGenerator<Exclude<T, undefined>>;
 
     /**
+     * Uses {@link transformer.optional} on the caller DataGenerator to include a probability of creating an undefined value.
+     */
+    optional(undefinedProbability?: number): DataGenerator<T | undefined>;
+
+    /**
      * Uses {@link transformer.flat} to flatten nested iterators into a single iterator.
      * For non-flattenable iterators (iterators that contain no nested iterables), this function is a no-op.
      */

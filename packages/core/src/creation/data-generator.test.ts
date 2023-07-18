@@ -156,12 +156,21 @@ describe('Data Generators: Data Generator', () => {
 
         expect(result).toEqual([expect.any(Number), expect.stringMatching(/.{5}/)]);
     });
+
     it('should default undefined values', () => {
         const gen = constantSequence(undefined, 5, undefined, 6).withDefault(integerGenerator(10, 20));
         const result = gen.createAll();
 
         expect(result).toEqual([expect.any(Number), 5, expect.any(Number), 6]);
     });
+
+    it('should make caller optional', () => {
+        const gen = constant('hello').optional(100);
+        const result = gen.create();
+
+        expect(result).toBeUndefined();
+    });
+
     it('should flat an iterable', () => {
         const gen = createGenerator(() => [[1, 2], [3, 4], ['a', 'b'], 5]).flat();
         const result = gen.createAll();
