@@ -1,4 +1,5 @@
 import { functionGenerator } from '../library/function';
+import { incrementGenerator } from '../library/increment';
 import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
 import { flat } from '../transformer/flat';
 import { constant } from './constant';
@@ -169,6 +170,16 @@ describe('Data Generators: Data Generator', () => {
         const result = gen.create();
 
         expect(result).toBeUndefined();
+    });
+
+    it('should create an array of specified length', () => {
+        const gen = incrementGenerator(1).many(3);
+        const result = gen.createMany(2);
+
+        expect(result).toEqual([
+            [1, 1, 1],
+            [2, 2, 2]
+        ]);
     });
 
     it('should flat an iterable', () => {

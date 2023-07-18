@@ -277,6 +277,11 @@ export interface DataGenerator<T> extends Iterable<T> {
     optional(undefinedProbability?: number): DataGenerator<T | undefined>;
 
     /**
+     * Uses {@link tansformer.many} on the caller DataGenerator to create an array of length `length` from the generator.
+     */
+    many(length: number): DataGenerator<T[]>;
+
+    /**
      * Uses {@link transformer.flat} to flatten nested iterators into a single iterator.
      * For non-flattenable iterators (iterators that contain no nested iterables), this function is a no-op.
      */

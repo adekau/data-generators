@@ -6,6 +6,7 @@ import { ap, apS, apT } from '../transformer/apply';
 import { bindS, bindT, bindToS, bindToT } from '../transformer/bind';
 import { withDefault } from '../transformer/default';
 import { flat } from '../transformer/flat';
+import { many } from '../transformer/many';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
 import { optional } from '../transformer/optional';
@@ -103,6 +104,9 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
         },
         optional(undefinedProbability?: number): DataGenerator<T | undefined> {
             return createGenerator(optional<T>(undefinedProbability)(gen), this.type);
+        },
+        many(length: number): DataGenerator<T[]> {
+            return createGenerator(many<T>(length)(gen), this.type);
         },
         flat(): DataGenerator<Flat<Iterable<T>>> {
             if (typeof gen()[Symbol.iterator] === 'function') {
