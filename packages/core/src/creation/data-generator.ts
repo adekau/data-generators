@@ -4,6 +4,7 @@ import { Flat } from '../flat.type';
 import { isDataGenerator } from '../is-data-generator';
 import { ap, apS, apT } from '../transformer/apply';
 import { bindS, bindT, bindToS, bindToT } from '../transformer/bind';
+import { withDefault } from '../transformer/default';
 import { flat } from '../transformer/flat';
 import { flatMap, map } from '../transformer/map';
 import { one } from '../transformer/one';
@@ -95,6 +96,9 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
                 default:
                     throw new Error('DataGenerator must be either a struct or tuple generator.');
             }
+        },
+        withDefault(defaultGenerator: Iterable<T>): DataGenerator<Exclude<T, undefined>> {
+            return createGenerator(withDefault(defaultGenerator)(gen), this.type) as any;
         },
         flat(): DataGenerator<Flat<Iterable<T>>> {
             if (typeof gen()[Symbol.iterator] === 'function') {

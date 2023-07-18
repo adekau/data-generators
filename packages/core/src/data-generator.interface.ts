@@ -267,6 +267,11 @@ export interface DataGenerator<T> extends Iterable<T> {
     apply<U, TName extends string>(...args: ApplyArgs<T, U, TName>): ApplyReturn<T, U, TName>;
 
     /**
+     * Uses {@link transformer.withDefault} to use a data generator in place of undefined values.
+     */
+    withDefault(defaultGenerator: Iterable<T>): DataGenerator<Exclude<T, undefined>>;
+
+    /**
      * Uses {@link transformer.flat} to flatten nested iterators into a single iterator.
      * For non-flattenable iterators (iterators that contain no nested iterables), this function is a no-op.
      */

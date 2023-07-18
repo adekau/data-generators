@@ -4,6 +4,7 @@ import { flat } from '../transformer/flat';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
 import { interpolate } from './interpolate';
+import { constantSequence } from './sequence';
 import { struct } from './struct';
 import { tuple } from './tuple';
 
@@ -154,6 +155,12 @@ describe('Data Generators: Data Generator', () => {
         const result = gen.create();
 
         expect(result).toEqual([expect.any(Number), expect.stringMatching(/.{5}/)]);
+    });
+    it('should default undefined values', () => {
+        const gen = constantSequence(undefined, 5, undefined, 6).withDefault(integerGenerator(10, 20));
+        const result = gen.createAll();
+
+        expect(result).toEqual([expect.any(Number), 5, expect.any(Number), 6]);
     });
     it('should flat an iterable', () => {
         const gen = createGenerator(() => [[1, 2], [3, 4], ['a', 'b'], 5]).flat();
