@@ -1,6 +1,6 @@
 import { DataGenerator } from '../data-generator.interface';
 import { IterableTuple } from '../iterable-tuple.type';
-import { createGenerator } from './data-generator';
+import { IterableFactoryWithType, createGenerator } from './data-generator';
 
 /**
  * Similar to struct, but in a fixed length array format.
@@ -19,20 +19,25 @@ export function tuple<T extends Iterable<unknown>[]>(...gens: T): DataGenerator<
     return createGenerator(_tuple(...gens), 'tuple');
 }
 
-export function _tuple<T extends Iterable<unknown>[]>(...generators: T): () => Iterable<IterableTuple<T>> {
-    return function* () {
-        const iterators = generators.map((dg) => dg[Symbol.iterator]());
+export function _tuple<T extends Iterable<unknown>[]>(...generators: T): IterableFactoryWithType<IterableTuple<T>> {
+    return Object.assign(
+        function* () {
+            const iterators = generators.map((dg) => dg[Symbol.iterator]());
 
-        while (true) {
-            const result = [];
-            for (const it of iterators) {
-                const { value, done } = it.next();
-                if (done) {
-                    return;
+            while (true) {
+                const result = [];
+                for (const it of iterators) {
+                    const { value, done } = it.next();
+                    if (done) {
+                        return;
+                    }
+                    result.push(value);
                 }
-                result.push(value);
+                yield result as IterableTuple<T>;
             }
-            yield result as IterableTuple<T>;
+        },
+        {
+            type: 'tuple' as const
         }
-    };
+    );
 }

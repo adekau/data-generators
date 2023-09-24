@@ -1,4 +1,4 @@
-import { createGenerator } from './data-generator';
+import { IterableFactoryWithType, createGenerator } from './data-generator';
 
 /**
  * Creates a generator that generates an object adhering to an interface using the provided generators for
@@ -21,26 +21,31 @@ export function struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> 
     return createGenerator(_struct(gens), 'struct');
 }
 
-export function _struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }) {
-    return function* () {
-        const iterators: [string, Iterator<T[keyof T]>][] = Object.entries(gens).map(([key, iterable]) => [
-            key,
-            (iterable as any)[Symbol.iterator]()
-        ]);
+export function _struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]> }): IterableFactoryWithType<T> {
+    return Object.assign(
+        function* () {
+            const iterators: [string, Iterator<T[keyof T]>][] = Object.entries(gens).map(([key, iterable]) => [
+                key,
+                (iterable as any)[Symbol.iterator]()
+            ]);
 
-        while (true) {
-            const result: T = {} as T;
-            for (const [key, it] of iterators) {
-                const { value, done } = it.next();
-                if (!done) {
-                    result[key as keyof T] = value;
-                } else {
-                    return;
+            while (true) {
+                const result: T = {} as T;
+                for (const [key, it] of iterators) {
+                    const { value, done } = it.next();
+                    if (!done) {
+                        result[key as keyof T] = value;
+                    } else {
+                        return;
+                    }
                 }
+                yield result;
             }
-            yield result;
+        },
+        {
+            type: 'struct' as const
         }
-    };
+    );
 }
 
 /**

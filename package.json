@@ -8,7 +8,7 @@
     "esnext": "./dist/esm5/index.js",
     "types": "./dist/types/index.d.ts",
     "typesVersions": {
-        ">=4.1": {
+        ">=5.0": {
             "*": [
                 "dist/types/*"
             ]

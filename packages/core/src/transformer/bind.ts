@@ -1,3 +1,4 @@
+import { IterableFactoryWithType } from '../creation/data-generator';
 import { _struct } from '../creation/struct';
 import { _tuple } from '../creation/tuple';
 import { flatMapShallow, map } from './map';
@@ -18,8 +19,10 @@ import { pipe } from './pipe';
  */
 export const bindToS =
     <TName extends string, T>(name: TName) =>
-    (gen: () => Iterable<T>): (() => Iterable<{ [K in TName]: T }>) => {
-        return () => _struct({ [name]: gen() })() as Iterable<{ [K in TName]: T }>;
+    (gen: () => Iterable<T>): IterableFactoryWithType<{ [K in TName]: T }> => {
+        return Object.assign(() => _struct({ [name]: gen() })() as Iterable<{ [K in TName]: T }>, {
+            type: 'struct' as const
+        });
     };
 
 /**
@@ -35,8 +38,8 @@ export const bindToS =
  */
 export const bindToT =
     <T>() =>
-    (generator: () => Iterable<T>): (() => Iterable<[T]>) => {
-        return () => _tuple(generator())();
+    (generator: () => Iterable<T>): IterableFactoryWithType<[T]> => {
+        return Object.assign(() => _tuple(generator())(), { type: 'tuple' as const });
     };
 
 /**

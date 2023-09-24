@@ -14,6 +14,11 @@ import { pipe } from '../transformer/pipe';
 import { take } from '../transformer/take';
 import { withS, withT, withoutS, withoutT } from '../transformer/with';
 
+export interface IterableFactoryWithType<T> {
+    (): Iterable<T>;
+    type?: 'struct' | 'tuple';
+}
+
 /**
  * Lifts an iterable into a data generator allowing use of data transformation operators.
  *
@@ -21,10 +26,12 @@ import { withS, withT, withoutS, withoutT } from '../transformer/with';
  * @param gen A function that returns an iterable
  * @returns A new Data Generator that outputs based on the input `Iterable`.
  */
-export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tuple'): DataGenerator<T> {
+export function createGenerator<T>(gen: IterableFactoryWithType<T>, type?: 'struct' | 'tuple'): DataGenerator<T> {
+    const computedType = gen.type ?? type;
+
     return Object.assign(gen(), <DataGenerator<T>>{
         brand: Symbol.for(getBrand()),
-        type,
+        type: computedType,
         create() {
             return [...take(1)(gen)()][0];
         },
@@ -51,7 +58,7 @@ export function createGenerator<T>(gen: () => Iterable<T>, type?: 'struct' | 'tu
         },
         pipe(...fns: any[]): any {
             const piped = pipe(gen, ...(fns as [any]));
-            return isDataGenerator(piped) ? piped : createGenerator(piped as any);
+            return isDataGenerator(piped) ? piped : createGenerator(piped as any, this.type);
         },
         with<U extends keyof T>(name: U, using: Iterable<T[U]>) {
             switch (this.type) {
