@@ -7,10 +7,10 @@ importers:
 
   ../../packages/compiler:
     specifiers:
+      '@data-generators/core': workspace:^
       '@rushstack/heft': ~0.50.0
       '@rushstack/heft-jest-plugin': ~0.5.5
       '@rushstack/heft-node-rig': ~1.12.5
-      '@semble-ts/core': workspace:^
       '@ts-morph/bootstrap': ^0.20.0
       '@types/glob': ^8.1.0
       '@types/heft-jest': 1.0.3
@@ -21,7 +21,7 @@ importers:
       ts-toolbelt: ^9.6.0
       typescript: ^5.1.3
     dependencies:
-      '@semble-ts/core': link:../core
+      '@data-generators/core': link:../core
     devDependencies:
       '@rushstack/heft': 0.50.0
       '@rushstack/heft-jest-plugin': 0.5.5_@rushstack+heft@0.50.0

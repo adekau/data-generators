@@ -1,5 +1,5 @@
 {
-    "name": "semble-ts",
+    "name": "data-generators",
     "version": "0.1.0",
     "description": "Mock unit test data generation",
     "main": "dist/cjs/index.js",
@@ -29,13 +29,7 @@
         "dist/cjs/**/*",
         "dist/esm/**/!(*.tsbuildinfo)",
         "dist/esm5/**/*",
-        "dist/types/**/*",
-        "library",
-        "interfaces",
-        "transformer",
-        "compiler",
-        "types",
-        "tsconfig.json"
+        "dist/types/**/*"
     ],
     "exports": {
         ".": {
@@ -43,35 +37,20 @@
             "default": "./dist/esm5/index.js",
             "types": "./dist/types/index.d.ts"
         },
-        "./library": {
-            "node": "./dist/cjs/library/index.js",
-            "default": "./dist/esm5/library/index.js",
-            "types": "./dist/types/library/index.d.ts"
-        },
-        "./transformer": {
-            "node": "./dist/cjs/transformer/index.js",
-            "default": "./dist/esm5/transformer/index.js",
-            "types": "./dist/types/transformer/index.d.ts"
-        },
-        "./interfaces": {
-            "node": "./dist/cjs/interfaces/index.js",
-            "default": "./dist/esm5/interfaces/index.js",
-            "types": "./dist/types/interfaces/index.d.ts"
+        "./core": {
+            "node": "./dist/cjs/core/index.js",
+            "default": "./dist/esm5/core/index.js",
+            "types": "./dist/types/core/index.d.ts"
         },
         "./compiler": {
             "node": "./dist/cjs/compiler/index.js",
             "default": "./dist/esm5/compiler/index.js",
             "types": "./dist/types/compiler/index.d.ts"
-        },
-        "./types": {
-            "node": "./dist/cjs/types/index.js",
-            "default": "./dist/esm5/types/index.js",
-            "types": "./dist/types/types/index.d.ts"
         }
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/adekau/semble-ts.git"
+        "url": "git+https://github.com/adekau/data-generators.git"
     },
     "keywords": [
         "mock",
@@ -81,9 +60,9 @@
     "author": "Alex Dekau",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/adekau/semble-ts/issues"
+        "url": "https://github.com/adekau/data-generators/issues"
     },
-    "homepage": "https://github.com/adekau/semble-ts#readme",
+    "homepage": "https://github.com/adekau/data-generators#readme",
     "dependencies": {
         "ts-toolbelt": "^9.6.0",
         "tslib": "^2.5.0",

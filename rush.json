@@ -306,12 +306,12 @@
      */
     "projects": [
         {
-            "packageName": "@semble-ts/compiler",
+            "packageName": "@data-generators/compiler",
             "projectFolder": "packages/compiler",
             "publishFolder": "lib"
         },
         {
-            "packageName": "@semble-ts/core",
+            "packageName": "@data-generators/core",
             "projectFolder": "packages/core",
             "publishFolder": "lib"
         }

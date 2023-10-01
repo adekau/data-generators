@@ -1,5 +1,5 @@
 {
-    "name": "@semble-ts/compiler",
+    "name": "@data-generators/compiler",
     "version": "0.1.0",
     "type": "module",
     "scripts": {
@@ -8,7 +8,7 @@
         "test": "heft test"
     },
     "dependencies": {
-        "@semble-ts/core": "workspace:^"
+        "@data-generators/core": "workspace:^"
     },
     "devDependencies": {
         "typescript": "^5.1.3",

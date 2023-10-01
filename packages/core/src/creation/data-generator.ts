@@ -58,7 +58,7 @@ export function createGenerator<T>(gen: IterableFactoryWithType<T>, type?: 'stru
         },
         pipe(...fns: any[]): any {
             const piped = pipe(gen, ...(fns as [any]));
-            return isDataGenerator(piped) ? piped : createGenerator(piped as any, this.type);
+            return isDataGenerator(piped) ? piped : createGenerator(piped as any, (piped as any).type ?? this.type);
         },
         with<U extends keyof T>(name: U, using: Iterable<T[U]>) {
             switch (this.type) {
