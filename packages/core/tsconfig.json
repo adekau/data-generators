@@ -4,6 +4,7 @@
     "compilerOptions": {
         "moduleResolution": "node",
         "module": "ESNext",
+        "declaration": true,
         "types": ["heft-jest", "node", "uuid"]
     }
 }

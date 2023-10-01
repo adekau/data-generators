@@ -4,8 +4,16 @@
     "type": "module",
     "scripts": {
         "clean": "rimraf lib",
-        "build": "npm run clean && node esbuild.js",
+        "build": "heft build",
         "test": "heft test"
+    },
+    "main": "lib/index.js",
+    "typesVersions": {
+        ">=5.0": {
+            "*": [
+                "lib/types/*"
+            ]
+        }
     },
     "dependencies": {
         "uuid": "^8.3.2"
