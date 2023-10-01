@@ -1,8 +1,8 @@
-# Semble-TS
+# Data Generators
 
 This library is intended to provide an abstraction over [ES6 Generator Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*) for use in Data Generation.
 
-`semble-ts` is aimed at random test data generation, but can be used for any data generation. More generally, it provides infinite lazy lists using [lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation).
+`data-generators` is aimed at random test data generation, but can be used for any data generation. More generally, it provides infinite lazy lists using [lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation).
 
 It's API is modeled after both RxJS and the fluent API of AutoFixture, so that it will look familiar to both C# and JavaScript developers.
 

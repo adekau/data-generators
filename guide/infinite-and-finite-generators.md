@@ -5,7 +5,7 @@ Data Generators can be broken down into two distinct types: **infinite** and **f
 A **finite** Data Generator can only produce a set amount of values. If you try to create more values than it can produce, it will produce only the amount it can and then terminate.
 
 ```ts
-import { createGenerator } from 'semble-ts';
+import { createGenerator } from '@data-generators/core';
 
 const gen = createGenerator(function* () {
     yield 'Hello';
@@ -22,8 +22,8 @@ Transformers such as [[`take`]] and [[`one`]] also result in a finite Data Gener
 and [[`createMany`]] is just generating some values from a potentially infinite data generator.
 
 ```ts
-import { int } from 'semble-ts/library';
-import { take } from 'semble-ts/transformer';
+import { int } from '@data-generators/core';
+import { take } from '@data-generators/core';
 
 const gen1 = int();
 const gen2 = int().pipe(take(5));
@@ -44,12 +44,12 @@ due to the [[`take`]] transformer and can only generate 5 integers at maximum. H
 
 ## Infinite
 
-An **infinite** Data Generator will never run out of values it can produce. All Data Generators in [[library | `semble-ts/library`]] are infinite.
+An **infinite** Data Generator will never run out of values it can produce. All Data Generators in [[library | `@data-generators/core/library`]] are infinite.
 
 An infinite Data Generator is just a `while (true)` infinite loop that yields the next value.
 
 ```ts
-import { createGenerator } from 'semble-ts';
+import { createGenerator } from '@data-generators/core';
 
 const number = createGenerator(function* () {
     while (true) {

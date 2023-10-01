@@ -15,7 +15,7 @@ For one of the tests, you want to verify the results when `firstName` is `undefi
 
 ```typescript
 import { personGenerator } from './person.generator';
-import { withS } from 'semble-ts/transformer';
+import { withS } from '@data-generators/core';
 
 it('should handle invalid first name values', () => {
     const persons = personGenerator
@@ -37,15 +37,14 @@ it('should handle invalid first name values', () => {
 
 ### Primitives
 
-`semble-ts` includes some generators out of the box under the [[library]] module for primitive data types such as strings, booleans, and numbers.
+`@data-generators/core` includes some generators out of the box under the [[library]] module for primitive data types such as strings, booleans, and numbers.
 
 To generate a value from these, the methods [[`create`]], [[`createMany`]], and [[`createAll`]] are available.
 
 [[`create`]] generates a single value, [[`createMany`]] allows you to specify how many values to generate and returns the values in an array, while [[`createAll`]] creates values from the generator until the generator is exhausted of values to generate.
 
 ```typescript
-import { int, bool, date } from 'semble-ts/library';
-import { take } from 'semble-ts/transformer';
+import { int, bool, date, take } from '@data-generators/core';
 
 int(1, 10).create(); // random integer between 1 and 10
 bool(70).createMany(3); // Array of 3 random booleans each with a 70% probability of being true
@@ -58,13 +57,12 @@ date({ minutes: int(10, 40) })
 
 While the library provides the primitive building blocks, the [[`index`]] and [[`transformer`]] modules provide various [combinators](https://en.wikipedia.org/wiki/Combinatory_logic#In_computing) for creating generators of more complex structure.
 
-Besides the primitive types in JavaScript, there are also Objects and Arrays (which are Objects as well). [[`struct`]] creates a new generator that generates an object, and [[`tuple`]] creates a new generator that generates an array. These functions are available in the index module (`semble-ts`).
+Besides the primitive types in JavaScript, there are also Objects and Arrays (which are Objects as well). [[`struct`]] creates a new generator that generates an object, and [[`tuple`]] creates a new generator that generates an array. These functions are available in the index module (`@data-generators/core`).
 
 A common use case of [[`struct`]] is creating a shareable generator for an interface/contract. For example, contact info,
 
 ```typescript
-import { struct } from 'semble-ts';
-import { string, date } from 'semble-ts/library';
+import { struct, string, date } from '@data-generators/core';
 
 export interface ContactInfo {
     firstName: string;
@@ -89,9 +87,7 @@ In addition to [[`struct`]], there is [[`tuple`]]. Tuple will generally be used 
 using a similar technique commonly used for RxJS Observables. If you need multiple generated values, and then want to map to a single value, in RxJS you would use `forkJoin` or `combineLatest`. Here tuple can be used for a similar purpose.
 
 ```typescript
-import { tuple } from 'semble-ts';
-import { int } from 'semble-ts/library';
-import { map } from 'semble-ts/transformer';
+import { tuple, int, map } from '@data-generators/core';
 
 tuple(int(1, 50), ['Bob', 'Jim', 'Larry'])
     .pipe(map(([num, name]) => `${name}, your lucky number is ${num}!`))
@@ -115,9 +111,7 @@ The `ap` and `bind` transformers all add members to a [[`struct`]] or [[`tuple`]
 -   `ap` appends a member to the end of an existing struct or tuple.
 
     ```ts
-    import { struct, tuple, constant } from 'semble-ts';
-    import { apS, apT } from 'semble-ts/transformer';
-    import { date } from 'semble-ts/library';
+    import { struct, tuple, constant, apS, apT, date } from '@data-generators/core';
 
     struct({
         name: constant('Bob')
@@ -131,8 +125,7 @@ The `ap` and `bind` transformers all add members to a [[`struct`]] or [[`tuple`]
 -   `bindTo` transforms a non struct or tuple into a struct or tuple.
 
     ```ts
-    import { bindToS, bindToT } from 'semble-ts/transformer';
-    import { int } from 'semble-ts/library';
+    import { bindToS, bindToT, int } from '@data-generators/core';
 
     int().pipe(bindToS('luckyNumber'));
     // Outputs an object with type { luckyNumber: number }
@@ -144,9 +137,7 @@ The `ap` and `bind` transformers all add members to a [[`struct`]] or [[`tuple`]
 -   `bind` appends a member to the end of an existing struct or tuple just as `ap` does, but allows you to use the existing values.
 
     ```ts
-    import { struct, tuple } from 'semble-ts';
-    import { bindS, bindT } from 'semble-ts/transformer';
-    import { int, string } from 'semble-ts/library';
+    import { struct, tuple, bindS, bindT,  int, string } from '@data-generators/core';
 
     struct({
         strLen: int(5, 10)

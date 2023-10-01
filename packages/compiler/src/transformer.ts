@@ -1,5 +1,5 @@
-import * as Index from '@semble-ts/core';
-import * as Library from '@semble-ts/core';
+import * as Index from '@data-generators/core';
+import * as Library from '@data-generators/core';
 import ts from 'typescript';
 import { defaultDataGeneratorCompilerConfig, IDataGeneratorCompilerConfig } from './configure';
 import { CONSTANTS } from './constants';
@@ -46,7 +46,7 @@ const transformationCache = new WeakMap<ts.Type, ts.Expression>();
  *
  * @param program The TypeScript program reference provided by a compiler. Gives the transformer access to type information.
  * @param context the typescript transformation context
- * @param config semble-ts specific configuration
+ * @param config @data-generators specific configuration
  * @returns
  */
 const getTransformSourceFileFunction: (
@@ -82,7 +82,7 @@ const getTransformSourceFileFunction: (
  * recursively transform the Type Parameter of [[`build`]] into a callable Data Generator.
  *
  * @param program The TypeScript program reference provided by a compiler. Gives the transformer access to type information.
- * @param config semble-ts specific configuration
+ * @param config @data-generators specific configuration
  * @returns a transformed Abstract Syntax Tree (AST)
  */
 const transformer =
@@ -672,7 +672,7 @@ function createConstantUndefinedExpression(factory: ts.NodeFactory): ts.Expressi
 }
 
 /**
- * Creates a function call expression on the index data generator package (e.g. 'semble-ts').
+ * Creates a function call expression on the index data generator package (e.g. '@data-generators').
  * @param access the index package function to call
  * @param args arguments to call the function with
  */
@@ -685,7 +685,7 @@ function createIndexCallExpression(
 }
 
 /**
- * Creates a function call expression on the library data generator package (e.g. 'semble-ts/library').
+ * Creates a function call expression on the library data generator package (e.g. '@data-generators/library').
  * @param access the library package function to call
  * @param args arguments to call the function with
  */

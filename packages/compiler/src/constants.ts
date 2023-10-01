@@ -1,4 +1,4 @@
-import * as dg from '@semble-ts/core';
+import * as dg from '@data-generators/core';
 
 /**
  * Mimic the behavior of C# nameof so if anything changes in the future it's a type error here
@@ -25,9 +25,9 @@ export const CONSTANTS = {
      * expression easier
      */
     INDEX: '__dg' as const,
-    INDEX_LOCATION: 'semble-ts' as const,
+    INDEX_LOCATION: '@data-generators/core' as const,
     LIBRARY: '__dgLib' as const,
-    LIBRARY_LOCATION: 'semble-ts/library' as const,
+    LIBRARY_LOCATION: '@data-generators/core' as const,
     /**
      * TypeScript doesn't expose a lot of information about function types without the `FunctionTypeNode`
      * `TypeNode` being present
