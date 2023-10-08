@@ -13,13 +13,13 @@ export { arrayGenerator as array, arrayGenerator } from './creation/array';
 export { build } from './creation/build';
 export { constant } from './creation/constant';
 export { createGenerator } from './creation/data-generator';
-export { either, _either } from './creation/either';
+export { _either, either } from './creation/either';
 export { iif as dgIf, iif } from './creation/iif';
 export { infinite } from './creation/infinite';
 export { interpolate } from './creation/interpolate';
 export { constantSequence, sequence } from './creation/sequence';
-export { partialStruct, struct, _partialStruct, _struct } from './creation/struct';
-export { tuple, _tuple } from './creation/tuple';
+export { _partialStruct, _struct, mergeStructs, partialStruct, struct } from './creation/struct';
+export { _tuple, tuple } from './creation/tuple';
 
 /* Transformer */
 export { ap, apS, apT } from './transformer/apply';
@@ -27,12 +27,12 @@ export { bindS, bindT, bindToS, bindToT } from './transformer/bind';
 export { withDefault } from './transformer/default';
 export { flat } from './transformer/flat';
 export { many } from './transformer/many';
-export { flatMap as dgFlatMap, flatMap, flatMapShallow, map as dgMap, map } from './transformer/map';
+export { flatMap as dgFlatMap, map as dgMap, flatMap, flatMapShallow, map } from './transformer/map';
 export { one } from './transformer/one';
 export { optional } from './transformer/optional';
-export { take as dgTake, take } from './transformer/take';
-export { withoutS, withoutT, withS, withT } from './transformer/with';
 export { pipe } from './transformer/pipe';
+export { take as dgTake, take } from './transformer/take';
+export { withS, withT, withoutS, withoutT } from './transformer/with';
 
 /* Library */
 export { dateGenerator as date, dateGenerator } from './library/date';
