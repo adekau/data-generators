@@ -1,5 +1,5 @@
-import { Head } from 'ts-toolbelt/out/List/Head';
-import { Tail, bool, int, tuple } from '..';
+import { List } from 'ts-toolbelt';
+import { tuple } from './tuple';
 import { IterableFactoryWithType, createGenerator } from './data-generator';
 
 /**
@@ -86,14 +86,14 @@ export function _partialStruct<T extends object>(gens: { [K in keyof T]+?: Itera
  * Type for merging data generator structs together
  */
 export type MergeStructs<T extends Iterable<object>[], Built extends object = {}> = {
-    1: Head<T> extends Iterable<infer U>
+    1: List.Head<T> extends Iterable<infer U>
         ? MergeStructs<
-              Tail<T>,
+              List.Tail<T>,
               {
                   [K in keyof Built | keyof U]: K extends keyof U ? U[K] : K extends keyof Built ? Built[K] : never;
               }
           >
-        : MergeStructs<Tail<T>, Built>;
+        : MergeStructs<List.Tail<T>, Built>;
     0: Built;
 }[T['length'] extends 0 ? 0 : 1];
 
@@ -109,5 +109,3 @@ export function mergeStructs<T extends Iterable<object>[]>(...gens: T) {
         return Object.assign({}, ...(structs as any[])) as MergeStructs<T>;
     });
 }
-
-const tester = mergeStructs(struct({ a: bool() }), struct({ b: int() }), struct({ b: bool(), c: int() }));
