@@ -1,3 +1,5 @@
+import { Head } from 'ts-toolbelt/out/List/Head';
+import { Tail, bool, int, tuple } from '..';
 import { IterableFactoryWithType, createGenerator } from './data-generator';
 
 /**
@@ -79,3 +81,33 @@ export function _partialStruct<T extends object>(gens: { [K in keyof T]+?: Itera
         }
     };
 }
+
+/**
+ * Type for merging data generator structs together
+ */
+export type MergeStructs<T extends Iterable<object>[], Built extends object = {}> = {
+    1: Head<T> extends Iterable<infer U>
+        ? MergeStructs<
+              Tail<T>,
+              {
+                  [K in keyof Built | keyof U]: K extends keyof U ? U[K] : K extends keyof Built ? Built[K] : never;
+              }
+          >
+        : MergeStructs<Tail<T>, Built>;
+    0: Built;
+}[T['length'] extends 0 ? 0 : 1];
+
+/**
+ * Creates a generator that merges structs together into a single struct.
+ *
+ * @category Creation
+ * @param gens the struct generators to merge
+ * @returns a generator that merges the results of each provided struct generator together
+ */
+export function mergeStructs<T extends Iterable<object>[]>(...gens: T) {
+    return tuple(...gens).map((structs) => {
+        return Object.assign({}, ...(structs as any[])) as MergeStructs<T>;
+    });
+}
+
+const tester = mergeStructs(struct({ a: bool() }), struct({ b: int() }), struct({ b: bool(), c: int() }));
