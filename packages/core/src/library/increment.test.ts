@@ -28,4 +28,12 @@ describe('Data Generators: Increment', () => {
         expect(result2.length).toBe(12);
         expect(result3.length).toBe(14);
     });
+
+    it('persists', () => {
+        const gen = incrementGenerator(0, true);
+
+        expect(incrementGenerator().createMany(5)).toEqual([0, 1, 2, 3, 4]);
+        expect(gen.createMany(5)).toEqual([0, 1, 2, 3, 4]);
+        expect(gen.createMany(2)).toEqual([5, 6]);
+    });
 });

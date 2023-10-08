@@ -12,10 +12,14 @@ import { createGenerator } from '../creation/data-generator';
  * // [5, 6, 7, 8, 9, 10]
  * ```
  */
-export const incrementGenerator = (startWith: number = 0) =>
+export const incrementGenerator = (startWith: number = 0, persist: boolean = false) =>
     createGenerator(function* () {
         let i = startWith;
         while (true) {
-            yield i++;
+            if (persist) {
+                yield startWith++;
+            } else {
+                yield i++;
+            }
         }
     });
