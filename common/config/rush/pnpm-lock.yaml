@@ -7,7 +7,7 @@ importers:
 
   ../../packages/compiler:
     specifiers:
-      '@data-generators/core': ^0.1.4
+      '@data-generators/core': ^0.2.0
       '@rushstack/heft': ~0.50.0
       '@rushstack/heft-jest-plugin': ~0.5.5
       '@rushstack/heft-node-rig': ~1.12.5
@@ -16,7 +16,7 @@ importers:
       ts-toolbelt: ^9.6.0
       typescript: ^5.1.6
     dependencies:
-      '@data-generators/core': 0.1.4
+      '@data-generators/core': 0.2.0
       ts-toolbelt: 9.6.0
       typescript: 5.1.6
     devDependencies:
@@ -390,8 +390,8 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@data-generators/core/0.1.4:
-    resolution: {integrity: sha512-LoueUKMRl3RmkCKvpwhjR9SCaoTTwdMcTXGp+sARti8FAtkCB/pMWLq1gIaU3K3VEGYD2KR1f3jSdq2vpAJqIA==}
+  /@data-generators/core/0.2.0:
+    resolution: {integrity: sha512-cyp9iHkxrtGrkpsAMd/pVh67DPrrAKfIhFJoqAZfRK1Tmn51582pL6c817v3DJqU2jGvxWT5sEFDo0vSv3jW8w==}
     dependencies:
       ts-toolbelt: 9.6.0
       uuid: 8.3.2
