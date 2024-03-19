@@ -1,7 +1,6 @@
 import { functionGenerator } from '../library/function';
 import { incrementGenerator } from '../library/increment';
 import { booleanGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
-import { flat } from '../transformer/flat';
 import { constant } from './constant';
 import { createGenerator } from './data-generator';
 import { interpolate } from './interpolate';
@@ -176,9 +175,11 @@ describe('Data Generators: Data Generator', () => {
         const gen = incrementGenerator(1).many(3);
         const result = gen.createMany(2);
 
+        console.log(result);
+
         expect(result).toEqual([
-            [1, 1, 1],
-            [2, 2, 2]
+            [1, 2, 3],
+            [4, 5, 6]
         ]);
     });
 

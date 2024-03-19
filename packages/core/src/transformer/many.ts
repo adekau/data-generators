@@ -19,5 +19,8 @@ import { _tuple } from '../creation/tuple';
 export const many =
     <T>(length: number) =>
     (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) => {
-        return () => _tuple(...Array.from({ length }).map(() => baseGenerator()))();
+        // DataGenerator makes an iterable "recyclable" where each time a value is pulled through a create method, it gets it from a new iterator.
+        // If a DataGenerator is passed in, e.g. from constantSequence, get the raw iterator from it to prevent this recycling.
+        const gen = baseGenerator()[Symbol.iterator]() as unknown as Iterable<T>;
+        return () => _tuple(...Array.from({ length }).map(() => gen))();
     };
