@@ -19,6 +19,13 @@ describe('Data Generators: Many', () => {
         expect(result).toEqual([4, 3, 2, 1]);
     });
 
+    it("shouldn't over-emit", () => {
+        const gen = constantSequence(4, 3, 2, 1).many(10);
+        const result = gen.create();
+
+        expect(result).toEqual([4, 3, 2, 1]);
+    });
+
     it('should work with structs containing sequences', () => {
         const gen = struct({
             id: [4, 3, 2, 1],

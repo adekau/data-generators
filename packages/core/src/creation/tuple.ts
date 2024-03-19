@@ -28,9 +28,11 @@ export function _tuple<T extends Iterable<unknown>[]>(...generators: T): Iterabl
                 const result = [];
                 for (const it of iterators) {
                     const { value, done } = it.next();
+
                     if (done) {
-                        return;
+                        return result as IterableTuple<T>;
                     }
+
                     result.push(value);
                 }
                 yield result as IterableTuple<T>;

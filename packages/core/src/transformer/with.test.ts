@@ -63,6 +63,21 @@ describe('Data Generators: With', () => {
         ]);
     });
 
+    it('should restrict an infinite generator to finite (tuple)', () => {
+        const gen = tuple(charGenerator, stringGenerator(), integerGenerator());
+
+        expect(gen.createMany(5).length).toBe(5);
+
+        const results = gen.pipe(withT(2, [1, 2, 3])).createMany(5);
+
+        expect(results.length).toBe(3);
+        expect(results).toEqual([
+            [expect.stringMatching(/./), expect.stringMatching(/.{10}/), 1],
+            [expect.stringMatching(/./), expect.stringMatching(/.{10}/), 2],
+            [expect.stringMatching(/./), expect.stringMatching(/.{10}/), 3]
+        ]);
+    });
+
     describe('Without', () => {
         it('should omit a struct property', () => {
             const gen = struct({

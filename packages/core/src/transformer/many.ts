@@ -1,4 +1,5 @@
-import { _tuple } from '../creation/tuple';
+import { infinite } from '../creation/infinite';
+import { tuple } from '../creation/tuple';
 
 /**
  * Creates a generator that returns an array of length `length` of outputs from `baseGenerator`.
@@ -19,8 +20,9 @@ import { _tuple } from '../creation/tuple';
 export const many =
     <T>(length: number) =>
     (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) => {
-        // DataGenerator makes an iterable "recyclable" where each time a value is pulled through a create method, it gets it from a new iterator.
-        // If a DataGenerator is passed in, e.g. from constantSequence, get the raw iterator from it to prevent this recycling.
-        const gen = baseGenerator()[Symbol.iterator]() as unknown as Iterable<T>;
-        return () => _tuple(...Array.from({ length }).map(() => gen))();
+        return () =>
+            infinite(() => {
+                const gen = baseGenerator()[Symbol.iterator]() as unknown as Iterable<T>;
+                return tuple(...Array.from({ length }).map(() => gen)).create();
+            });
     };

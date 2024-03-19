@@ -38,7 +38,7 @@ export function _struct<T extends object>(gens: { [K in keyof T]: Iterable<T[K]>
                     if (!done) {
                         result[key as keyof T] = value;
                     } else {
-                        return;
+                        return result;
                     }
                 }
                 yield result;

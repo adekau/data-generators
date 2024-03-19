@@ -175,11 +175,9 @@ describe('Data Generators: Data Generator', () => {
         const gen = incrementGenerator(1).many(3);
         const result = gen.createMany(2);
 
-        console.log(result);
-
         expect(result).toEqual([
             [1, 2, 3],
-            [4, 5, 6]
+            [1, 2, 3]
         ]);
     });
 

@@ -33,7 +33,8 @@ export function createGenerator<T>(gen: IterableFactoryWithType<T>, type?: 'stru
         brand: Symbol.for(getBrand()),
         type: computedType,
         create() {
-            return [...take(1)(gen)()][0];
+            const { value } = this[Symbol.iterator]().next();
+            return value;
         },
         createMany(n: number) {
             return [...take(n)(gen)()];
