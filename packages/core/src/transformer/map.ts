@@ -23,7 +23,7 @@ export function map<T, U>(project: (t: T) => U) {
  */
 export function flatMap<T, U>(project: (v: T) => Iterable<U>) {
     return function (gen: () => Iterable<T>) {
-        return pipe(gen, map(project), flat());
+        return pipe(() => gen(), map(project), flat());
     };
 }
 

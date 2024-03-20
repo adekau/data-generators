@@ -22,7 +22,7 @@ export const toFunctionGenerator =
     <T>() =>
     (dg: () => Iterable<T>): (() => Iterable<() => T>) => {
         return pipe(
-            dg,
+            () => dg(),
             map((t) => () => t)
         );
     };

@@ -62,7 +62,7 @@ export const bindS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, f: (a: A) => Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
         return pipe(
-            dgA,
+            () => dgA(),
             flatMapShallow((a) =>
                 pipe(
                     () => f(a),
@@ -94,7 +94,7 @@ export const bindT =
     <A extends unknown[], T>(f: (a: A) => Iterable<T>) =>
     (dgA: () => Iterable<A>): (() => Iterable<[...A, T]>) => {
         return pipe(
-            dgA,
+            () => dgA(),
             flatMapShallow((a) =>
                 pipe(
                     () => f(a),

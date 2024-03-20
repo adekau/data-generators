@@ -1,6 +1,6 @@
 import { constantSequence } from '../creation/sequence';
 import { struct } from '../creation/struct';
-import { integerGenerator } from '../library/primitives';
+import { integerGenerator, stringGenerator } from '../library/primitives';
 import { many } from './many';
 
 describe('Data Generators: Many', () => {
@@ -24,6 +24,75 @@ describe('Data Generators: Many', () => {
         const result = gen.create();
 
         expect(result).toEqual([4, 3, 2, 1]);
+    });
+
+    it('should work with nested manys', () => {
+        const itemGen = struct({
+            id: integerGenerator(),
+            name: stringGenerator()
+        });
+        const itemGenModified = itemGen.with('id', [1, 2, 3]).with('name', ['Name 1', 'Name 2', 'Name 3']);
+
+        const gen = struct({
+            version: integerGenerator(),
+            items: itemGenModified.many(3)
+        });
+
+        const result = gen.createMany(3);
+
+        expect(result).toEqual([
+            {
+                version: expect.any(Number),
+                items: [
+                    {
+                        id: 1,
+                        name: 'Name 1'
+                    },
+                    {
+                        id: 2,
+                        name: 'Name 2'
+                    },
+                    {
+                        id: 3,
+                        name: 'Name 3'
+                    }
+                ]
+            },
+            {
+                version: expect.any(Number),
+                items: [
+                    {
+                        id: 1,
+                        name: 'Name 1'
+                    },
+                    {
+                        id: 2,
+                        name: 'Name 2'
+                    },
+                    {
+                        id: 3,
+                        name: 'Name 3'
+                    }
+                ]
+            },
+            {
+                version: expect.any(Number),
+                items: [
+                    {
+                        id: 1,
+                        name: 'Name 1'
+                    },
+                    {
+                        id: 2,
+                        name: 'Name 2'
+                    },
+                    {
+                        id: 3,
+                        name: 'Name 3'
+                    }
+                ]
+            }
+        ]);
     });
 
     it('should work with structs containing sequences', () => {

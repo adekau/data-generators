@@ -22,7 +22,7 @@ import { pipe } from './pipe';
 export function withS<TName extends keyof A, A extends Record<any, any>>(name: TName, using: Iterable<A[TName]>) {
     return function (gen: () => Iterable<A>): () => Iterable<A> {
         return pipe(
-            _struct({ out: gen(), replace: using }),
+            () => _struct({ out: gen(), replace: using })(),
             map(({ out, replace }) => Object.assign({}, out, { [name]: replace }))
         );
     };
@@ -51,7 +51,7 @@ export const withT =
     ) =>
     (gen: () => Iterable<T>): (() => Iterable<T>) => {
         return pipe(
-            _tuple(gen(), using),
+            () => _tuple(gen(), using)(),
             map(([out, replace]) => [...out.slice(0, index), replace, ...out.slice(index + 1, out.length)] as any)
         );
     };
@@ -77,7 +77,7 @@ export const withoutS =
     <TName extends keyof A, A extends Record<any, any>>(name: TName) =>
     (gen: () => Iterable<A>): (() => Iterable<{ [K in keyof A as K extends TName ? never : K]: A[K] }>) => {
         return pipe(
-            gen,
+            () => gen(),
             map(({ [name]: _, ...rest }) => rest)
         ) as any;
     };
@@ -106,7 +106,7 @@ export const withoutT =
     <TIndex extends number, T extends unknown[]>(index: TIndex) =>
     (dgT: () => Iterable<T>): (() => Iterable<WithoutT<TIndex, T>>) => {
         return pipe(
-            dgT,
+            () => dgT(),
             map((t) => t.filter((_, i) => i !== index))
         ) as any;
     };

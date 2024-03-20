@@ -9,6 +9,6 @@ import { take } from './take';
  */
 export function one<T>() {
     return function (gen: () => Iterable<T>) {
-        return pipe(gen, take(1));
+        return pipe(() => gen(), take(1));
     };
 }

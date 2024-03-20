@@ -1,3 +1,4 @@
+import { pipe } from './pipe';
 import { take } from './take';
 
 /**
@@ -20,7 +21,7 @@ export const many =
     <T>(length: number) =>
     (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) => {
         return function* () {
-            const gen = take(length)(baseGenerator);
+            const gen = pipe(() => baseGenerator(), take(length));
             while (true) {
                 yield [...gen()];
             }
