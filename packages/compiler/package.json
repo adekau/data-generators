@@ -1,6 +1,6 @@
 {
     "name": "@data-generators/compiler",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "type": "module",
     "main": "lib/index.js",
     "typings": "lib/index.d.ts",
@@ -9,7 +9,7 @@
         "test": "heft test"
     },
     "dependencies": {
-        "@data-generators/core": "^0.2.0",
+        "@data-generators/core": "^0.2.5",
         "ts-toolbelt": "^9.6.0",
         "typescript": "^5.1.6"
     },

@@ -1,5 +1,4 @@
-import { infinite } from '../creation/infinite';
-import { tuple } from '../creation/tuple';
+import { take } from './take';
 
 /**
  * Creates a generator that returns an array of length `length` of outputs from `baseGenerator`.
@@ -20,9 +19,10 @@ import { tuple } from '../creation/tuple';
 export const many =
     <T>(length: number) =>
     (baseGenerator: () => Iterable<T>): (() => Iterable<T[]>) => {
-        return () =>
-            infinite(() => {
-                const gen = baseGenerator()[Symbol.iterator]() as unknown as Iterable<T>;
-                return tuple(...Array.from({ length }).map(() => gen)).create();
-            });
+        return function* () {
+            const gen = take(length)(baseGenerator);
+            while (true) {
+                yield [...gen()];
+            }
+        };
     };

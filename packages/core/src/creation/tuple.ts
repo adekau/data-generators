@@ -32,7 +32,6 @@ export function _tuple<T extends Iterable<unknown>[]>(...generators: T): Iterabl
                     if (done) {
                         return result as IterableTuple<T>;
                     }
-
                     result.push(value);
                 }
                 yield result as IterableTuple<T>;
