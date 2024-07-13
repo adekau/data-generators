@@ -2,6 +2,7 @@ import { charGenerator, integerGenerator, numberGenerator, stringGenerator } fro
 import { enumValueGenerator } from '../library/enum';
 import { mergeStructs, struct } from './struct';
 import { constant } from './constant';
+import { either } from './either';
 
 enum EyeColor {
     Blue = 'blue',
@@ -62,6 +63,7 @@ describe('Data Generators (Creation): Struct', () => {
         const merged = mergeStructs(personGen, structGen1, structGen2);
         const result = merged.create();
 
+        expect(merged.type).toBe('struct');
         expect(
             result.eyeColor === EyeColor.Blue ||
                 result.eyeColor === EyeColor.Brown ||

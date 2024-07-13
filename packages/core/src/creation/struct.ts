@@ -1,6 +1,8 @@
 import { List } from 'ts-toolbelt';
-import { tuple } from './tuple';
+import { map } from '../transformer/map';
+import { pipe } from '../transformer/pipe';
 import { IterableFactoryWithType, createGenerator } from './data-generator';
+import { _tuple } from './tuple';
 
 /**
  * Creates a generator that generates an object adhering to an interface using the provided generators for
@@ -82,17 +84,9 @@ export function _partialStruct<T extends object>(gens: { [K in keyof T]+?: Itera
     };
 }
 
-/**
- * Type for merging data generator structs together
- */
 export type MergeStructs<T extends Iterable<object>[], Built extends object = {}> = {
     1: List.Head<T> extends Iterable<infer U>
-        ? MergeStructs<
-              List.Tail<T>,
-              {
-                  [K in keyof Built | keyof U]: K extends keyof U ? U[K] : K extends keyof Built ? Built[K] : never;
-              }
-          >
+        ? MergeStructs<List.Tail<T>, Built & U>
         : MergeStructs<List.Tail<T>, Built>;
     0: Built;
 }[T['length'] extends 0 ? 0 : 1];
@@ -105,7 +99,14 @@ export type MergeStructs<T extends Iterable<object>[], Built extends object = {}
  * @returns a generator that merges the results of each provided struct generator together
  */
 export function mergeStructs<T extends Iterable<object>[]>(...gens: T) {
-    return tuple(...gens).map((structs) => {
-        return Object.assign({}, ...(structs as any[])) as MergeStructs<T>;
-    });
+    return createGenerator(_mergeStructs(...gens), 'struct');
+}
+
+export function _mergeStructs<T extends Iterable<object>[]>(...gens: T): IterableFactoryWithType<MergeStructs<T>> {
+    return pipe(
+        () => _tuple(...gens)(),
+        map((structs) => {
+            return Object.assign({}, ...(structs as any[]));
+        })
+    );
 }
