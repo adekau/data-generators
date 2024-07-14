@@ -22,6 +22,8 @@ export type ApplyArgs<T, U, TName extends string> = T extends unknown[]
 
 export type ApplyReturn<T, U, TName extends string> = BindReturn<T, U, TName>;
 
+type AllAvailableKeys<T> = T extends Record<any, any> ? keyof T : never;
+
 export interface DataGenerator<T> extends Iterable<T> {
     /** @internal */
     readonly brand: unique symbol;
@@ -238,10 +240,12 @@ export interface DataGenerator<T> extends Iterable<T> {
      * Uses {@link transformer.withoutS} on structs and {@link transformer.withoutT} on tuples.
      * Cannot be used on non-struct and non-tuple (i.e. primitive) values.
      */
-    without: T extends unknown[]
+    without: [T] extends [unknown[]]
         ? <TIndex extends number>(index: TIndex) => DataGenerator<WithoutT<TIndex, T>>
-        : T extends Record<any, any>
-        ? <TName extends keyof T>(name: TName) => DataGenerator<{ [K in keyof T as K extends TName ? never : K]: T[K] }>
+        : [T] extends [Record<any, any>]
+        ? <TName extends AllAvailableKeys<T>>(
+              name: TName
+          ) => DataGenerator<{ [K in keyof T as K extends TName ? never : K]: T[K] }>
         : never;
 
     /**

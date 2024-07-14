@@ -1,8 +1,11 @@
-import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
+import { O } from 'ts-toolbelt';
+import { DataGenerator } from '../data-generator.interface';
 import { enumValueGenerator } from '../library/enum';
-import { mergeStructs, struct } from './struct';
+import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
+import { WithoutT } from '../transformer/with';
 import { constant } from './constant';
 import { either } from './either';
+import { mergeStructs, struct } from './struct';
 
 enum EyeColor {
     Blue = 'blue',
