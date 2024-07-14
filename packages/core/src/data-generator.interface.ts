@@ -1,28 +1,26 @@
 import { Flat } from './flat.type';
 import { IterableResult, PFst, UFn } from './pipe.type';
-import { WithoutT } from './transformer/with';
+import { AllAvailableKeys, WithoutT } from './transformer/with';
 
-export type BindArgs<T, U, TName extends string> = T extends unknown[]
+export type BindArgs<T, U, TName extends string> = [T] extends [unknown[]]
     ? [(f: T) => Iterable<U>]
-    : T extends Record<any, any>
+    : [T] extends [Record<any, any>]
     ? [name: Exclude<TName, keyof T>, f: (a: T) => Iterable<U>]
     : never;
 
-export type BindReturn<T, U, TName extends string> = T extends unknown[]
+export type BindReturn<T, U, TName extends string> = [T] extends [unknown[]]
     ? DataGenerator<[...T, U]>
-    : T extends Record<any, any>
-    ? DataGenerator<{ [K in keyof T | TName]: K extends keyof T ? T[K] : U }>
+    : [T] extends [Record<any, any>]
+    ? DataGenerator<T & { [_ in TName]: U }>
     : never;
 
-export type ApplyArgs<T, U, TName extends string> = T extends unknown[]
+export type ApplyArgs<T, U, TName extends string> = [T] extends [unknown[]]
     ? [gen: Iterable<U>]
-    : T extends Record<any, any>
+    : [T] extends [Record<any, any>]
     ? [name: Exclude<TName, keyof T>, gen: Iterable<U>]
     : never;
 
 export type ApplyReturn<T, U, TName extends string> = BindReturn<T, U, TName>;
-
-type AllAvailableKeys<T> = T extends Record<any, any> ? keyof T : never;
 
 export interface DataGenerator<T> extends Iterable<T> {
     /** @internal */

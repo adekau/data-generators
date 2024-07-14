@@ -2,10 +2,12 @@ import { O } from 'ts-toolbelt';
 import { DataGenerator } from '../data-generator.interface';
 import { enumValueGenerator } from '../library/enum';
 import { charGenerator, integerGenerator, numberGenerator, stringGenerator } from '../library/primitives';
-import { WithoutT } from '../transformer/with';
+import { WithoutT, withoutS } from '../transformer/with';
 import { constant } from './constant';
 import { either } from './either';
 import { mergeStructs, struct } from './struct';
+import { bindS } from '../transformer/bind';
+import { apS } from '../transformer/apply';
 
 enum EyeColor {
     Blue = 'blue',

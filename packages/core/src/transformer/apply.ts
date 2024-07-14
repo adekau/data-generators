@@ -37,15 +37,10 @@ export function ap<T, U>(projectGenerator: Iterable<(v: T) => U>) {
  */
 export const apS =
     <TName extends string, A extends object, T>(name: Exclude<TName, keyof A>, dgT: Iterable<T>) =>
-    (dgA: () => Iterable<A>): (() => Iterable<{ [K in keyof A | TName]: K extends keyof A ? A[K] : T }>) => {
+    (dgA: () => Iterable<A>): (() => Iterable<A & { [_ in TName]: T }>) => {
         return pipe(
             _struct({ out: dgA(), append: dgT }),
-            map(
-                ({ out, append }) =>
-                    Object.assign({}, out, { [name]: append }) as {
-                        [K in keyof A | TName]: K extends keyof A ? A[K] : T;
-                    }
-            )
+            map(({ out, append }) => Object.assign({}, out, { [name]: append }) as A & { [_ in TName]: T })
         );
     };
 

@@ -56,6 +56,8 @@ export const withT =
         );
     };
 
+export type AllAvailableKeys<T> = T extends Record<any, any> ? keyof T : never;
+
 /**
  * Omits a property of an object Data Generator from the output.
  *
@@ -74,7 +76,7 @@ export const withT =
  * ```
  */
 export const withoutS =
-    <TName extends keyof A, A extends Record<any, any>>(name: TName) =>
+    <TName extends AllAvailableKeys<A>, A extends Record<any, any>>(name: TName) =>
     (gen: () => Iterable<A>): (() => Iterable<{ [K in keyof A as K extends TName ? never : K]: A[K] }>) => {
         return pipe(
             () => gen(),
