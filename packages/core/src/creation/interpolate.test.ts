@@ -1,4 +1,5 @@
 import { enumValueGenerator } from '../library/enum';
+import { incrementGenerator } from '../library/increment';
 import { integerGenerator } from '../library/primitives';
 import { interpolate } from './interpolate';
 
@@ -26,5 +27,12 @@ describe('Data Generators: Interpolate', () => {
         const check = /^value[1-3]-member[1-4]:\d{3}/;
 
         expect(results.every((result) => check.test(result))).toBe(true);
+    });
+
+    it('should interpolate incr with many properly', () => {
+        const gen = interpolate`test-id-${incrementGenerator(1)}`.many(3);
+        const results = gen.create();
+
+        expect(results).toEqual(['test-id-1', 'test-id-2', 'test-id-3']);
     });
 });

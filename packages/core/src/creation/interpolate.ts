@@ -1,6 +1,6 @@
 import { DataGenerator } from '../data-generator.interface';
 import { StringLike } from '../string-like.type';
-import { infinite } from './infinite';
+import { tuple } from './tuple';
 
 /**
  * Tag function that generates an interpolated string using other data generators.
@@ -26,9 +26,9 @@ export function interpolate<TGens extends DataGenerator<StringLike>[]>(
     strings: TemplateStringsArray,
     ...expressions: TGens
 ): DataGenerator<string> {
-    return infinite(() => {
+    return tuple(...expressions).map((resolvedExpressions) => {
         return strings.reduce((acc, cur, i) => {
-            return acc + cur + (expressions[i]?.create().toString() ?? '');
+            return acc + cur + ((resolvedExpressions as any)[i] ?? '');
         }, '');
     });
 }
