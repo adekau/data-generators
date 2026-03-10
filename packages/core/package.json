@@ -1,10 +1,14 @@
 {
     "name": "@data-generators/core",
-    "version": "0.2.10",
+    "version": "0.3.0",
     "type": "module",
+    "engines": {
+        "node": ">=24.0.0"
+    },
     "scripts": {
         "build": "tsup",
         "test": "vitest run",
+        "test:release": "tsup && vitest run --config vitest.config.release.ts",
         "typecheck": "tsc --noEmit"
     },
     "main": "./dist/index.cjs",
@@ -33,6 +37,6 @@
         "typescript": "^5.9.3",
         "tsup": "^8.5.1",
         "vitest": "^4.0.18",
-        "@types/node": "^22.0.0"
+        "@types/node": "^24.0.0"
     }
 }

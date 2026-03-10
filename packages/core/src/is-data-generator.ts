@@ -10,6 +10,7 @@ import { DataGenerator } from './data-generator.interface';
  */
 export function isDataGenerator(v: unknown): v is DataGenerator<unknown> {
     return (
+        v != null &&
         Object.prototype.hasOwnProperty.call(v, 'brand') &&
         (v as DataGenerator<unknown>).brand === Symbol.for(getBrand())
     );

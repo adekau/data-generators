@@ -2,9 +2,13 @@
     "name": "data-generators",
     "version": "0.0.0",
     "private": true,
+    "engines": {
+        "node": ">=24.0.0"
+    },
     "scripts": {
         "build": "pnpm -r build",
         "test": "pnpm -r test",
+        "test:release": "pnpm -r test:release",
         "typecheck": "pnpm -r typecheck",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
