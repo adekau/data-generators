@@ -1,11 +1,21 @@
 {
     "extends": "./node_modules/@rushstack/heft-node-rig/profiles/default/tsconfig-base.json",
-    "exclude": ["node_modules", "lib", "src/**/*.test.ts", "src/testlib/**/*"],
+    "exclude": [
+        "node_modules",
+        "lib",
+        "src/**/*.test.ts",
+        "src/testlib/**/*"
+    ],
     "compilerOptions": {
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "module": "ESNext",
-        "types": ["heft-jest"],
-        "lib": ["ES2021", "DOM"]
+        "types": [
+            "jest"
+        ],
+        "lib": [
+            "ES2021",
+            "DOM"
+        ]
     }
 }

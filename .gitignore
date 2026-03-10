@@ -63,16 +63,20 @@ jspm_packages/
 .idea/
 *.iml
 
-# Rush temporary files
-common/deploy/
-common/temp/
-common/autoinstallers/*/.npmrc
-**/.rush/temp/
-
-# Heft temporary files
-.heft
-
-.DS_STORE
-semble-ts-*.tgz
+# Build output
+dist/
+packages/**/dist
 packages/**/lib
 packages/**/lib-commonjs
+
+# pnpm
+.pnpm-store/
+
+# Rush/heft legacy temp (local only)
+.rush/
+temp/
+packages/**/.rush/
+packages/**/temp/
+
+# Editor
+.vscode/

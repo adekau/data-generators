@@ -79,7 +79,7 @@ describe('Data Generators: Data Generator', () => {
             numberGenerator().with('toString', functionGenerator(stringGenerator()));
         }
 
-        expect(testCreation).toThrowError('DataGenerator must be either a struct or tuple generator.');
+        expect(testCreation).toThrow('DataGenerator must be either a struct or tuple generator.');
     });
 
     it('should error calling without on non-tuple/struct', () => {
@@ -87,7 +87,7 @@ describe('Data Generators: Data Generator', () => {
             (numberGenerator() as any).without('toString');
         }
 
-        expect(testCreation).toThrowError('DataGenerator must be either a struct or tuple generator.');
+        expect(testCreation).toThrow('DataGenerator must be either a struct or tuple generator.');
     });
 
     it('should bind on a tuple', () => {
@@ -117,7 +117,7 @@ describe('Data Generators: Data Generator', () => {
             (numberGenerator() as any).bind('a', (n: number) => constant(n + 1));
         }
 
-        expect(testCreation).toThrowError('DataGenerator must be either a struct or tuple generator.');
+        expect(testCreation).toThrow('DataGenerator must be either a struct or tuple generator.');
     });
 
     it('should bind to a struct', () => {

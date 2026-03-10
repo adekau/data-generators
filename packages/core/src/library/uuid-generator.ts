@@ -1,4 +1,4 @@
-import { v4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import { createGenerator } from '../creation/data-generator';
 
 /**
@@ -8,6 +8,6 @@ import { createGenerator } from '../creation/data-generator';
  */
 export const uuidGenerator = createGenerator(function* () {
     while (true) {
-        yield v4();
+        yield randomUUID();
     }
 });
